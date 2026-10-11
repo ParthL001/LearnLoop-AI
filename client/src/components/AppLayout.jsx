@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Outlet, useLocation, Link } from 'react-router-dom'
 import Sidebar, { navItems } from './Sidebar'
-import Navbar from './Navbar'
+import Navbar from './navbar'
 
 export default function AppLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
