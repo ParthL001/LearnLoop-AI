@@ -2,9 +2,64 @@
 import json
 from pathlib import Path
 
-from rule_detector import detect_misconception
+try:
+    from .rule_detector import detect_misconception
+except ImportError:
+    from rule_detector import detect_misconception
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "dataset"
+
+FEEDBACK = {
+    "zero_vs_one_based_indexing": {
+        "feedback": (
+            "Python lists use zero-based indexing. "
+            "Index 0 refers to the first element, so items[0] is 'a'."
+        ),
+        "followup_goal": (
+            "Practice accessing the first, second, and third elements "
+            "using indexes 0, 1, and 2."
+        ),
+    },
+    "length_vs_last_index_confusion": {
+        "feedback": (
+            "len(list) returns the number of elements, not the last index. "
+            "For a list of 3 elements, len(list) is 3 and the last index is 2."
+        ),
+        "followup_goal": "Practice finding a list's length and last valid index.",
+    },
+    "exclusive_bound_misunderstanding": {
+        "feedback": (
+            "Python range(start, stop) includes start but excludes stop."
+        ),
+        "followup_goal": "Try another range() example and explain its output.",
+    },
+    "start_value_misunderstanding": {
+        "feedback": (
+            "When range() receives one argument, it starts at 0 and stops "
+            "before that argument."
+        ),
+        "followup_goal": "Predict the output of list(range(4)).",
+    },
+    "none": {
+        "feedback": "Correct! Your answer matches the expected output.",
+        "followup_goal": "Try another Python exercise.",
+    },
+    "uncertain_needs_clarification": {
+        "feedback": (
+            "I couldn't confidently identify the exact misconception. "
+            "Please explain your reasoning in more detail."
+        ),
+        "followup_goal": "Explain your steps, then try a similar exercise.",
+    },
+}
+
+DEFAULT_FEEDBACK = {
+    "feedback": (
+        "Your answer differs from the expected result. "
+        "Review the relevant Python concept and try again."
+    ),
+    "followup_goal": "Try a similar exercise and explain each step.",
+}
 
 
 def predict(row: dict) -> dict:
@@ -33,6 +88,18 @@ def predict(row: dict) -> dict:
         label == "uncertain_needs_clarification"
     )
 
+    generated = FEEDBACK.get(label, DEFAULT_FEEDBACK)
+
+    feedback = (
+        row.get("expected_feedback")
+        or generated["feedback"]
+    )
+
+    followup_goal = (
+        row.get("recommended_followup")
+        or generated["followup_goal"]
+    )
+
     return {
         "example_id": row.get("example_id"),
         "is_correct": is_correct,
@@ -47,8 +114,8 @@ def predict(row: dict) -> dict:
             "Can you explain how you arrived at your answer?"
             if needs_clarification else None
         ),
-        "feedback": row.get("expected_feedback", ""),
-        "followup_goal": row.get("recommended_followup", ""),
+        "feedback": feedback,
+        "followup_goal": followup_goal,
     }
 
 

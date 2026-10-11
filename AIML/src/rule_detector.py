@@ -258,6 +258,73 @@ def _has_comparison_misconception(question, answer, reasoning):
     return False
 
 
+def _has_list_indexing_misconception(
+    question, answer, reasoning, correct_answer=None
+):
+    q = (question or "").lower()
+    a = (answer or "").strip()
+    r = (reasoning or "").lower()
+    text = f"{q} {a.lower()} {r}"
+
+    # Detect confusion between list length and the last valid index.
+    if "len(" in q:
+        expected = str(correct_answer or "").strip()
+        if expected.isdigit() and a.isdigit():
+            if int(a) == int(expected) - 1:
+                return "length_vs_last_index_confusion"
+
+    # Detect list indexing such as items[0] or nums[1].
+    match = re.search(
+        r"\b([a-z_]\w*)\s*=\s*(\[[^\]]*\]).*?"
+        r"\b\1\s*\[\s*(\d+)\s*\]",
+        q,
+    )
+
+    if not match:
+        return None
+
+    try:
+        values = ast.literal_eval(match.group(2))
+        index = int(match.group(3))
+    except (ValueError, SyntaxError, TypeError):
+        return None
+
+    if not isinstance(values, list):
+        return None
+
+    if index < 0 or index >= len(values):
+        return None
+
+    # Explicit evidence that the student thinks indexing starts at 1.
+    if _contains(
+        text,
+        [
+            "indexing starts at 1",
+            "indexing starts at one",
+            "lists start at 1",
+            "lists start at one",
+            "first index is 1",
+            "first index is one",
+            "starts counting from 1",
+            "starts counting from one",
+            "index 1 is the first element",
+        ],
+    ):
+        return "zero_vs_one_based_indexing"
+
+    # An answer matching the next list element suggests an off-by-one error.
+    if index + 1 < len(values):
+        next_value = values[index + 1]
+        try:
+            student_value = ast.literal_eval(a)
+        except (ValueError, SyntaxError, TypeError):
+            student_value = a.strip("'\"")
+
+        if student_value == next_value:
+            return "zero_vs_one_based_indexing"
+
+    return None
+
 def detect_misconception(
     question,
     student_answer,
@@ -268,6 +335,16 @@ def detect_misconception(
     a = (student_answer or "").lower()
     r = (student_reasoning or "").lower()
     text = f"{q} {a} {r}"
+
+        # List indexing and length-versus-index confusion.
+    indexing_label = _has_list_indexing_misconception(
+        question,
+        student_answer,
+        student_reasoning,
+        correct_answer,
+    )
+    if indexing_label:
+        return indexing_label
 
     # 1. Assignment used instead of comparison in an if condition.
     if (
