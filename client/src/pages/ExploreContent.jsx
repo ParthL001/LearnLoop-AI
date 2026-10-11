@@ -9,6 +9,7 @@ import {
   Sparkles,
   BookOpen,
   Layout,
+  ChevronRight,
 } from 'lucide-react'
 
 const FALLBACK_SUBJECTS = [
@@ -68,20 +69,17 @@ export default function ExploreContent() {
   }, [])
 
   return (
-    <div className="space-y-6">
+    <div className="reveal-stagger space-y-6">
       {/* Page Header */}
-      <div className="bg-[#FFFFFF] border border-[#D8D8CF] rounded-lg p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#3D5F58]"></span>
-            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#3D5F58]">
-              Curriculum Catalog
-            </span>
+          <div className="eyebrow mb-1">
+            Curriculum Catalog
           </div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-[#231F20]">
+          <h1 className="font-heading text-lg sm:text-xl font-bold tracking-tight text-[var(--text-main)]">
             Explore Content
           </h1>
-          <p className="text-sm text-[#4B5563] mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-1 max-w-xl">
             Choose a programming language and concept topic. Lessons are generated on demand with clear mental models, code traces, and interactive checks.
           </p>
         </div>
@@ -89,34 +87,31 @@ export default function ExploreContent() {
         <div className="flex flex-wrap items-center gap-2 shrink-0">
           <Link
             to="/python-practice"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#F2F2EB] text-[#231F20] font-mono text-xs font-bold rounded-md border border-[#D8D8CF] hover:bg-[#3D5F58] hover:text-white transition"
+            className="btn btn-secondary btn-sm"
           >
-            <Code2 size={13} />
+            <Code2 size={14} className="text-[var(--accent-primary)]" />
             <span>Python Practice</span>
           </Link>
           <Link
             to="/css-practice"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#F2F2EB] text-[#231F20] font-mono text-xs font-bold rounded-md border border-[#D8D8CF] hover:bg-[#3D5F58] hover:text-white transition"
+            className="btn btn-secondary btn-sm"
           >
-            <Layout size={13} />
+            <Layout size={14} className="text-[var(--accent-primary)]" />
             <span>CSS Practice</span>
           </Link>
         </div>
       </div>
 
       {/* Language Track Selector Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#D8D8CF] pb-2">
+      <div className="tabs">
         {subjects.map((sub) => {
           const isSelected = selectedSubject === sub.id
           return (
             <button
               key={sub.id}
               onClick={() => setSelectedSubject(sub.id)}
-              className={`px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider rounded-md transition ${
-                isSelected
-                  ? 'bg-[#3D5F58] text-white shadow-xs'
-                  : 'bg-[#FFFFFF] text-[#231F20] border border-[#D8D8CF] hover:bg-[#F2F2EB]'
-              }`}
+              aria-selected={isSelected}
+              className="tab font-mono text-xs uppercase tracking-wider font-bold"
             >
               {sub.name} Track
             </button>
@@ -134,41 +129,39 @@ export default function ExploreContent() {
           return (
             <div
               key={subject.id}
-              className={`flex flex-col justify-between rounded-lg border bg-[#FFFFFF] p-6 transition shadow-xs ${
-                isSelected
-                  ? 'border-[#3D5F58] ring-1 ring-[#3D5F58]'
-                  : 'border-[#D8D8CF] hover:border-[#3D5F58]'
+              className={`card card-interactive flex flex-col justify-between ${
+                isSelected ? 'ring-2 ring-[var(--accent-primary)]' : ''
               }`}
             >
               <div className="space-y-4">
                 {/* Header */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-md border border-[#D8D8CF] bg-[#F2F2EB] text-[#3D5F58]">
+                    <div className="icon-tile">
                       <Icon size={22} />
                     </div>
                     <div>
-                      <h2 className="font-heading text-xl font-bold text-[#231F20] tracking-tight">
+                      <h2 className="font-heading text-xl font-bold text-[var(--text-main)] tracking-tight">
                         {subject.name}
                       </h2>
-                      <span className="font-mono text-xs text-[#6B7280]">
+                      <span className="font-mono text-xs text-[var(--text-muted)]">
                         {subject.topics?.length || 5} Core Topics Available
                       </span>
                     </div>
                   </div>
-                  <span className="font-mono text-xs font-bold text-[#3D5F58] bg-[#F2F2EB] px-2 py-0.5 rounded border border-[#D8D8CF]">
+                  <span className="badge badge-ochre">
                     {subject.badge || (isPython ? 'INTERPRETED' : 'COMPILED')}
                   </span>
                 </div>
 
                 {/* Description */}
-                <p className="text-xs text-[#4B5563] leading-relaxed">
+                <p className="text-xs text-[var(--text-body)] leading-relaxed">
                   {subject.description}
                 </p>
 
                 {/* Topics Preview */}
                 <div className="space-y-2 pt-2">
-                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#6B7280]">
+                  <span className="eyebrow text-[10px]">
                     Available Concepts
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -176,17 +169,17 @@ export default function ExploreContent() {
                       <Link
                         key={topic.id}
                         to={`/lessons/${subject.id}/${topic.id}`}
-                        className="p-2.5 rounded-md border border-[#D8D8CF] bg-[#FAF9F5] hover:bg-[#FFFFFF] hover:border-[#3D5F58] transition group flex items-center justify-between"
+                        className="p-3 rounded-md border border-[var(--border-soft)] bg-[var(--bg-surface-elevated)] hover:bg-[var(--bg-surface)] hover:border-[var(--accent-primary)] hover:shadow-card transition flex items-center justify-between group"
                       >
                         <div>
-                          <div className="font-heading text-sm font-bold text-[#231F20] group-hover:text-[#3D5F58] transition-colors">
+                          <div className="font-heading text-sm font-bold text-[var(--text-main)] group-hover:text-[var(--accent-primary)] transition-colors">
                             {topic.title}
                           </div>
-                          <div className="font-mono text-[10px] text-[#6B7280] line-clamp-1">
+                          <div className="font-mono text-[10px] text-[var(--text-muted)] line-clamp-1">
                             {topic.description}
                           </div>
                         </div>
-                        <ArrowRight size={13} className="text-[#6B7280] group-hover:text-[#3D5F58] group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
+                        <ArrowRight size={13} className="text-[var(--text-muted)] group-hover:text-[var(--accent-primary)] group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
                       </Link>
                     ))}
                   </div>
@@ -194,13 +187,13 @@ export default function ExploreContent() {
               </div>
 
               {/* Action */}
-              <div className="pt-6 mt-6 border-t border-[#D8D8CF] flex items-center justify-between">
-                <span className="font-mono text-[11px] text-[#6B7280]">
-                  Dynamic Ollama Qwen3:4b
+              <div className="pt-6 mt-6 border-t border-[var(--border-soft)] flex items-center justify-between">
+                <span className="font-mono text-[11px] text-[var(--text-muted)]">
+                  Dynamic Qwen3:4b Engine
                 </span>
                 <Link
                   to={`/lessons/${subject.id}`}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#3D5F58] text-white font-sans text-xs font-bold rounded-md hover:bg-[#2E4742] transition shadow-xs"
+                  className="btn btn-primary btn-sm"
                 >
                   <span>Start Track</span>
                   <ArrowRight size={13} />
@@ -211,17 +204,17 @@ export default function ExploreContent() {
         })}
       </div>
 
-      {/* Dynamic Engine Callout */}
-      <div className="rounded-lg border border-[#D8D8CF] bg-[#FFFFFF] p-5 flex items-start gap-3 shadow-xs">
-        <div className="p-2 bg-[#F2F2EB] text-[#3D5F58] rounded-md border border-[#D8D8CF] shrink-0">
-          <Layers size={18} />
+      {/* Dynamic Engine Callout (.alert-info or .card) */}
+      <div className="card flex items-start gap-3">
+        <div className="icon-tile shrink-0">
+          <Layers size={20} />
         </div>
         <div className="text-xs space-y-1">
-          <p className="font-heading text-sm font-bold text-[#231F20]">
+          <p className="font-heading text-base font-bold text-[var(--text-main)]">
             Dynamic Adaptive Generation via Local Qwen3:4b
           </p>
-          <p className="text-[#4B5563] leading-relaxed font-sans">
-            Lessons are generated dynamically by your local Ollama backend. Python lessons contain verified Python code walkthroughs and idioms, while C++ lessons feature statically typed syntax, header inclusions, and STL containers.
+          <p className="text-[var(--text-muted)] leading-relaxed font-sans">
+            Lessons are synthesized dynamically by your local Ollama backend. Python lessons contain verified Python idioms and mental model diagnostics, while C++ lessons feature statically typed syntax, header inclusions, and STL containers.
           </p>
         </div>
       </div>

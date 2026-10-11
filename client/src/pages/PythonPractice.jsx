@@ -14,6 +14,8 @@ import {
   Sparkles,
   BookOpen,
   Terminal,
+  Target,
+  BrainCircuit,
 } from 'lucide-react'
 
 export default function PythonPractice() {

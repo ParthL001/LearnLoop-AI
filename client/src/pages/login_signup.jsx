@@ -53,37 +53,36 @@ export default function LoginSignup({ onLoginSuccess }) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F2F2EB] p-4 sm:p-6 text-[#231F20] font-sans">
-      <div className="w-full max-w-md">
+    <div className="flex min-h-screen items-center justify-center bg-[var(--bg-app)] p-4 sm:p-6 text-[var(--text-main)] font-sans">
+      <div className="w-full max-w-md space-y-6">
         {/* Brand Header */}
-        <div className="mb-6 text-center">
-          <Logo className="mx-auto mb-3 h-12 w-auto" />
-          <h1 className="font-heading text-2xl font-extrabold uppercase tracking-tight text-[#231F20]">
+        <div className="text-center space-y-1.5">
+          <div className="inline-flex p-2.5 rounded-xl bg-white border border-[var(--border-color)] shadow-xs mb-1">
+            <Logo className="h-10 w-auto" />
+          </div>
+          <h1 className="font-heading text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-main)]">
             LearnLoop AI
           </h1>
-          <p className="mt-1 font-mono text-xs text-[#3D5F58] uppercase font-bold tracking-wider">
+          <p className="font-mono text-xs text-[var(--accent-primary)] font-bold uppercase tracking-wider">
             Adaptive Programming & Misconception Engine
           </p>
         </div>
 
         {/* Auth Card */}
-        <div className="rounded-lg border border-[#D8D8CF] bg-[#FFFFFF] p-6 sm:p-8 shadow-xs">
-          <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#D8D8CF]">
-            <h2 className="font-heading text-xl font-bold text-[#231F20]">
+        <div className="card shadow-card p-6 sm:p-8 space-y-5">
+          <div className="flex items-center justify-between pb-4 border-b border-[var(--border-color)]">
+            <h2 className="font-heading text-xl font-bold text-[var(--text-main)]">
               {mode === 'login' ? 'Sign In' : 'Create Account'}
             </h2>
-            <div className="flex rounded-md border border-[#D8D8CF] p-0.5 bg-[#F2F2EB]">
+            <div className="tabs">
               <button
                 type="button"
                 onClick={() => {
                   setMode('login')
                   setError('')
                 }}
-                className={`px-3 py-1 text-xs font-mono font-bold rounded transition ${
-                  mode === 'login'
-                    ? 'bg-[#3D5F58] text-white shadow-xs'
-                    : 'text-[#4B5563] hover:text-[#231F20]'
-                }`}
+                aria-selected={mode === 'login'}
+                className="tab font-mono text-xs font-bold"
               >
                 Sign In
               </button>
@@ -93,25 +92,22 @@ export default function LoginSignup({ onLoginSuccess }) {
                   setMode('signup')
                   setError('')
                 }}
-                className={`px-3 py-1 text-xs font-mono font-bold rounded transition ${
-                  mode === 'signup'
-                    ? 'bg-[#3D5F58] text-white shadow-xs'
-                    : 'text-[#4B5563] hover:text-[#231F20]'
-                }`}
+                aria-selected={mode === 'signup'}
+                className="tab font-mono text-xs font-bold"
               >
                 Sign Up
               </button>
             </div>
           </div>
 
-          <p className="text-xs text-[#6B7280] mb-5">
+          <p className="text-xs text-[var(--text-muted)]">
             {mode === 'login'
               ? 'Enter your credentials to access your adaptive learning dashboard.'
               : 'Create an account to begin diagnostic concept analysis.'}
           </p>
 
           {error && (
-            <div className="mb-4 rounded-md border border-[#FECDD3] bg-[#FFF1F2] p-3 text-xs text-[#9F1239]">
+            <div className="alert alert-danger text-xs p-3">
               {error}
             </div>
           )}
@@ -119,7 +115,7 @@ export default function LoginSignup({ onLoginSuccess }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'signup' && (
               <div>
-                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#3D5F58] mb-1">
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
                   Full Name
                 </label>
                 <input
@@ -127,14 +123,14 @@ export default function LoginSignup({ onLoginSuccess }) {
                   placeholder="Alex Rivera"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-[#FAF9F5] text-[#231F20] border border-[#D8D8CF] rounded-md px-3.5 py-2.5 text-xs sm:text-sm focus:bg-[#FFFFFF] focus:outline-none focus:ring-1 focus:ring-[#3D5F58] transition"
+                  className="input"
                   required
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#3D5F58] mb-1">
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
                 Email Address
               </label>
               <input
@@ -142,13 +138,13 @@ export default function LoginSignup({ onLoginSuccess }) {
                 placeholder="student@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-[#FAF9F5] text-[#231F20] border border-[#D8D8CF] rounded-md px-3.5 py-2.5 text-xs sm:text-sm focus:bg-[#FFFFFF] focus:outline-none focus:ring-1 focus:ring-[#3D5F58] transition"
+                className="input"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#3D5F58] mb-1">
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
                 Password
               </label>
               <input
@@ -156,14 +152,14 @@ export default function LoginSignup({ onLoginSuccess }) {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#FAF9F5] text-[#231F20] border border-[#D8D8CF] rounded-md px-3.5 py-2.5 text-xs sm:text-sm focus:bg-[#FFFFFF] focus:outline-none focus:ring-1 focus:ring-[#3D5F58] transition"
+                className="input"
                 required
               />
             </div>
 
             {mode === 'signup' && (
               <div>
-                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#3D5F58] mb-1">
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
                   Confirm Password
                 </label>
                 <input
@@ -171,24 +167,24 @@ export default function LoginSignup({ onLoginSuccess }) {
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full bg-[#FAF9F5] text-[#231F20] border border-[#D8D8CF] rounded-md px-3.5 py-2.5 text-xs sm:text-sm focus:bg-[#FFFFFF] focus:outline-none focus:ring-1 focus:ring-[#3D5F58] transition"
+                  className="input"
                   required
                 />
               </div>
             )}
 
-            <div className="pt-2 space-y-2">
+            <div className="pt-2 space-y-2.5">
               <button
                 type="submit"
-                className="w-full inline-flex items-center justify-center px-4 py-2.5 bg-[#3D5F58] text-white font-sans text-xs sm:text-sm font-bold rounded-md hover:bg-[#2E4742] transition shadow-xs"
+                className="btn btn-primary w-full"
               >
-                {mode === 'login' ? 'Sign In' : 'Create Account'}
+                {mode === 'login' ? 'Sign In to Workspace' : 'Create Free Account'}
               </button>
 
               <button
                 type="button"
                 onClick={handleDemoLogin}
-                className="w-full inline-flex items-center justify-center px-4 py-2.5 border border-[#D8D8CF] bg-[#FFFFFF] text-[#231F20] font-mono text-xs font-bold rounded-md hover:bg-[#F2F2EB] transition"
+                className="btn btn-secondary w-full"
               >
                 Continue as Demo Student
               </button>
@@ -196,7 +192,7 @@ export default function LoginSignup({ onLoginSuccess }) {
           </form>
         </div>
 
-        <p className="mt-4 text-center font-mono text-[11px] text-[#6B7280]">
+        <p className="text-center font-mono text-[11px] text-[var(--text-muted)]">
           Diagnostic items are calibrated to detect underlying reasoning patterns, not rank students.
         </p>
       </div>

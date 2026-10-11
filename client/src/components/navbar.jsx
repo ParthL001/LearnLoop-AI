@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  Menu, Home, LayoutDashboard, Info, Mail, LogOut,
-  Search, BookOpen, Target, Sparkles, Compass, BarChart2
+  Menu, LogOut, Search, BookOpen,
+  Sparkles, Compass, Code2, Layout
 } from 'lucide-react'
 import {
   CommandDialog,
@@ -13,16 +13,13 @@ import {
   CommandItem,
   CommandShortcut,
 } from '@/components/ui/command'
-import { useApp } from '@/context/AppContext'
 import Logo from './Logo'
 
 export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout }) {
   const [openCommand, setOpenCommand] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate()
-  const { topics } = useApp()
 
-  // Listen for Ctrl+K or Cmd+K
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
@@ -46,89 +43,90 @@ export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout 
     navigate(path)
   }
 
-  // Filter topics based on search
-  const filteredTopics = (topics || []).filter(
-    (t) =>
-      t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.subject?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const displayName = user?.name || user?.email?.split('@')[0] || 'Learner'
+  const initials = displayName
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase()
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-15 items-center justify-between border-b border-[#D8D8CF] bg-[#FFFFFF] px-4 sm:px-6 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-        {/* Left side: mobile toggle & current title */}
-        <div className="flex items-center gap-3">
+      <header className="topbar">
+        {/* Left Section: Mobile Drawer Toggle & Page Context */}
+        <div className="flex items-center gap-2.5 shrink-0 min-w-0">
           <button
             type="button"
             onClick={onOpenMobileMenu}
             aria-label="Toggle navigation menu"
-            className="rounded-[4px] border border-[#D8D8CF] p-1.5 text-[#231F20] hover:bg-[#F2F2EB] lg:hidden transition-colors"
+            className="rounded-lg border border-[var(--border-color)] p-2 text-[var(--text-main)] hover:bg-[var(--bg-surface-sunken)] lg:hidden transition shrink-0"
           >
-            <Menu size={16} />
+            <Menu size={18} />
           </button>
 
-          <div className="flex items-center gap-2.5">
-            <Logo className="h-5 w-auto lg:hidden shrink-0" />
-            <h1 className="font-heading text-lg font-bold text-[#231F20] tracking-tight">
-              {currentTitle || 'Dashboard'}
-            </h1>
-          </div>
+          <span className="font-heading text-sm sm:text-base font-bold text-[var(--text-main)] tracking-tight whitespace-nowrap">
+            {currentTitle || 'Dashboard'}
+          </span>
         </div>
 
-        {/* Center: Search Bar */}
-        <div className="flex-1 max-w-xs sm:max-w-sm mx-3">
+        {/* Center Section: Global Command Search */}
+        <div className="flex-1 max-w-sm sm:max-w-md mx-3 sm:mx-6">
           <button
             type="button"
             onClick={() => setOpenCommand(true)}
-            className="w-full flex items-center justify-between px-3 py-1.5 text-xs text-[#6B6864] bg-[#F2F2EB] border border-[#D8D8CF] rounded-[6px] hover:bg-[#FFFFFF] hover:text-[#231F20] hover:border-[#3D5F58] transition-colors"
+            className="search w-full cursor-pointer hover:border-[var(--accent-primary)] transition"
           >
-            <div className="flex items-center gap-2 min-w-0">
-              <Search size={14} className="shrink-0 text-[#3D5F58]" />
-              <span className="truncate">Search concepts, practice, lessons...</span>
-            </div>
-            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 font-mono text-[9px] font-semibold text-[#231F20] bg-[#E5E5DC] border border-[#D8D8CF] rounded-[3px] shrink-0 ml-2">
-              Ctrl K
-            </kbd>
+            <Search size={15} className="text-[var(--accent-primary)] shrink-0" />
+            <span className="text-xs text-[var(--text-muted)] truncate flex-1 text-left font-sans">
+              Search topics, code exercises, concepts...
+            </span>
+            <kbd className="kbd">Ctrl K</kbd>
           </button>
         </div>
 
-        {/* Right: Quick actions and learner status */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <nav className="flex items-center gap-1 mr-1">
-            <Link
-              to="/explore"
-              className="px-2.5 py-1 text-xs font-semibold text-[#231F20] hover:text-[#3D5F58] hover:bg-[#F2F2EB] rounded-[4px] transition-colors hidden md:inline-flex items-center gap-1.5"
-            >
-              <Compass size={13} className="text-[#3D5F58]" />
-              <span>Explore</span>
-            </Link>
+        {/* Right Section: Quick Navigation & Student Profile */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            to="/explore"
+            className="btn btn-secondary btn-sm hidden md:inline-flex"
+          >
+            <Compass size={14} className="text-[var(--accent-primary)]" />
+            <span>Explore</span>
+          </Link>
 
-            <Link
-              to="/tutor"
-              className="px-2.5 py-1 text-xs font-semibold text-[#FFFFFF] bg-[#3D5F58] border border-[#3D5F58] rounded-[4px] hover:bg-[#2E4742] transition-colors inline-flex items-center gap-1.5"
-            >
-              <Sparkles size={13} className="text-[#F5B726]" />
-              <span>AI Tutor</span>
-            </Link>
-          </nav>
+          <Link
+            to="/tutor"
+            className="btn btn-primary btn-sm inline-flex shadow-xs"
+          >
+            <Sparkles size={13} className="text-[#FCD34D]" />
+            <span className="hidden sm:inline">AI Tutor</span>
+          </Link>
 
-          {/* User badge & logout */}
-          <div className="flex items-center gap-2 pl-2 border-l border-[#D8D8CF]">
-            {user && (
-              <span className="text-xs text-[#231F20] hidden xl:inline-block font-semibold">
-                {user.name || user.email?.split('@')[0] || 'Learner'}
-              </span>
-            )}
+          {/* User Profile Chip */}
+          <div className="flex items-center gap-2.5 pl-3 border-l border-[var(--border-color)]">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-[var(--accent-primary)] text-white text-xs font-bold flex items-center justify-center font-mono shadow-xs shrink-0">
+                {initials}
+              </div>
+              <div className="hidden xl:flex flex-col text-left">
+                <span className="text-xs font-bold text-[var(--text-main)] leading-tight">
+                  {displayName}
+                </span>
+                <span className="font-mono text-[10px] text-[var(--text-muted)] font-semibold uppercase tracking-wider">
+                  Student
+                </span>
+              </div>
+            </div>
 
             <button
               type="button"
               onClick={handleLogout}
               title="Sign Out"
               aria-label="Sign Out"
-              className="p-1.5 rounded-[4px] border border-[#D8D8CF] text-[#6B6864] hover:text-[#E97B77] hover:border-[#E97B77] hover:bg-[#FEF2F2] transition-colors"
+              className="p-1.5 rounded-md border border-[var(--border-color)] text-[var(--text-muted)] hover:text-[var(--danger)] hover:border-[var(--danger)] hover:bg-[#FFF1F2] transition"
             >
-              <LogOut size={14} />
+              <LogOut size={15} />
             </button>
           </div>
         </div>
@@ -139,67 +137,70 @@ export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout 
         <CommandInput
           value={searchQuery}
           onValueChange={setSearchQuery}
-          placeholder="Search learning concepts, practice questions, modules..."
+          placeholder="Search curriculum topics, misconception detector, tools..."
         />
 
         <CommandList>
-          {filteredTopics.length === 0 && searchQuery ? (
-            <CommandEmpty>No matching topics found for &quot;{searchQuery}&quot;</CommandEmpty>
-          ) : null}
+          <CommandEmpty>No matching topics found.</CommandEmpty>
 
-          {/* Core Curriculum Routes */}
-          <CommandGroup heading="Curriculum Concepts">
-            {filteredTopics.map((topic) => (
-              <CommandItem
-                key={topic.id}
-                onSelect={() => handleSelectRoute(`/lessons/${topic.id}`)}
-              >
-                <div className="flex items-center gap-2.5">
-                  <BookOpen size={14} className="text-[#3B82F6] shrink-0" />
-                  <div>
-                    <span className="font-semibold text-[#F8FAFC]">{topic.title}</span>
-                    <span className="text-[11px] text-[#7F8A9B] ml-2 hidden sm:inline">
-                      {topic.subject} · {topic.mastery || 0}% Mastery
-                    </span>
-                  </div>
+          <CommandGroup heading="Curriculum & Practice">
+            <CommandItem onSelect={() => handleSelectRoute('/python-practice')}>
+              <div className="flex items-center gap-2.5">
+                <Code2 size={15} className="text-[var(--accent-primary)] shrink-0" />
+                <div>
+                  <span className="font-semibold text-[var(--text-main)]">Python Misconception Detector</span>
+                  <span className="text-[11px] text-[var(--text-muted)] ml-2 hidden sm:inline">
+                    Diagnose mental models & reasoning
+                  </span>
                 </div>
-                <CommandShortcut>Lesson</CommandShortcut>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-
-          {/* Quick Navigation Pages */}
-          <CommandGroup heading="Platform Navigation">
-            <CommandItem onSelect={() => handleSelectRoute('/dashboard')}>
-              <div className="flex items-center gap-2.5">
-                <LayoutDashboard size={14} className="text-[#A8B3C4]" />
-                <span>Dashboard</span>
-              </div>
-              <CommandShortcut>Home</CommandShortcut>
-            </CommandItem>
-
-            <CommandItem onSelect={() => handleSelectRoute('/tutor')}>
-              <div className="flex items-center gap-2.5">
-                <Sparkles size={14} className="text-[#3B82F6]" />
-                <span>AI Tutor (Interactive Socratic Guide)</span>
-              </div>
-              <CommandShortcut>Tutor</CommandShortcut>
-            </CommandItem>
-
-            <CommandItem onSelect={() => handleSelectRoute('/practice')}>
-              <div className="flex items-center gap-2.5">
-                <Target size={14} className="text-[#4ADE80]" />
-                <span>Targeted Practice Probes</span>
               </div>
               <CommandShortcut>Practice</CommandShortcut>
             </CommandItem>
 
+            <CommandItem onSelect={() => handleSelectRoute('/css-practice')}>
+              <div className="flex items-center gap-2.5">
+                <Layout size={15} className="text-[var(--accent-primary)] shrink-0" />
+                <div>
+                  <span className="font-semibold text-[var(--text-main)]">CSS Practice Lab</span>
+                  <span className="text-[11px] text-[var(--text-muted)] ml-2 hidden sm:inline">
+                    Box model, specificity & flexbox
+                  </span>
+                </div>
+              </div>
+              <CommandShortcut>Lab</CommandShortcut>
+            </CommandItem>
+
+            <CommandItem onSelect={() => handleSelectRoute('/explore')}>
+              <div className="flex items-center gap-2.5">
+                <Compass size={15} className="text-[var(--accent-primary)] shrink-0" />
+                <div>
+                  <span className="font-semibold text-[var(--text-main)]">Explore Python & C++ Tracks</span>
+                </div>
+              </div>
+              <CommandShortcut>Curriculum</CommandShortcut>
+            </CommandItem>
+
+            <CommandItem onSelect={() => handleSelectRoute('/tutor')}>
+              <div className="flex items-center gap-2.5">
+                <Sparkles size={15} className="text-[#F59E0B] shrink-0" />
+                <div>
+                  <span className="font-semibold text-[var(--text-main)]">AI Tutor</span>
+                  <span className="text-[11px] text-[var(--text-muted)] ml-2 hidden sm:inline">
+                    Local Qwen3:4b dialog
+                  </span>
+                </div>
+              </div>
+              <CommandShortcut>Tutor</CommandShortcut>
+            </CommandItem>
+
             <CommandItem onSelect={() => handleSelectRoute('/progress')}>
               <div className="flex items-center gap-2.5">
-                <BarChart2 size={14} className="text-[#FCD34D]" />
-                <span>Progress & Mastery Calibration</span>
+                <BookOpen size={15} className="text-[var(--accent-primary)] shrink-0" />
+                <div>
+                  <span className="font-semibold text-[var(--text-main)]">My Learning Progress</span>
+                </div>
               </div>
-              <CommandShortcut>Stats</CommandShortcut>
+              <CommandShortcut>Progress</CommandShortcut>
             </CommandItem>
           </CommandGroup>
         </CommandList>

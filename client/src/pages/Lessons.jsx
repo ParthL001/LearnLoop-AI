@@ -203,90 +203,84 @@ export default function Lessons() {
   const SubjectIcon = isPython ? Terminal : Code2
 
   return (
-    <div className="space-y-6">
+    <div className="reveal-stagger space-y-6">
       {/* Top Header / Breadcrumbs */}
-      <div className="bg-[#FFFFFF] border border-[#D8D8CF] rounded-lg p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-2 font-mono text-xs text-[#6B7280]">
+      <div className="card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-2 font-mono text-xs text-[var(--text-muted)]">
           <Link
             to="/explore"
-            className="flex items-center gap-1.5 font-bold text-[#3D5F58] hover:text-[#2E4742] transition"
+            className="flex items-center gap-1.5 font-bold text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition"
           >
             <ArrowLeft size={13} />
             <span>Explore</span>
           </Link>
           <span>/</span>
-          <span className="font-bold text-[#231F20]">{currentSubject.name}</span>
+          <span className="font-bold text-[var(--text-main)]">{currentSubject.name}</span>
           {activeTopicObj && (
             <>
               <span>/</span>
-              <span className="text-[#3D5F58] font-bold">{activeTopicObj.title}</span>
+              <span className="text-[var(--accent-primary)] font-bold">{activeTopicObj.title}</span>
             </>
           )}
         </div>
 
-        {/* Language Track Selector */}
-        <div className="flex items-center gap-1.5 bg-[#F2F2EB] p-1 rounded-md border border-[#D8D8CF]">
+        {/* Language Track Selector Tabs */}
+        <div className="tabs">
           <button
             type="button"
             onClick={() => handleSelectSubject('python')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-mono font-bold transition ${
-              activeSubjectId === 'python'
-                ? 'bg-[#3D5F58] text-white shadow-xs'
-                : 'text-[#4B5563] hover:text-[#231F20]'
-            }`}
+            aria-selected={activeSubjectId === 'python'}
+            className="tab font-mono text-xs font-bold"
           >
-            <Terminal size={12} />
-            <span>Python</span>
+            <Terminal size={12} className="inline mr-1" />
+            Python
           </button>
           <button
             type="button"
             onClick={() => handleSelectSubject('cpp')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-mono font-bold transition ${
-              activeSubjectId === 'cpp'
-                ? 'bg-[#3D5F58] text-white shadow-xs'
-                : 'text-[#4B5563] hover:text-[#231F20]'
-            }`}
+            aria-selected={activeSubjectId === 'cpp'}
+            className="tab font-mono text-xs font-bold"
           >
-            <Code2 size={12} />
-            <span>C++</span>
+            <Code2 size={12} className="inline mr-1" />
+            C++
           </button>
         </div>
       </div>
 
       {/* Accordion: Topic Selector Bar */}
-      <div className="bg-[#FFFFFF] border border-[#D8D8CF] rounded-lg overflow-hidden shadow-xs">
+      <div className="card p-0 overflow-hidden">
         <button
           type="button"
           onClick={() => setAccordionOpen(!accordionOpen)}
-          className="w-full flex items-center justify-between p-4 text-left hover:bg-[#FAF9F5] transition"
+          className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-[var(--bg-surface-elevated)] transition"
         >
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-[#F2F2EB] text-[#3D5F58] border border-[#D8D8CF]">
+            <div className="icon-tile">
               <SubjectIcon size={18} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-heading text-base font-bold text-[#231F20]">
+                <span className="font-heading text-lg font-bold text-[var(--text-main)]">
                   {currentSubject.name} Topic Navigator
                 </span>
-                <span className="font-mono text-[10px] text-[#3D5F58] bg-[#F2F2EB] px-2 py-0.2 rounded border border-[#D8D8CF]">
+                <span className="badge badge-sky">
                   {topicsList.length} TOPICS
                 </span>
               </div>
-              <span className="text-xs text-[#6B7280]">
+              <span className="text-xs text-[var(--text-muted)]">
                 {selectedTopicId
                   ? `Active Topic: ${activeTopicObj?.title || selectedTopicId}`
                   : 'Select a topic to generate dynamic AI lesson content'}
               </span>
             </div>
           </div>
-          <div className="text-[#6B7280]">
+          <div className="text-[var(--text-muted)] pr-2">
             {accordionOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
           </div>
         </button>
 
         {accordionOpen && (
-          <div className="border-t border-[#D8D8CF] p-3 grid gap-2 sm:grid-cols-5 bg-[#FAF9F5]">
+          <div className="border-t border-[var(--border-soft)] p-4 grid gap-3 sm:grid-cols-5 bg-[var(--bg-surface-elevated)]">
             {topicsList.map((topic) => {
               const isSelected = topic.id === selectedTopicId
               return (
@@ -294,14 +288,14 @@ export default function Lessons() {
                   key={topic.id}
                   type="button"
                   onClick={() => handleSelectTopic(topic.id)}
-                  className={`flex flex-col items-start p-3 rounded-md border text-left transition ${
+                  className={`flex flex-col items-start p-3.5 rounded-md border text-left transition ${
                     isSelected
-                      ? 'border-[#3D5F58] bg-[#FFFFFF] ring-2 ring-[#3D5F58] text-[#231F20]'
-                      : 'border-[#D8D8CF] bg-[#FFFFFF] text-[#4B5563] hover:border-[#3D5F58] hover:text-[#231F20]'
+                      ? 'border-[var(--accent-primary)] bg-[var(--bg-surface)] ring-2 ring-[var(--accent-primary)] shadow-card'
+                      : 'border-[var(--border-soft)] bg-[var(--bg-surface)] text-[var(--text-body)] hover:border-[var(--accent-primary)]'
                   }`}
                 >
-                  <span className="font-heading text-sm font-bold text-[#231F20]">{topic.title}</span>
-                  <span className="font-mono text-[10px] text-[#6B7280] mt-1 line-clamp-1">
+                  <span className="font-heading text-sm font-bold text-[var(--text-main)]">{topic.title}</span>
+                  <span className="font-mono text-[10px] text-[var(--text-muted)] mt-1 line-clamp-1">
                     {topic.description}
                   </span>
                 </button>
@@ -313,14 +307,14 @@ export default function Lessons() {
 
       {/* Main Content Area */}
       {!selectedTopicId ? (
-        <div className="bg-[#FFFFFF] border border-dashed border-[#D8D8CF] rounded-lg p-12 text-center space-y-4 shadow-xs">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#F2F2EB] text-[#3D5F58] border border-[#D8D8CF]">
+        <div className="card text-center p-12 space-y-4 border-dashed">
+          <div className="icon-tile mx-auto">
             <BookOpen size={22} />
           </div>
           <div>
-            <h3 className="font-heading text-lg font-bold text-[#231F20]">Choose a Topic to Begin</h3>
-            <p className="mt-1 text-xs text-[#6B7280] max-w-md mx-auto leading-relaxed">
-              Select one of the {currentSubject.name} topics above to trigger dynamic AI lesson generation via local Ollama (<code className="font-mono text-[#3D5F58]">qwen3:4b</code>).
+            <h3 className="font-heading text-xl font-bold text-[var(--text-main)]">Choose a Topic to Begin</h3>
+            <p className="mt-1 text-xs text-[var(--text-muted)] max-w-md mx-auto leading-relaxed">
+              Select one of the {currentSubject.name} topics above to trigger dynamic AI lesson generation via local Ollama (<code className="font-mono text-[var(--accent-primary)] font-bold">qwen3:4b</code>).
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-2 pt-2">
@@ -328,7 +322,7 @@ export default function Lessons() {
               <button
                 key={t.id}
                 onClick={() => handleSelectTopic(t.id)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F2F2EB] border border-[#D8D8CF] text-xs font-mono font-bold text-[#231F20] rounded hover:bg-[#3D5F58] hover:text-white transition"
+                className="btn btn-secondary btn-sm"
               >
                 <span>{t.title}</span>
                 <ArrowRight size={12} />
@@ -337,49 +331,47 @@ export default function Lessons() {
           </div>
         </div>
       ) : loading ? (
-        <div className="bg-[#FFFFFF] border border-[#D8D8CF] rounded-lg p-12 text-center space-y-4 shadow-xs">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#F2F2EB] text-[#3D5F58] border border-[#D8D8CF]">
-            <RotateCw size={22} className="animate-spin text-[#3D5F58]" />
+        <div className="card text-center p-12 space-y-4">
+          <div className="icon-tile mx-auto">
+            <RotateCw size={22} className="animate-spin text-[var(--accent-primary)]" />
           </div>
           <div>
-            <h3 className="font-heading text-lg font-bold text-[#231F20]">
+            <h3 className="font-heading text-xl font-bold text-[var(--text-main)]">
               Synthesizing Lesson: {activeTopicObj?.title}
             </h3>
-            <p className="mt-1 text-xs text-[#6B7280] max-w-md mx-auto leading-relaxed">
-              Requesting structured conceptual explanations, runnable code traces, common traps, and interactive checks from Ollama (<code className="font-mono text-[#3D5F58]">qwen3:4b</code>).
+            <p className="mt-1 text-xs text-[var(--text-muted)] max-w-md mx-auto leading-relaxed">
+              Requesting structured conceptual models, runnable code traces, and common traps from Ollama (<code className="font-mono text-[var(--accent-primary)]">qwen3:4b</code>)...
             </p>
           </div>
-          <div className="font-mono text-[11px] text-[#9CA3AF]">
-            Processing locally on your GPU/CPU...
-          </div>
+          <div className="skeleton h-2 w-48 mx-auto" />
         </div>
       ) : error ? (
-        <div className="bg-[#FFFFFF] border border-[#FECDD3] rounded-lg p-8 text-center space-y-4 shadow-xs">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#FFF1F2] text-[#E11D48] border border-[#FECDD3]">
+        <div className="card text-center p-10 space-y-4 border-[var(--danger)]">
+          <div className="icon-tile mx-auto text-[var(--danger)]">
             <AlertTriangle size={24} />
           </div>
           <div>
-            <h3 className="font-heading text-lg font-bold text-[#9F1239]">
+            <h3 className="font-heading text-xl font-bold text-[var(--danger)]">
               Lesson Generation Unavailable
             </h3>
-            <p className="mt-1 text-xs text-[#9F1239] max-w-lg mx-auto leading-relaxed">
+            <p className="mt-1 text-xs text-[var(--danger)] max-w-lg mx-auto leading-relaxed">
               {error}
             </p>
-            <p className="mt-2 text-xs text-[#6B7280] max-w-md mx-auto">
-              Please verify that Ollama is running locally with <code className="font-mono text-[#231F20]">ollama serve</code> and that model <code className="font-mono text-[#231F20]">qwen3:4b</code> is accessible.
+            <p className="mt-2 text-xs text-[var(--text-muted)] max-w-md mx-auto">
+              Please verify that Ollama is running locally with <code className="font-mono text-[var(--text-main)]">ollama serve</code> and that model <code className="font-mono text-[var(--text-main)]">qwen3:4b</code> is accessible.
             </p>
           </div>
           <div className="flex justify-center gap-3 pt-2">
             <button
               onClick={() => handleRetry(false)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#3D5F58] text-white text-xs font-bold rounded-md hover:bg-[#2E4742] transition"
+              className="btn btn-primary btn-sm"
             >
               <RefreshCw size={12} />
               <span>Retry Generation</span>
             </button>
             <Link
               to="/explore"
-              className="inline-flex items-center gap-1.5 px-4 py-2 border border-[#D8D8CF] text-xs font-bold text-[#231F20] rounded-md hover:bg-[#F2F2EB] transition"
+              className="btn btn-secondary btn-sm"
             >
               <span>Back to Catalog</span>
             </Link>
@@ -394,24 +386,24 @@ export default function Lessons() {
             return (
               <>
                 {/* 1. Lesson Header */}
-                <div className="bg-[#FFFFFF] border border-[#D8D8CF] rounded-lg p-6 shadow-xs">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[#D8D8CF]">
+                <div className="card space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[var(--border-soft)]">
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#3D5F58]">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="eyebrow text-xs">
                           {currentSubject.name} · {lesson.learnerLevel || 'Beginner'} Unit
                         </span>
                         {isCached ? (
-                          <span className="font-mono text-[10px] text-[#6B7280] bg-[#FAF9F5] px-2 py-0.5 rounded border border-[#E5E5DC]">
+                          <span className="badge badge-neutral text-[10px]">
                             Cached
                           </span>
                         ) : (
-                          <span className="font-mono text-[10px] font-bold text-[#231F20] bg-[#F5B726] px-2 py-0.5 rounded">
+                          <span className="badge badge-ochre text-[10px]">
                             Fresh Qwen3:4b
                           </span>
                         )}
                       </div>
-                      <h1 className="font-heading text-2xl font-extrabold text-[#231F20]">
+                      <h1 className="font-heading text-lg sm:text-xl font-bold text-[var(--text-main)]">
                         {lesson.topicTitle || activeTopicObj?.title}
                       </h1>
                     </div>
@@ -419,7 +411,7 @@ export default function Lessons() {
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => handleRetry(true)}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 border border-[#D8D8CF] text-xs font-mono font-bold text-[#231F20] rounded-md hover:bg-[#F2F2EB] transition"
+                        className="btn btn-secondary btn-sm"
                         title="Regenerate fresh lesson"
                       >
                         <RefreshCw size={12} />
@@ -427,7 +419,7 @@ export default function Lessons() {
                       </button>
                       <Link
                         to={`/tutor/${activeSubjectId}`}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#3D5F58] text-white text-xs font-bold rounded-md hover:bg-[#2E4742] transition"
+                        className="btn btn-primary btn-sm"
                       >
                         <Sparkles size={13} className="text-[#F5B726]" />
                         <span>Ask AI Tutor</span>
@@ -435,20 +427,20 @@ export default function Lessons() {
                     </div>
                   </div>
 
-                  <div className="mt-4 space-y-4">
-                    <p className="text-sm text-[#4B5563] leading-relaxed">
+                  <div className="space-y-4 pt-1">
+                    <p className="text-sm text-[var(--text-body)] leading-relaxed">
                       {lesson.shortIntroduction}
                     </p>
 
                     {lesson.learningObjectives && lesson.learningObjectives.length > 0 && (
-                      <div className="rounded-md border border-[#D8D8CF] bg-[#FAF9F5] p-4 space-y-2">
-                        <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#3D5F58] block">
+                      <div className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-surface-elevated)] p-4 space-y-2">
+                        <span className="eyebrow text-[10px] block">
                           Core Learning Objectives
                         </span>
-                        <ul className="space-y-1.5 text-xs text-[#231F20] font-sans">
+                        <ul className="space-y-1.5 text-xs text-[var(--text-body)] font-sans">
                           {lesson.learningObjectives.map((obj, i) => (
                             <li key={i} className="flex items-start gap-2">
-                              <CheckCircle size={14} className="text-[#3D5F58] shrink-0 mt-0.5" />
+                              <CheckCircle size={14} className="text-[var(--accent-primary)] shrink-0 mt-0.5" />
                               <span>{obj}</span>
                             </li>
                           ))}
@@ -459,57 +451,75 @@ export default function Lessons() {
                 </div>
 
                 {/* 2. Concept Explanation */}
-                <div className="bg-[#FFFFFF] border border-[#D8D8CF] rounded-lg p-6 shadow-xs space-y-4">
-                  <div className="border-b border-[#D8D8CF] pb-3">
-                    <h2 className="font-heading text-lg font-bold text-[#231F20]">
-                      Deep Concept Explanation
+                <div className="card space-y-4">
+                  <div className="pb-3 border-b border-[var(--border-soft)]">
+                    <span className="eyebrow text-xs mb-1">
+                      Conceptual Deep Dive
+                    </span>
+                    <h2 className="font-heading text-xl font-bold text-[var(--text-main)]">
+                      Concept Explanation
                     </h2>
                   </div>
 
-                  <div className="text-sm text-[#374151] leading-relaxed whitespace-pre-line font-sans">
+                  <div className="text-sm text-[var(--text-body)] leading-relaxed whitespace-pre-line font-sans">
                     {lesson.conceptExplanation}
                   </div>
 
                   {lesson.simpleExamples && (
-                    <div className="rounded-md border border-[#D8D8CF] bg-[#FAF9F5] p-4 space-y-1">
-                      <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#3D5F58] block">
-                        Intuitive Real-World Analogy
-                      </span>
-                      <p className="text-xs text-[#4B5563] leading-relaxed">
-                        {lesson.simpleExamples}
-                      </p>
+                    <div className="alert alert-info">
+                      <Lightbulb size={18} className="shrink-0 mt-0.5" />
+                      <div className="space-y-0.5">
+                        <span className="font-mono text-xs font-bold uppercase tracking-wider block">
+                          Intuitive Real-World Analogy
+                        </span>
+                        <p className="text-xs leading-relaxed">
+                          {lesson.simpleExamples}
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>
 
                 {/* 3. Code Examples & Walkthrough */}
                 {lesson.codeExamples && (
-                  <div className="bg-[#FFFFFF] border border-[#D8D8CF] rounded-lg p-6 shadow-xs space-y-4">
-                    <div className="flex items-center justify-between border-b border-[#D8D8CF] pb-3">
-                      <h2 className="font-heading text-lg font-bold text-[#231F20]">
-                        Code Walkthrough ({currentSubject.name})
-                      </h2>
-                      <span className="font-mono text-xs font-bold text-[#3D5F58] bg-[#F2F2EB] px-2 py-0.5 rounded border border-[#D8D8CF]">
+                  <div className="card space-y-4">
+                    <div className="flex items-center justify-between pb-3 border-b border-[var(--border-soft)]">
+                      <div>
+                        <span className="eyebrow text-xs mb-1">
+                          Implementation
+                        </span>
+                        <h2 className="font-heading text-xl font-bold text-[var(--text-main)]">
+                          Code Walkthrough ({currentSubject.name})
+                        </h2>
+                      </div>
+                      <span className="badge badge-forest">
                         {isPython ? 'Python 3' : 'C++17 STL'}
                       </span>
                     </div>
 
-                    {/* Dark Code Container */}
-                    <div className="rounded-md bg-[#231F20] border border-[#3D5F58]/30 overflow-hidden">
-                      <div className="flex items-center justify-between px-4 py-2 border-b border-[#3D5F58]/20 bg-[#1A1818] text-xs font-mono text-[#D8D8CF]">
-                        <span className="text-[#8BB2DE] flex items-center gap-1.5">
-                          <Code2 size={13} />
-                          {isPython ? 'main.py' : 'main.cpp'}
-                        </span>
+                    {/* Dark Code Container with Mac Dots */}
+                    <div className="rounded-lg overflow-hidden border border-black/20 shadow-card">
+                      <div className="bg-[#1A1818] px-4 py-2 flex items-center justify-between text-xs font-mono text-[#D8D8CF]">
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#E97B77] inline-block" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#F5B726] inline-block" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#3D8B6A] inline-block" />
+                          </div>
+                          <span className="text-[#8BB2DE] ml-2 flex items-center gap-1.5">
+                            <Code2 size={13} />
+                            {isPython ? 'main.py' : 'main.cpp'}
+                          </span>
+                        </div>
                         <button
                           type="button"
                           onClick={() => handleCopyCode(lesson.codeExamples, 0)}
-                          className="flex items-center gap-1 hover:text-white transition"
+                          className="btn btn-ghost-inverse btn-sm py-1 px-2 text-[10px]"
                         >
                           {copiedCodeIndex === 0 ? (
                             <>
-                              <Check size={12} className="text-[#22C55E]" />
-                              <span className="text-[#22C55E]">Copied</span>
+                              <Check size={12} className="text-[#3D8B6A]" />
+                              <span>Copied</span>
                             </>
                           ) : (
                             <>
@@ -519,17 +529,17 @@ export default function Lessons() {
                           )}
                         </button>
                       </div>
-                      <pre className="p-4 text-xs font-mono text-[#F2F2EB] overflow-x-auto leading-relaxed">
+                      <pre>
                         <code>{lesson.codeExamples}</code>
                       </pre>
                     </div>
 
                     {lesson.codeExplanation && (
-                      <div className="space-y-1.5 pt-2">
-                        <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#6B7280] block">
-                          Step-by-Step Code Execution Logic
+                      <div className="space-y-1 pt-2">
+                        <span className="eyebrow text-[10px]">
+                          Execution Trace
                         </span>
-                        <p className="text-xs text-[#4B5563] leading-relaxed whitespace-pre-line font-sans">
+                        <p className="text-xs text-[var(--text-body)] leading-relaxed whitespace-pre-line font-sans">
                           {lesson.codeExplanation}
                         </p>
                       </div>
@@ -539,30 +549,30 @@ export default function Lessons() {
 
                 {/* 4. Common Mistakes & Pitfalls */}
                 {lesson.commonMistakes && (
-                  <div className="bg-[#FFFFFF] border border-[#D8D8CF] rounded-lg p-6 shadow-xs space-y-3">
-                    <div className="flex items-center gap-2 border-b border-[#D8D8CF] pb-3">
-                      <AlertTriangle size={16} className="text-[#E97B77]" />
-                      <h2 className="font-heading text-lg font-bold text-[#231F20]">
-                        Common Mistakes & Pitfalls to Avoid
-                      </h2>
-                    </div>
-                    <div className="text-xs text-[#4B5563] leading-relaxed whitespace-pre-line font-sans">
-                      {lesson.commonMistakes}
+                  <div className="alert alert-warning">
+                    <AlertTriangle size={18} className="shrink-0 mt-0.5" />
+                    <div className="space-y-1 w-full">
+                      <span className="font-mono text-xs font-bold uppercase tracking-wider block">
+                        Common Mistakes to Avoid
+                      </span>
+                      <div className="text-xs leading-relaxed whitespace-pre-line font-sans">
+                        {lesson.commonMistakes}
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {/* 5. Key Takeaways Recap */}
                 {lesson.shortRecap && (
-                  <div className="rounded-lg border border-[#D8D8CF] bg-[#FAF9F5] p-5 flex items-start gap-3 shadow-xs">
-                    <div className="p-2 bg-[#F2F2EB] text-[#3D5F58] rounded-md border border-[#D8D8CF] shrink-0">
-                      <Lightbulb size={18} className="text-[#F5B726]" />
+                  <div className="card flex items-start gap-4">
+                    <div className="icon-tile shrink-0">
+                      <Lightbulb size={20} className="text-[#F5B726]" />
                     </div>
-                    <div className="text-xs space-y-1">
-                      <span className="font-heading text-base font-bold text-[#231F20] block">
+                    <div className="space-y-1">
+                      <h3 className="font-heading text-lg font-bold text-[var(--text-main)]">
                         Key Takeaways Recap
-                      </span>
-                      <p className="text-[#4B5563] leading-relaxed font-sans">
+                      </h3>
+                      <p className="text-xs text-[var(--text-body)] leading-relaxed font-sans">
                         {lesson.shortRecap}
                       </p>
                     </div>
@@ -571,20 +581,25 @@ export default function Lessons() {
 
                 {/* 6. Interactive Practice Questions (3 checks) */}
                 {lesson.practiceQuestions && lesson.practiceQuestions.length > 0 && (
-                  <div className="bg-[#FFFFFF] border border-[#D8D8CF] rounded-lg p-6 shadow-xs space-y-6">
-                    <div className="flex items-center justify-between border-b border-[#D8D8CF] pb-3">
-                      <div className="flex items-center gap-2">
-                        <HelpCircle size={17} className="text-[#3D5F58]" />
-                        <h2 className="font-heading text-lg font-bold text-[#231F20]">
-                          Interactive Knowledge Checks
-                        </h2>
+                  <div className="card space-y-6">
+                    <div className="flex items-center justify-between pb-3 border-b border-[var(--border-soft)]">
+                      <div className="flex items-center gap-2.5">
+                        <div className="icon-tile" style={{ width: '2.4rem', height: '2.4rem' }}>
+                          <HelpCircle size={16} />
+                        </div>
+                        <div>
+                          <h2 className="font-heading text-lg font-bold text-[var(--text-main)]">
+                            Interactive Knowledge Checks
+                          </h2>
+                          <span className="text-xs text-[var(--text-muted)]">Verify your mental model</span>
+                        </div>
                       </div>
-                      <span className="font-mono text-xs font-bold text-[#3D5F58] bg-[#F2F2EB] px-2.5 py-0.5 rounded border border-[#D8D8CF]">
+                      <span className="badge badge-ochre">
                         {lesson.practiceQuestions.length} PRACTICE CHECKS
                       </span>
                     </div>
 
-                    <div className="space-y-6">
+                    <div className="space-y-5">
                       {lesson.practiceQuestions.map((q, qIdx) => {
                         const isSubmitted = submittedAnswers[qIdx]
                         const selectedOpt = selectedAnswers[qIdx]
@@ -599,20 +614,14 @@ export default function Lessons() {
                         return (
                           <div
                             key={qIdx}
-                            className="rounded-md border border-[#D8D8CF] bg-[#FAF9F5] p-4 sm:p-5 space-y-3"
+                            className="rounded-lg border border-[var(--border-soft)] bg-[var(--bg-surface-elevated)] p-4 sm:p-5 space-y-3 shadow-xs"
                           >
                             <div className="flex items-start justify-between gap-3">
-                              <span className="font-heading text-base font-bold text-[#231F20]">
+                              <span className="font-heading text-base font-bold text-[var(--text-main)]">
                                 {qIdx + 1}. {q.prompt || q.question}
                               </span>
                               {isSubmitted && (
-                                <span
-                                  className={`font-mono text-xs font-bold px-2 py-0.5 rounded border ${
-                                    isCorrect
-                                      ? 'bg-[#F0FDF4] text-[#166534] border-[#86EFAC]'
-                                      : 'bg-[#FEFCE8] text-[#854D0E] border-[#FDE047]'
-                                  }`}
-                                >
+                                <span className={`badge ${isCorrect ? 'badge-forest' : 'badge-pink'}`}>
                                   {isCorrect ? 'CORRECT' : 'REVIEW'}
                                 </span>
                               )}
@@ -622,16 +631,16 @@ export default function Lessons() {
                             <div className="space-y-2">
                               {q.options?.map((opt, optIdx) => {
                                 const isOptionSelected = selectedOpt === optIdx
-                                let optClass = 'border-[#D8D8CF] bg-[#FFFFFF] text-[#231F20] hover:border-[#3D5F58]'
+                                let optClass = 'border-[var(--border-soft)] bg-[var(--bg-surface)] text-[var(--text-main)] hover:border-[var(--accent-primary)]'
 
                                 if (isSubmitted) {
                                   if (optIdx === targetCorrect) {
-                                    optClass = 'border-[#86EFAC] bg-[#F0FDF4] text-[#166534] font-semibold'
+                                    optClass = 'border-[#3D8B6A] bg-[#E7F3EC] text-[#1F5A40] font-semibold'
                                   } else if (isOptionSelected && !isCorrect) {
-                                    optClass = 'border-[#FECDD3] bg-[#FFF1F2] text-[#9F1239]'
+                                    optClass = 'border-[#D4524D] bg-[#FBE5E3] text-[#8C2925]'
                                   }
                                 } else if (isOptionSelected) {
-                                  optClass = 'border-[#3D5F58] ring-1 ring-[#3D5F58] bg-[#FFFFFF] font-semibold'
+                                  optClass = 'border-[var(--accent-primary)] ring-2 ring-[var(--accent-primary)] bg-[var(--bg-surface)] font-semibold'
                                 }
 
                                 return (
@@ -640,7 +649,7 @@ export default function Lessons() {
                                     type="button"
                                     disabled={isSubmitted}
                                     onClick={() => handleAnswerSelect(qIdx, optIdx)}
-                                    className={`w-full flex items-center gap-3 p-3 rounded border text-left text-xs transition ${optClass}`}
+                                    className={`w-full flex items-center gap-3 p-3 rounded-md border text-left text-xs transition shadow-xs ${optClass}`}
                                   >
                                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-current text-[10px] font-mono font-bold">
                                       {String.fromCharCode(65 + optIdx)}
@@ -651,24 +660,24 @@ export default function Lessons() {
                               })}
                             </div>
 
-                            {/* Action or Explanation */}
+                            {/* Submit or Explanation */}
                             {!isSubmitted ? (
                               <div className="pt-2 flex justify-end">
                                 <button
                                   type="button"
                                   disabled={selectedOpt === undefined}
                                   onClick={() => handleAnswerSubmit(qIdx)}
-                                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#3D5F58] text-white text-xs font-bold rounded-md hover:bg-[#2E4742] disabled:opacity-40 disabled:cursor-not-allowed transition"
+                                  className="btn btn-primary btn-sm"
                                 >
                                   <span>Submit Check</span>
                                 </button>
                               </div>
                             ) : (
-                              <div className="rounded border border-[#D8D8CF] bg-[#FFFFFF] p-3 text-xs space-y-1">
-                                <span className="font-mono text-xs font-bold text-[#3D5F58] uppercase block">
-                                  {isCorrect ? 'Accurate Model' : 'Concept Clarification'}
+                              <div className="alert alert-info text-xs space-y-1">
+                                <span className="font-mono text-xs font-bold uppercase block">
+                                  {isCorrect ? 'Accurate Understanding' : 'Concept Explanation'}
                                 </span>
-                                <p className="text-[#4B5563] leading-relaxed font-sans">
+                                <p className="font-sans leading-relaxed">
                                   {q.explanation}
                                 </p>
                               </div>

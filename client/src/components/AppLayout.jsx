@@ -21,9 +21,9 @@ export default function AppLayout({ user, onLogout }) {
     '/explore': 'Explore Content',
     '/lessons': 'Interactive Lessons',
     '/tutor': 'AI Tutor',
-    '/python-practice': 'Python Misconception Detector',
+    '/python-practice': 'Python Practice',
     '/css-practice': 'CSS Practice Lab',
-    '/progress': 'My Progress & Evidence',
+    '/progress': 'My Progress',
     '/about': 'About Platform',
     '/contact': 'Contact Us',
     '/privacy': 'Privacy Policy',
@@ -40,12 +40,12 @@ export default function AppLayout({ user, onLogout }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#F2F2EB] text-[#231F20] font-sans">
+    <div className="min-h-screen bg-[var(--bg-app)] text-[var(--text-main)] font-sans antialiased">
       {/* Sidebar (Desktop and Mobile Drawer) */}
       <Sidebar isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
       {/* Main Column */}
-      <div className="flex min-h-screen flex-col lg:pl-64">
+      <div className="flex min-h-screen flex-col lg:pl-[240px] transition-all">
         {/* Sticky Header with Current Page Title, Command Search, and Quick Nav */}
         <Navbar
           onOpenMobileMenu={handleDashboardClick}
@@ -54,29 +54,29 @@ export default function AppLayout({ user, onLogout }) {
           onLogout={onLogout}
         />
 
-        {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto">
+        {/* Page Content wrapped in .main-content */}
+        <main className="main-content flex-1 w-full">
           <Outlet />
         </main>
 
         {/* Cohesive Footer */}
-        <footer className="border-t border-[#D8D8CF] bg-[#FFFFFF] px-6 py-4 text-xs text-[#6B7280]">
-          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="font-mono">© 2026 LearnLoop AI · Adaptive Learning & Misconception Engine</p>
-            <div className="flex items-center gap-4 font-sans">
-              <Link to="/about" className="hover:text-[#231F20] transition-colors">
+        <footer className="border-t border-[var(--border-soft)] bg-[var(--bg-surface)] px-6 py-4 text-xs text-[var(--text-muted)] mt-auto">
+          <div className="max-w-[var(--content-max)] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="font-mono text-[11px]">© 2026 LearnLoop AI · Adaptive Learning & Misconception Engine</p>
+            <div className="flex items-center gap-4 font-sans text-xs">
+              <Link to="/about" className="hover:text-[var(--text-main)] transition-colors">
                 About
               </Link>
               <span>·</span>
-              <Link to="/contact" className="hover:text-[#231F20] transition-colors">
+              <Link to="/contact" className="hover:text-[var(--text-main)] transition-colors">
                 Contact
               </Link>
               <span>·</span>
-              <Link to="/privacy" className="hover:text-[#231F20] transition-colors">
+              <Link to="/privacy" className="hover:text-[var(--text-main)] transition-colors">
                 Privacy Policy
               </Link>
               <span>·</span>
-              <Link to="/terms" className="hover:text-[#231F20] transition-colors">
+              <Link to="/terms" className="hover:text-[var(--text-main)] transition-colors">
                 Terms and Conditions
               </Link>
             </div>
