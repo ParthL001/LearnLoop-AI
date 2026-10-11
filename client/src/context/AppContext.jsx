@@ -6,6 +6,7 @@ import {
   activityTrendData as defaultActivityData,
   practiceQuestions,
 } from '../services/mockData'
+import { fetchConcepts, fetchLearnerProgress } from '../services/api'
 
 const AppContext = createContext(null)
 
@@ -107,6 +108,52 @@ export function AppProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('cognara_misconceptions', JSON.stringify(misconceptions))
   }, [misconceptions])
+
+  // Synchronize state with verified backend curriculum and progress
+  useEffect(() => {
+    let active = true
+    const learnerId = user?.id || user?.email || 'learner-local'
+
+    Promise.all([
+      fetchConcepts().catch(() => null),
+      fetchLearnerProgress(learnerId).catch(() => null)
+    ]).then(([backendConcepts, backendProgress]) => {
+      if (!active) return
+
+      if (backendConcepts && backendConcepts.length > 0) {
+        setTopics((prev) =>
+          backendConcepts.map((bc) => {
+            const existing = prev.find((t) => t.id === bc.id)
+            return {
+              id: bc.id,
+              title: bc.title,
+              description: bc.description,
+              subject: 'Mathematics',
+              level: 'Fundamental',
+              mastery: backendProgress?.mastery?.[bc.id] ?? existing?.mastery ?? 0,
+              objectives: bc.objectives
+            }
+          })
+        )
+      }
+
+      if (backendProgress && backendProgress.totalAttempts > 0) {
+        if (backendProgress.mastery) {
+          setMastery(backendProgress.mastery)
+        }
+        if (backendProgress.practiceHistory && backendProgress.practiceHistory.length > 0) {
+          setPracticeHistory(backendProgress.practiceHistory)
+        }
+        if (backendProgress.recentMisconceptions && backendProgress.recentMisconceptions.length > 0) {
+          setMisconceptions(backendProgress.recentMisconceptions)
+        }
+      }
+    })
+
+    return () => {
+      active = false
+    }
+  }, [user])
 
   // Dynamic actions
   const recordPracticeResult = ({ questionId, isCorrect, reasoning, misconception }) => {

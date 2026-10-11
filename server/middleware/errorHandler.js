@@ -14,9 +14,15 @@ export function errorHandler(err, req, res, next) {
     console.error(err.stack)
   }
 
+  // Sanitize message to strip internal filesystem paths
+  let safeMessage = err.message || 'Internal Server Error'
+  if (safeMessage.includes(':\\') || safeMessage.includes(':/') || safeMessage.includes('/')) {
+    safeMessage = safeMessage.replace(/([A-Za-z]:\\[^ :]+)|(\/[^ :]+)/g, '[internal-path]')
+  }
+
   res.status(statusCode).json({
     success: false,
-    error: err.message || 'Internal Server Error',
+    error: safeMessage,
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   })
 }

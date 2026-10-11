@@ -1,17 +1,122 @@
-// Cognara Service Layer: connects to Express backend (Ollama / Qwen3:4b) with graceful offline fallback
+/**
+ * LearnLoop AI Centralized Service Layer
+ * Connects React frontend directly to the Express backend.
+ * Uses VITE_API_BASE_URL with fallback to VITE_API_URL or localhost:5000.
+ */
 
-import { topics, learningPathMilestones, practiceQuestions, recentMisconceptions } from './mockData'
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  'http://localhost:5000/api'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+export { API_BASE_URL }
 
 /**
- * Send learner message to AI Tutor (Node.js/Express + Ollama Qwen3:4b)
+ * Check general backend service health
  */
-export async function chatWithTutor(message, { topicId = 'fractions', history = [], studentReasoning = '' } = {}) {
+export async function checkBackendHealth() {
   try {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 4000)
+    const res = await fetch(`${API_BASE_URL}/health`)
+    if (!res.ok) return { status: 'down', ok: false }
+    const data = await res.json()
+    return { ...data, ok: true }
+  } catch (err) {
+    return { status: 'down', ok: false, error: err.message }
+  }
+}
 
+/**
+ * Check Ollama & local model (qwen3:4b) availability
+ */
+export async function checkAIHealth() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/ai/health`)
+    const data = await res.json().catch(() => ({}))
+    return {
+      status: res.ok ? 'connected' : 'unavailable',
+      ok: res.ok,
+      ...data
+    }
+  } catch (err) {
+    return {
+      status: 'offline',
+      ok: false,
+      error: 'Backend or Ollama AI service unreachable.'
+    }
+  }
+}
+
+/**
+ * Fetch verified fraction curriculum concepts
+ */
+export async function fetchConcepts() {
+  const res = await fetch(`${API_BASE_URL}/concepts`)
+  if (!res.ok) throw new Error(`Failed to fetch concepts: ${res.status}`)
+  const data = await res.json()
+  return data.concepts || []
+}
+
+/**
+ * Fetch structured lessons with visual partition models
+ */
+export async function fetchLessons() {
+  const res = await fetch(`${API_BASE_URL}/lessons`)
+  if (!res.ok) throw new Error(`Failed to fetch lessons: ${res.status}`)
+  const data = await res.json()
+  return data.lessons || []
+}
+
+/**
+ * Fetch a specific lesson by concept ID
+ */
+export async function fetchLessonById(id) {
+  const res = await fetch(`${API_BASE_URL}/lessons/${encodeURIComponent(id)}`)
+  if (!res.ok) throw new Error(`Lesson not found: ${res.status}`)
+  const data = await res.json()
+  return data.lesson
+}
+
+/**
+ * Fetch practice questions (sanitized - answer keys never exposed)
+ */
+export async function fetchPracticeQuestions(conceptId = null) {
+  const url = conceptId
+    ? `${API_BASE_URL}/practice/questions?conceptId=${encodeURIComponent(conceptId)}`
+    : `${API_BASE_URL}/practice/questions`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Failed to fetch practice questions: ${res.status}`)
+  const data = await res.json()
+  return data.questions || []
+}
+
+/**
+ * Adaptively select next practice question based on history and flagged misconceptions
+ */
+export async function fetchNextAdaptiveQuestion({
+  conceptId,
+  attemptedQuestionIds = [],
+  lastMisconception = null
+} = {}) {
+  const res = await fetch(`${API_BASE_URL}/practice/next`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ conceptId, attemptedQuestionIds, lastMisconception })
+  })
+  if (!res.ok) throw new Error(`Failed to retrieve adaptive question: ${res.status}`)
+  return await res.json()
+}
+
+/**
+ * Interactive Socratic chat with backend AI Tutor (grounded in verified curriculum)
+ */
+export async function chatWithTutor(
+  message,
+  { topicId = 'fractions', history = [], studentReasoning = '' } = {}
+) {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 20000)
+
+  try {
     const response = await fetch(`${API_BASE_URL}/tutor/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -20,7 +125,11 @@ export async function chatWithTutor(message, { topicId = 'fractions', history = 
     })
     clearTimeout(timeoutId)
 
-    if (!response.ok) throw new Error(`Server returned ${response.status}`)
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}))
+      throw new Error(errData.error || `Tutor service error ${response.status}`)
+    }
+
     const data = await response.json()
     return {
       text: data.reply || data.message,
@@ -29,100 +138,59 @@ export async function chatWithTutor(message, { topicId = 'fractions', history = 
       suggestedAction: data.suggestedAction || null
     }
   } catch (err) {
-    // Graceful intelligent simulation matching Qwen3:4b Socratic pedagogy
-    return generateOfflineTutorReply(message, topicId, studentReasoning)
+    clearTimeout(timeoutId)
+    // Honest offline handling - never fabricate AI responses
+    const isTimeout = err.name === 'AbortError'
+    return {
+      text: isTimeout
+        ? 'The AI tutor request timed out. Please try asking a more focused question.'
+        : 'AI Tutor service is currently unavailable. Ensure the backend and Ollama (qwen3:4b) are running.',
+      isLiveBackend: false,
+      isOffline: true,
+      error: err.message,
+      misconceptionDetected: null,
+      suggestedAction: 'Review the visual model in the lesson.'
+    }
   }
 }
 
 /**
- * Diagnostic analysis of student reasoning to isolate misconceptions
+ * Diagnostic submission evaluation against backend answer keys
  */
-export async function analyzeMisconception({ questionId, selectedAnswerIndex, studentReasoning = '', topicId = 'fractions' }) {
-  try {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 4000)
+export async function analyzeMisconception({
+  questionId,
+  selectedAnswerIndex,
+  studentReasoning = '',
+  topicId = 'fractions',
+  learnerId = null
+}) {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 20000)
 
+  try {
     const response = await fetch(`${API_BASE_URL}/analyze/misconception`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ questionId, selectedAnswerIndex, studentReasoning, topicId }),
+      body: JSON.stringify({
+        questionId,
+        selectedAnswerIndex,
+        studentReasoning,
+        topicId,
+        learnerId
+      }),
       signal: controller.signal
     })
     clearTimeout(timeoutId)
 
-    if (!response.ok) throw new Error(`Analysis failed with status ${response.status}`)
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}))
+      throw new Error(errData.error || `Analysis failed with status ${response.status}`)
+    }
+
     return await response.json()
   } catch (err) {
-    // Intelligent local evaluation from diagnostic catalog
-    const q = practiceQuestions.find(item => item.id === questionId) || practiceQuestions[0]
-    const tag = q.misconceptionTags?.[selectedAnswerIndex]
-
-    if (selectedAnswerIndex === q.correctIndex) {
-      return {
-        isCorrect: true,
-        detectedMisconception: null,
-        feedback: 'Excellent reasoning! You correctly accounted for the underlying concept.',
-        confidence: 0.95,
-        remediationAdvice: 'Ready to try a higher-complexity variation.'
-      }
-    }
-
-    if (tag) {
-      return {
-        isCorrect: false,
-        detectedMisconception: {
-          code: tag.code,
-          name: tag.title,
-          description: tag.explanation
-        },
-        feedback: tag.explanation,
-        confidence: 0.88,
-        remediationAdvice: tag.suggestion
-      }
-    }
-
-    return {
-      isCorrect: false,
-      detectedMisconception: {
-        code: 'MIS-GENERAL',
-        name: 'Concept Gap',
-        description: 'Your answer suggests an unfamiliarity with this unit operation.'
-      },
-      feedback: q.explanation,
-      confidence: 0.7,
-      remediationAdvice: 'Review the visual model in the lesson.'
-    }
-  }
-}
-
-function generateOfflineTutorReply(userPrompt, topicId, studentReasoning) {
-  const lower = userPrompt.toLowerCase()
-  let reply = ''
-  let misconceptionDetected = null
-
-  if (lower.includes('why') && (lower.includes('denominator') || lower.includes('smaller') || lower.includes('bigger'))) {
-    reply = "Let's test this with a picture! Imagine a chocolate bar. If you divide it into 3 equal pieces, each piece is relatively chunky (1/3). But if you divide that exact same bar into 5 equal pieces (1/5), each slice must get skinnier to fit all 5. So even though 5 is a larger number, each fifth (1/5) is actually smaller than a third (1/3). Does this visualization help clarify why 2/3 is greater than 2/5?"
-    misconceptionDetected = {
-      name: 'Denominator Size Inversion',
-      note: 'Learner questioned how larger numbers produce smaller fractional pieces.'
-    }
-  } else if (lower.includes('hint') || lower.includes('stuck') || lower.includes('help')) {
-    reply = "Here's a gentle nudge: Look closely at the denominator (the bottom number). The denominator names the size or kind of each part, while the numerator (top number) counts how many of those parts you possess. Try picturing the unit size first before comparing amounts!"
-  } else if (lower.includes('add') || lower.includes('plus') || lower.includes('unlike')) {
-    reply = "When adding fractions like 1/2 + 1/3, we can't just add across to get 2/5. Think of denominators like units of measurement: you wouldn't say 1 inch + 1 meter equals 2 'inch-meters'! We have to convert them into a shared common unit (sixths) first: 3/6 + 2/6 = 5/6."
-    misconceptionDetected = {
-      name: 'Common Unit Necessity',
-      note: 'Addressed additive denominator misconception.'
-    }
-  } else {
-    reply = `I see your point about "${userPrompt.slice(0, 40)}...". As your adaptive guide, I want to make sure we build lasting intuition rather than memorized tricks. Could you walk me through one specific step of how you reached your conclusion?`
-  }
-
-  return {
-    text: reply,
-    isLiveBackend: false,
-    misconceptionDetected,
-    suggestedAction: 'Explore visual model'
+    clearTimeout(timeoutId)
+    throw err
   }
 }
 
@@ -140,6 +208,22 @@ export async function fetchLearnerProgress(learnerId) {
   } catch (err) {
     return null
   }
+}
+
+/**
+ * Explicitly record a learner attempt
+ */
+export async function recordAttempt(attemptData) {
+  const res = await fetch(`${API_BASE_URL}/attempts`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(attemptData)
+  })
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}))
+    throw new Error(errData.error || `Failed to record attempt: ${res.status}`)
+  }
+  return await res.json()
 }
 
 /**
@@ -166,7 +250,9 @@ export async function submitAssessment({ learnerId, type, itemResponses }) {
   })
   if (!res.ok) {
     const errData = await res.json().catch(() => ({}))
-    throw new Error(errData.error || `Assessment submission failed: ${res.status}`)
+    const error = new Error(errData.error || `Assessment submission failed: ${res.status}`)
+    error.status = res.status
+    throw error
   }
   return await res.json()
 }
@@ -196,4 +282,3 @@ export async function fetchCohortAssessmentReport() {
     return null
   }
 }
-

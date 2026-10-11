@@ -1,11 +1,15 @@
 import { Router } from 'express'
 import { evaluatorService } from '../services/evaluatorService.js'
 import { storageService } from '../services/storageService.js'
+import { createRateLimiter } from '../middleware/rateLimiter.js'
 
 const router = Router()
 
+// Rate limiter for computationally expensive Ollama AI endpoints (60 req/min)
+const aiRateLimiter = createRateLimiter({ windowMs: 60000, max: 60 })
+
 // POST /api/tutor/chat - Socratic interactive AI Tutor endpoint (expected by frontend chatWithTutor)
-router.post('/tutor/chat', async (req, res, next) => {
+router.post('/tutor/chat', aiRateLimiter, async (req, res, next) => {
   try {
     const { message, topicId, history, studentReasoning } = req.body
 
