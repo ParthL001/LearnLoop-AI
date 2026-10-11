@@ -18,19 +18,19 @@ export default function AppLayout({ user, onLogout }) {
   const pathTitles = {
     '/': 'Dashboard',
     '/dashboard': 'Dashboard',
-    '/learning-path': 'Adaptive Learning Path',
-    '/lessons': 'Lessons',
+    '/explore': 'Explore Content',
+    '/lessons': 'Interactive Lessons',
     '/tutor': 'AI Tutor',
-    '/practice': 'Targeted Practice',
-    '/assessments': 'Assessments',
-    '/progress': 'Progress & Mastery',
+    '/python-practice': 'Python Misconception Detector',
+    '/css-practice': 'CSS Practice Lab',
+    '/progress': 'My Progress & Evidence',
     '/about': 'About Platform',
     '/contact': 'Contact Us',
     '/privacy': 'Privacy Policy',
     '/terms': 'Terms and Conditions',
   }
 
-  const currentTitle = pathTitles[location.pathname] || currentNav?.name || 'Adaptive Learning'
+  const currentTitle = pathTitles[location.pathname] || currentNav?.name || 'LearnLoop AI'
 
   const handleDashboardClick = () => {
     setMobileMenuOpen(true)
@@ -40,7 +40,7 @@ export default function AppLayout({ user, onLogout }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0D10] text-[#F8FAFC]">
+    <div className="min-h-screen bg-[#F2F2EB] text-[#231F20] font-sans">
       {/* Sidebar (Desktop and Mobile Drawer) */}
       <Sidebar isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
@@ -59,24 +59,24 @@ export default function AppLayout({ user, onLogout }) {
           <Outlet />
         </main>
 
-        {/* Cohesive Dark Footer */}
-        <footer className="border-t border-[#303846] bg-[#080A0D] px-6 py-4 text-xs text-[#7F8A9B]">
+        {/* Cohesive Footer */}
+        <footer className="border-t border-[#D8D8CF] bg-[#FFFFFF] px-6 py-4 text-xs text-[#6B7280]">
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p>© 2026 LearnLoop AI · Adaptive Learning & Misconception Engine</p>
-            <div className="flex items-center gap-4">
-              <Link to="/about" className="hover:text-[#F8FAFC] transition-colors">
+            <p className="font-mono">© 2026 LearnLoop AI · Adaptive Learning & Misconception Engine</p>
+            <div className="flex items-center gap-4 font-sans">
+              <Link to="/about" className="hover:text-[#231F20] transition-colors">
                 About
               </Link>
               <span>·</span>
-              <Link to="/contact" className="hover:text-[#F8FAFC] transition-colors">
+              <Link to="/contact" className="hover:text-[#231F20] transition-colors">
                 Contact
               </Link>
               <span>·</span>
-              <Link to="/privacy" className="hover:text-[#F8FAFC] transition-colors">
+              <Link to="/privacy" className="hover:text-[#231F20] transition-colors">
                 Privacy Policy
               </Link>
               <span>·</span>
-              <Link to="/terms" className="hover:text-[#F8FAFC] transition-colors">
+              <Link to="/terms" className="hover:text-[#231F20] transition-colors">
                 Terms and Conditions
               </Link>
             </div>

@@ -37,18 +37,14 @@ router.post('/python/diagnose', async (req, res, next) => {
 
         if (
             typeof question !== 'string' ||
-            !question.trim() ||
-            (correctAnswer !== undefined &&
-                correctAnswer !== null &&
-                typeof correctAnswer !== 'string') ||
+            typeof correctAnswer !== 'string' ||
             typeof studentAnswer !== 'string' ||
-            !studentAnswer.trim() ||
-            (!String(exampleId || '').trim() &&
-                (typeof correctAnswer !== 'string' || !correctAnswer.trim()))
+            !question.trim() ||
+            !correctAnswer.trim() ||
+            !studentAnswer.trim()
         ) {
             return res.status(400).json({
-                success: false,
-                error: 'A question, studentAnswer, and either exampleId or correctAnswer are required',
+                error: 'question, correctAnswer and studentAnswer are required strings',
             })
         }
 

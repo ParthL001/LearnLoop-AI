@@ -1,24 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
 import Logo from '@/components/Logo'
 
 export default function LoginSignup({ onLoginSuccess }) {
-  const [mode, setMode] = useState('login') // 'login' or 'signup'
+  const [mode, setMode] = useState('login')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -68,169 +53,151 @@ export default function LoginSignup({ onLoginSuccess }) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0B0D10] p-4 sm:p-6">
+    <div className="flex min-h-screen items-center justify-center bg-[#F2F2EB] p-4 sm:p-6 text-[#231F20] font-sans">
       <div className="w-full max-w-md">
-        {/* Brand header: Logo only, no Cognara text */}
+        {/* Brand Header */}
         <div className="mb-6 text-center">
           <Logo className="mx-auto mb-3 h-12 w-auto" />
-          <h2 className="text-base font-bold tracking-tight text-[#F8FAFC]">Adaptive Learning Platform</h2>
-          <p className="mt-0.5 text-xs text-[#7F8A9B]">AI-Assisted Diagnostic Tutoring & Misconception Detection</p>
+          <h1 className="font-heading text-2xl font-extrabold uppercase tracking-tight text-[#231F20]">
+            LearnLoop AI
+          </h1>
+          <p className="mt-1 font-mono text-xs text-[#3D5F58] uppercase font-bold tracking-wider">
+            Adaptive Programming & Misconception Engine
+          </p>
         </div>
 
-        {/* Auth Card using shadcn components */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>
-                {mode === 'login' ? 'Sign In' : 'Create an Account'}
-              </CardTitle>
-              <div className="flex rounded-[6px] border border-[#303846] p-0.5 bg-[#1B2028]">
-                <button
-                  type="button"
-                  onClick={() => { setMode('login'); setError('') }}
-                  className={`px-2.5 py-1 text-[11px] font-semibold rounded-[4px] transition-colors ${
-                    mode === 'login' ? 'bg-[#3B82F6] text-white shadow-xs' : 'text-[#7F8A9B] hover:text-[#F8FAFC]'
-                  }`}
-                >
-                  Sign In
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setMode('signup'); setError('') }}
-                  className={`px-2.5 py-1 text-[11px] font-semibold rounded-[4px] transition-colors ${
-                    mode === 'signup' ? 'bg-[#3B82F6] text-white shadow-xs' : 'text-[#7F8A9B] hover:text-[#F8FAFC]'
-                  }`}
-                >
-                  Sign Up
-                </button>
-              </div>
+        {/* Auth Card */}
+        <div className="rounded-lg border border-[#D8D8CF] bg-[#FFFFFF] p-6 sm:p-8 shadow-xs">
+          <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#D8D8CF]">
+            <h2 className="font-heading text-xl font-bold text-[#231F20]">
+              {mode === 'login' ? 'Sign In' : 'Create Account'}
+            </h2>
+            <div className="flex rounded-md border border-[#D8D8CF] p-0.5 bg-[#F2F2EB]">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('login')
+                  setError('')
+                }}
+                className={`px-3 py-1 text-xs font-mono font-bold rounded transition ${
+                  mode === 'login'
+                    ? 'bg-[#3D5F58] text-white shadow-xs'
+                    : 'text-[#4B5563] hover:text-[#231F20]'
+                }`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('signup')
+                  setError('')
+                }}
+                className={`px-3 py-1 text-xs font-mono font-bold rounded transition ${
+                  mode === 'signup'
+                    ? 'bg-[#3D5F58] text-white shadow-xs'
+                    : 'text-[#4B5563] hover:text-[#231F20]'
+                }`}
+              >
+                Sign Up
+              </button>
             </div>
-            <CardDescription>
-              {mode === 'login'
-                ? 'Enter your credentials to access your adaptive learning path.'
-                : 'Create an account to begin diagnostic concept analysis.'}
-            </CardDescription>
-          </CardHeader>
+          </div>
 
-          <CardContent>
-            {error && (
-              <div className="mb-4 rounded-[6px] border border-[#991B1B] bg-[#2A1618] p-2.5 text-xs text-[#EF4444]">
-                {error}
+          <p className="text-xs text-[#6B7280] mb-5">
+            {mode === 'login'
+              ? 'Enter your credentials to access your adaptive learning dashboard.'
+              : 'Create an account to begin diagnostic concept analysis.'}
+          </p>
+
+          {error && (
+            <div className="mb-4 rounded-md border border-[#FECDD3] bg-[#FFF1F2] p-3 text-xs text-[#9F1239]">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {mode === 'signup' && (
+              <div>
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#3D5F58] mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Alex Rivera"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full bg-[#FAF9F5] text-[#231F20] border border-[#D8D8CF] rounded-md px-3.5 py-2.5 text-xs sm:text-sm focus:bg-[#FFFFFF] focus:outline-none focus:ring-1 focus:ring-[#3D5F58] transition"
+                  required
+                />
               </div>
             )}
 
-            <form onSubmit={handleSubmit}>
-              <FieldGroup>
-                {mode === 'signup' && (
-                  <Field>
-                    <FieldLabel htmlFor="name">Full Name</FieldLabel>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Alex Rivera"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-                  </Field>
-                )}
+            <div>
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#3D5F58] mb-1">
+                Email Address
+              </label>
+              <input
+                type="email"
+                placeholder="student@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-[#FAF9F5] text-[#231F20] border border-[#D8D8CF] rounded-md px-3.5 py-2.5 text-xs sm:text-sm focus:bg-[#FFFFFF] focus:outline-none focus:ring-1 focus:ring-[#3D5F58] transition"
+                required
+              />
+            </div>
 
-                <Field>
-                  <FieldLabel htmlFor="email">Email</FieldLabel>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="student@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  {mode === 'signup' && (
-                    <FieldDescription>
-                      Used for progress notifications and learning reports.
-                    </FieldDescription>
-                  )}
-                </Field>
+            <div>
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#3D5F58] mb-1">
+                Password
+              </label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-[#FAF9F5] text-[#231F20] border border-[#D8D8CF] rounded-md px-3.5 py-2.5 text-xs sm:text-sm focus:bg-[#FFFFFF] focus:outline-none focus:ring-1 focus:ring-[#3D5F58] transition"
+                required
+              />
+            </div>
 
-                <Field>
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  {mode === 'signup' && (
-                    <FieldDescription>
-                      Must be at least 6 characters long.
-                    </FieldDescription>
-                  )}
-                </Field>
+            {mode === 'signup' && (
+              <div>
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#3D5F58] mb-1">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full bg-[#FAF9F5] text-[#231F20] border border-[#D8D8CF] rounded-md px-3.5 py-2.5 text-xs sm:text-sm focus:bg-[#FFFFFF] focus:outline-none focus:ring-1 focus:ring-[#3D5F58] transition"
+                  required
+                />
+              </div>
+            )}
 
-                {mode === 'signup' && (
-                  <Field>
-                    <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                    />
-                  </Field>
-                )}
+            <div className="pt-2 space-y-2">
+              <button
+                type="submit"
+                className="w-full inline-flex items-center justify-center px-4 py-2.5 bg-[#3D5F58] text-white font-sans text-xs sm:text-sm font-bold rounded-md hover:bg-[#2E4742] transition shadow-xs"
+              >
+                {mode === 'login' ? 'Sign In' : 'Create Account'}
+              </button>
 
-                <div className="pt-2 space-y-2">
-                  <Button type="submit" className="w-full">
-                    {mode === 'login' ? 'Sign In' : 'Create Account'}
-                  </Button>
+              <button
+                type="button"
+                onClick={handleDemoLogin}
+                className="w-full inline-flex items-center justify-center px-4 py-2.5 border border-[#D8D8CF] bg-[#FFFFFF] text-[#231F20] font-mono text-xs font-bold rounded-md hover:bg-[#F2F2EB] transition"
+              >
+                Continue as Demo Student
+              </button>
+            </div>
+          </form>
+        </div>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={handleDemoLogin}
-                  >
-                    Continue as Demo Student
-                  </Button>
-                </div>
-
-                <FieldDescription className="text-center pt-2">
-                  {mode === 'login' ? (
-                    <>
-                      Do not have an account?{' '}
-                      <button
-                        type="button"
-                        onClick={() => { setMode('signup'); setError('') }}
-                        className="font-semibold text-[#3B82F6] hover:underline"
-                      >
-                        Create one
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      Already have an account?{' '}
-                      <button
-                        type="button"
-                        onClick={() => { setMode('login'); setError('') }}
-                        className="font-semibold text-[#3B82F6] hover:underline"
-                      >
-                        Sign in
-                      </button>
-                    </>
-                  )}
-                </FieldDescription>
-              </FieldGroup>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* Simple disclaimer without brand name */}
-        <p className="mt-4 text-center text-[11px] text-[#7F8A9B]">
-          Formative diagnostic items are calibrated to detect underlying reasoning patterns, not test capability.
+        <p className="mt-4 text-center font-mono text-[11px] text-[#6B7280]">
+          Diagnostic items are calibrated to detect underlying reasoning patterns, not rank students.
         </p>
       </div>
     </div>

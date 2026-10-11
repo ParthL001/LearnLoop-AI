@@ -4,6 +4,7 @@ import AppLayout from './components/AppLayout'
 
 // Pages
 import PythonPractice from './pages/PythonPractice'
+import CssPractice from './pages/CssPractice'
 import LoginSignup from './pages/login_signup'
 import Dashboard from './pages/Dashboard'
 import ExploreContent from './pages/ExploreContent'
@@ -57,6 +58,7 @@ export default function App() {
         <Route path="/assessments" element={<Assessments />} />
         <Route path="/progress" element={<Progress />} />
         <Route path="/python-practice" element={<PythonPractice />} />
+        <Route path="/css-practice" element={<CssPractice />} />
 
         {/* Informational & Legal Routes */}
         <Route path="/about" element={<About />} />

@@ -68,5 +68,42 @@
       }
     ],
     "cachedAt": "2026-10-11T11:29:50.462Z"
+  },
+  "python:data-types": {
+    "subjectId": "python",
+    "subjectName": "Python",
+    "topicId": "data-types",
+    "generatedAt": "2026-10-11T12:43:50.004Z",
+    "title": "Data Types Example",
+    "description": "This example shows basic data types in Python.",
+    "codeExamples": [
+      "    # Data Types Example\\n    # This is a comment\\n    integer_example = 42\\n    float_example = 3.14\\n    string_example = \"Hello, World!\"\\n    boolean_example = True\\n\\n    # Convert data types\\n    converted_integer = int(float_example)\\n    converted_string = str(integer_example)\\n\\n    # Print results\\n    print(f\"Integer: {integer_example}, Float: {float_example}, String: {string_example}, Boolean: {boolean_example}\")\\n    print(f\"Converted integer: {converted_integer}, Converted string: {converted_string}\")"
+    ],
+    "topicTitle": "Data Types in Python",
+    "shortIntroduction": "Learn about Data Types in Python.",
+    "learningObjectives": [
+      "Learn how to identify, assign, and convert between primitive data types in Python."
+    ],
+    "conceptExplanation": "Data Types is an essential programming concept in Python.",
+    "codeExplanation": "The code demonstrates basic usage and syntax.",
+    "commonMistakes": [
+      "Overlooking boundary conditions or edge cases."
+    ],
+    "shortRecap": "Mastering Data Types establishes a strong foundation in Python.",
+    "practiceQuestions": [
+      {
+        "id": "q1",
+        "prompt": "What is the primary role of Data Types in Python?",
+        "options": [
+          "To organize logic and data safely",
+          "To slow down program execution",
+          "To replace operating system drivers",
+          "None of the above"
+        ],
+        "correctIndex": 0,
+        "explanation": "Data Types provides structured logic and data control in Python."
+      }
+    ],
+    "cachedAt": "2026-10-11T12:43:50.004Z"
   }
 }
