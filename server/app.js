@@ -39,20 +39,16 @@ app.get('/api/health', (req, res) => {
 })
 
 // 4. GET /api/ai/health - Ollama Availability & Model Health
-app.get('/api/ai/health', async (req, res, next) => {
+app.get('/api/ai/health', async (req, res) => {
   try {
-    const health = await geminiService.checkHealth()
-    const isHealthy = health.status === 'connected' && health.modelAvailable
-
-    res.status(isHealthy ? 200 : 503).json({
-      status: isHealthy ? 'ok' : 'degraded',
-      timestamp: new Date().toISOString(),
-      ollama: health,
-    })
-  } catch (err) {
-    next(err)
+    const health = await geminiService.checkHealth();
+    res.json({ gemini: health });
+  } catch (e) {
+    console.error('[Health] Gemini check failed', e);
+    res.status(500).json({ error: 'Gemini health check failed' });
   }
-})
+});
+
 
 // 5. Mount Learning Content, Tutor, Adaptive, Progress, and Assessment Routes under /api
 app.use('/api', contentRoutes)

@@ -52,7 +52,8 @@ export default function PythonPractice() {
     }
   }, [])
 
-  const exercise = exercises[index]
+ const exercise = exercises[index] || {};
+
 
   function moveToQuestion(nextIndex) {
     if (nextIndex < 0 || nextIndex >= exercises.length) return
