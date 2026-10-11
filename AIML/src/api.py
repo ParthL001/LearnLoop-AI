@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import FastAPI
 from pydantic import BaseModel
-from predict import predict
+from .predict import predict
 
 app = FastAPI(
     title="LearnLoop AI - AIML API",

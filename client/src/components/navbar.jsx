@@ -56,21 +56,21 @@ export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout 
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[#303846] bg-[#080A0D] px-4 sm:px-6">
+      <header className="sticky top-0 z-30 flex h-15 items-center justify-between border-b border-[#D8D8CF] bg-[#FFFFFF] px-4 sm:px-6 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
         {/* Left side: mobile toggle & current title */}
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onOpenMobileMenu}
             aria-label="Toggle navigation menu"
-            className="rounded-[5px] border border-[#303846] p-1.5 text-[#A8B3C4] hover:bg-[#14171C] hover:text-[#F8FAFC] lg:hidden transition-colors"
+            className="rounded-[4px] border border-[#D8D8CF] p-1.5 text-[#231F20] hover:bg-[#F2F2EB] lg:hidden transition-colors"
           >
             <Menu size={16} />
           </button>
 
           <div className="flex items-center gap-2.5">
             <Logo className="h-5 w-auto lg:hidden shrink-0" />
-            <h1 className="text-sm font-bold text-[#F8FAFC] tracking-tight">
+            <h1 className="font-heading text-lg font-bold text-[#231F20] tracking-tight">
               {currentTitle || 'Dashboard'}
             </h1>
           </div>
@@ -81,13 +81,13 @@ export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout 
           <button
             type="button"
             onClick={() => setOpenCommand(true)}
-            className="w-full flex items-center justify-between px-3 py-1.5 text-xs text-[#7F8A9B] bg-[#14171C] border border-[#303846] rounded-[6px] hover:bg-[#1B2028] hover:text-[#F8FAFC] hover:border-[#475569] transition-colors"
+            className="w-full flex items-center justify-between px-3 py-1.5 text-xs text-[#6B6864] bg-[#F2F2EB] border border-[#D8D8CF] rounded-[6px] hover:bg-[#FFFFFF] hover:text-[#231F20] hover:border-[#3D5F58] transition-colors"
           >
             <div className="flex items-center gap-2 min-w-0">
-              <Search size={14} className="shrink-0 text-[#7F8A9B]" />
+              <Search size={14} className="shrink-0 text-[#3D5F58]" />
               <span className="truncate">Search concepts, practice, lessons...</span>
             </div>
-            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold text-[#A8B3C4] bg-[#1B2028] border border-[#303846] rounded-[3px] shrink-0 ml-2">
+            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 font-mono text-[9px] font-semibold text-[#231F20] bg-[#E5E5DC] border border-[#D8D8CF] rounded-[3px] shrink-0 ml-2">
               Ctrl K
             </kbd>
           </button>
@@ -97,26 +97,26 @@ export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout 
         <div className="flex items-center gap-1.5 sm:gap-2">
           <nav className="flex items-center gap-1 mr-1">
             <Link
-              to="/dashboard"
-              className="px-2.5 py-1 text-xs font-medium text-[#A8B3C4] hover:text-[#F8FAFC] hover:bg-[#14171C] rounded-[5px] transition-colors hidden md:inline-flex items-center gap-1.5"
+              to="/explore"
+              className="px-2.5 py-1 text-xs font-semibold text-[#231F20] hover:text-[#3D5F58] hover:bg-[#F2F2EB] rounded-[4px] transition-colors hidden md:inline-flex items-center gap-1.5"
             >
-              <Home size={13} />
-              <span>Dashboard</span>
+              <Compass size={13} className="text-[#3D5F58]" />
+              <span>Explore</span>
             </Link>
 
             <Link
               to="/tutor"
-              className="px-2.5 py-1 text-xs font-semibold text-[#3B82F6] bg-[#152746] border border-[#1E3A8A] rounded-[5px] hover:bg-[#1E3A8A]/60 transition-colors inline-flex items-center gap-1.5"
+              className="px-2.5 py-1 text-xs font-semibold text-[#FFFFFF] bg-[#3D5F58] border border-[#3D5F58] rounded-[4px] hover:bg-[#2E4742] transition-colors inline-flex items-center gap-1.5"
             >
-              <Sparkles size={13} />
+              <Sparkles size={13} className="text-[#F5B726]" />
               <span>AI Tutor</span>
             </Link>
           </nav>
 
           {/* User badge & logout */}
-          <div className="flex items-center gap-2 pl-2 border-l border-[#303846]">
+          <div className="flex items-center gap-2 pl-2 border-l border-[#D8D8CF]">
             {user && (
-              <span className="text-xs text-[#A8B3C4] hidden xl:inline-block font-medium">
+              <span className="text-xs text-[#231F20] hidden xl:inline-block font-semibold">
                 {user.name || user.email?.split('@')[0] || 'Learner'}
               </span>
             )}
@@ -126,7 +126,7 @@ export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout 
               onClick={handleLogout}
               title="Sign Out"
               aria-label="Sign Out"
-              className="p-1.5 rounded-[5px] border border-[#303846] text-[#7F8A9B] hover:text-[#F87171] hover:border-[#7F1D1D] hover:bg-[#450A0A]/30 transition-colors"
+              className="p-1.5 rounded-[4px] border border-[#D8D8CF] text-[#6B6864] hover:text-[#E97B77] hover:border-[#E97B77] hover:bg-[#FEF2F2] transition-colors"
             >
               <LogOut size={14} />
             </button>

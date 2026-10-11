@@ -35,14 +35,12 @@ router.post('/python/diagnose', async (req, res, next) => {
 
         if (
             typeof question !== 'string' ||
-            typeof correctAnswer !== 'string' ||
             typeof studentAnswer !== 'string' ||
             !question.trim() ||
-            !correctAnswer.trim() ||
             !studentAnswer.trim()
         ) {
             return res.status(400).json({
-                error: 'question, correctAnswer and studentAnswer are required strings',
+                error: 'question and studentAnswer are required strings',
             })
         }
 

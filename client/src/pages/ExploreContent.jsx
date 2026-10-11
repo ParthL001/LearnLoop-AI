@@ -1,53 +1,63 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, Button, Badge } from '../components/UI'
 import { fetchSubjects } from '../services/api'
-import { ArrowRight, Code2, Cpu, BookOpen, Layers, Terminal, Sparkles, RefreshCw } from 'lucide-react'
+import {
+  ArrowRight,
+  Code2,
+  Layers,
+  Terminal,
+  Sparkles,
+  BookOpen,
+  Layout,
+} from 'lucide-react'
 
-// Default fallback catalog if backend is connecting
 const FALLBACK_SUBJECTS = [
   {
     id: 'python',
     name: 'Python',
-    description: 'Master clean, readable Python fundamentals from variables and control flow to stack and queue data structures.',
+    badge: 'Interpreted',
+    tagline: 'Clean syntax, dynamic typing, and expressive standard library',
+    description:
+      'Master fundamental computational thinking with Python. Deepen your understanding of variables, control flow, functions, and standard data structures like Stack and Queue.',
     topics: [
       { id: 'data-types', title: 'Data Types', description: 'Primitive types (int, float, str, bool) and dynamic typing' },
       { id: 'variables', title: 'Variables', description: 'Naming conventions, variable assignment, and memory references' },
       { id: 'loops', title: 'Loops', description: 'For loops, while loops, range iteration, and loop control' },
       { id: 'stack', title: 'Stack', description: 'LIFO data structure behavior, push/pop operations with lists' },
       { id: 'queue', title: 'Queue', description: 'FIFO data structure behavior using collections.deque' },
-    ]
+    ],
   },
   {
     id: 'cpp',
     name: 'C++',
-    description: 'Learn robust systems programming with strongly typed primitives, loops, and standard template library structures.',
+    badge: 'Compiled',
+    tagline: 'Static types, memory management, and Standard Template Library',
+    description:
+      'Explore high-performance systems programming. Build rigorous mental models around static type safety, iterative loops, and STL containers.',
     topics: [
       { id: 'data-types', title: 'Data Types', description: 'Static types (int, double, char, bool) and memory sizes' },
       { id: 'variables', title: 'Variables', description: 'Variable declarations, scope, and constants' },
       { id: 'loops', title: 'Loops', description: 'For loops, while loops, and do-while iterative control' },
       { id: 'stack', title: 'Stack', description: 'LIFO container adapter behavior using std::stack' },
       { id: 'queue', title: 'Queue', description: 'FIFO container adapter behavior using std::queue' },
-    ]
-  }
+    ],
+  },
 ]
 
 export default function ExploreContent() {
   const [subjects, setSubjects] = useState(FALLBACK_SUBJECTS)
+  const [selectedSubject, setSelectedSubject] = useState('python')
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
 
   const loadSubjects = async () => {
     setLoading(true)
-    setError(null)
     try {
       const data = await fetchSubjects()
       if (Array.isArray(data) && data.length > 0) {
         setSubjects(data)
       }
     } catch (err) {
-      console.warn('Using local catalog fallback:', err.message)
-      // Keep fallback subjects
+      console.warn('Using local fallback catalog:', err.message)
     } finally {
       setLoading(false)
     }
@@ -59,82 +69,124 @@ export default function ExploreContent() {
 
   return (
     <div className="space-y-6">
-      {/* Page Heading */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#303846] pb-5">
+      {/* Page Header */}
+      <div className="bg-[#FFFFFF] border border-[#D8D8CF] rounded-lg p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-[#F8FAFC] tracking-tight">Explore Content</h1>
-            <Badge variant="accent">AI-Powered</Badge>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#3D5F58]"></span>
+            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#3D5F58]">
+              Curriculum Catalog
+            </span>
           </div>
-          <p className="mt-1 text-xs text-[#A8B3C4] leading-relaxed">
-            Select a programming language track to access dynamically generated lessons and interactive code challenges.
+          <h1 className="font-heading text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-[#231F20]">
+            Explore Content
+          </h1>
+          <p className="text-sm text-[#4B5563] mt-1 max-w-xl">
+            Choose a programming language and concept topic. Lessons are generated on demand with clear mental models, code traces, and interactive checks.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Link to="/python-practice">
-            <Button variant="secondary" size="sm">
-              <Code2 size={13} className="text-[#3B82F6]" />
-              <span>Python Diagnostic Practice</span>
-            </Button>
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <Link
+            to="/python-practice"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#F2F2EB] text-[#231F20] font-mono text-xs font-bold rounded-md border border-[#D8D8CF] hover:bg-[#3D5F58] hover:text-white transition"
+          >
+            <Code2 size={13} />
+            <span>Python Practice</span>
           </Link>
-          <Link to="/tutor">
-            <Button variant="secondary" size="sm">
-              <Sparkles size={13} className="text-[#3B82F6]" />
-              <span>Ask AI Tutor</span>
-            </Button>
+          <Link
+            to="/css-practice"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#F2F2EB] text-[#231F20] font-mono text-xs font-bold rounded-md border border-[#D8D8CF] hover:bg-[#3D5F58] hover:text-white transition"
+          >
+            <Layout size={13} />
+            <span>CSS Practice</span>
           </Link>
         </div>
       </div>
 
-      {/* Subject Cards Grid */}
+      {/* Language Track Selector Tabs */}
+      <div className="flex items-center gap-2 border-b border-[#D8D8CF] pb-2">
+        {subjects.map((sub) => {
+          const isSelected = selectedSubject === sub.id
+          return (
+            <button
+              key={sub.id}
+              onClick={() => setSelectedSubject(sub.id)}
+              className={`px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider rounded-md transition ${
+                isSelected
+                  ? 'bg-[#3D5F58] text-white shadow-xs'
+                  : 'bg-[#FFFFFF] text-[#231F20] border border-[#D8D8CF] hover:bg-[#F2F2EB]'
+              }`}
+            >
+              {sub.name} Track
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Track Cards Grid */}
       <div className="grid gap-6 md:grid-cols-2">
         {subjects.map((subject) => {
           const isPython = subject.id === 'python'
+          const isSelected = selectedSubject === subject.id
           const Icon = isPython ? Terminal : Code2
 
           return (
             <div
               key={subject.id}
-              className="flex flex-col justify-between rounded-[8px] border border-[#303846] bg-[#14171C] p-6 hover:border-[#3B82F6]/50 transition-all duration-150"
+              className={`flex flex-col justify-between rounded-lg border bg-[#FFFFFF] p-6 transition shadow-xs ${
+                isSelected
+                  ? 'border-[#3D5F58] ring-1 ring-[#3D5F58]'
+                  : 'border-[#D8D8CF] hover:border-[#3D5F58]'
+              }`}
             >
               <div className="space-y-4">
                 {/* Header */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-[6px] border border-[#303846] bg-[#1B2028] text-[#3B82F6]">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-md border border-[#D8D8CF] bg-[#F2F2EB] text-[#3D5F58]">
                       <Icon size={22} />
                     </div>
                     <div>
-                      <h2 className="text-lg font-bold text-[#F8FAFC] tracking-tight">
+                      <h2 className="font-heading text-xl font-bold text-[#231F20] tracking-tight">
                         {subject.name}
                       </h2>
-                      <span className="text-[11px] font-medium text-[#7F8A9B]">
-                        {subject.topics?.length || 5} Lessons available
+                      <span className="font-mono text-xs text-[#6B7280]">
+                        {subject.topics?.length || 5} Core Topics Available
                       </span>
                     </div>
                   </div>
-                  <Badge variant="neutral">{isPython ? 'Interpreted' : 'Compiled'}</Badge>
+                  <span className="font-mono text-xs font-bold text-[#3D5F58] bg-[#F2F2EB] px-2 py-0.5 rounded border border-[#D8D8CF]">
+                    {subject.badge || (isPython ? 'INTERPRETED' : 'COMPILED')}
+                  </span>
                 </div>
 
                 {/* Description */}
-                <p className="text-xs text-[#A8B3C4] leading-relaxed">
+                <p className="text-xs text-[#4B5563] leading-relaxed">
                   {subject.description}
                 </p>
 
                 {/* Topics Preview */}
                 <div className="space-y-2 pt-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#7F8A9B]">
-                    Included Topics
+                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#6B7280]">
+                    Available Concepts
                   </span>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {subject.topics?.map((topic) => (
                       <Link
                         key={topic.id}
                         to={`/lessons/${subject.id}/${topic.id}`}
-                        className="rounded-[4px] border border-[#303846] bg-[#1B2028] px-2.5 py-1 text-[11px] font-medium text-[#A8B3C4] hover:border-[#3B82F6] hover:text-[#F8FAFC] transition-colors"
+                        className="p-2.5 rounded-md border border-[#D8D8CF] bg-[#FAF9F5] hover:bg-[#FFFFFF] hover:border-[#3D5F58] transition group flex items-center justify-between"
                       >
-                        {topic.title}
+                        <div>
+                          <div className="font-heading text-sm font-bold text-[#231F20] group-hover:text-[#3D5F58] transition-colors">
+                            {topic.title}
+                          </div>
+                          <div className="font-mono text-[10px] text-[#6B7280] line-clamp-1">
+                            {topic.description}
+                          </div>
+                        </div>
+                        <ArrowRight size={13} className="text-[#6B7280] group-hover:text-[#3D5F58] group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
                       </Link>
                     ))}
                   </div>
@@ -142,15 +194,16 @@ export default function ExploreContent() {
               </div>
 
               {/* Action */}
-              <div className="pt-6 mt-4 border-t border-[#303846]/60 flex items-center justify-between">
-                <span className="text-[11px] text-[#7F8A9B]">
-                  Dynamic AI lessons via Ollama
+              <div className="pt-6 mt-6 border-t border-[#D8D8CF] flex items-center justify-between">
+                <span className="font-mono text-[11px] text-[#6B7280]">
+                  Dynamic Ollama Qwen3:4b
                 </span>
-                <Link to={`/lessons/${subject.id}`}>
-                  <Button variant="primary" size="sm">
-                    <span>Explore Lessons</span>
-                    <ArrowRight size={14} />
-                  </Button>
+                <Link
+                  to={`/lessons/${subject.id}`}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#3D5F58] text-white font-sans text-xs font-bold rounded-md hover:bg-[#2E4742] transition shadow-xs"
+                >
+                  <span>Start Track</span>
+                  <ArrowRight size={13} />
                 </Link>
               </div>
             </div>
@@ -158,15 +211,17 @@ export default function ExploreContent() {
         })}
       </div>
 
-      {/* Guidance Note */}
-      <div className="rounded-[6px] border border-[#303846] bg-[#1B2028] p-4 flex items-start gap-3">
-        <Layers size={18} className="text-[#3B82F6] shrink-0 mt-0.5" />
+      {/* Dynamic Engine Callout */}
+      <div className="rounded-lg border border-[#D8D8CF] bg-[#FFFFFF] p-5 flex items-start gap-3 shadow-xs">
+        <div className="p-2 bg-[#F2F2EB] text-[#3D5F58] rounded-md border border-[#D8D8CF] shrink-0">
+          <Layers size={18} />
+        </div>
         <div className="text-xs space-y-1">
-          <p className="font-semibold text-[#F8FAFC]">
-            Dynamic Learning Engine (qwen3:4b)
+          <p className="font-heading text-sm font-bold text-[#231F20]">
+            Dynamic Adaptive Generation via Local Qwen3:4b
           </p>
-          <p className="text-[#A8B3C4] leading-relaxed">
-            Lessons are generated dynamically on demand by your local Ollama instance and cached for instantaneous review. Every topic includes conceptual models, runnable code examples, common pitfalls, and interactive practice checks.
+          <p className="text-[#4B5563] leading-relaxed font-sans">
+            Lessons are generated dynamically by your local Ollama backend. Python lessons contain verified Python code walkthroughs and idioms, while C++ lessons feature statically typed syntax, header inclusions, and STL containers.
           </p>
         </div>
       </div>
