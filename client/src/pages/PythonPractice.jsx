@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import {
     fetchPythonExercises,
     diagnosePythonAnswer,
+    checkPythonFollowup,
 } from '../services/api'
 import { Card, Button, Badge } from '../components/UI'
 import { AlertTriangle, CheckCircle, Loader2 } from 'lucide-react'
@@ -13,9 +14,13 @@ export default function PythonPractice() {
     const [answer, setAnswer] = useState('')
     const [reasoning, setReasoning] = useState('')
     const [diagnosis, setDiagnosis] = useState(null)
+    const [showFollowup, setShowFollowup] = useState(false)
+    const [followupAnswer, setFollowupAnswer] = useState('')
+    const [followupFeedback, setFollowupFeedback] = useState('')
     const [loading, setLoading] = useState(false)
     const [loadingExercises, setLoadingExercises] = useState(true)
     const [error, setError] = useState('')
+    const [checkingFollowup, setCheckingFollowup] = useState(false)
 
     useEffect(() => {
         let active = true
@@ -39,7 +44,7 @@ export default function PythonPractice() {
         }
     }, [])
 
-    const exercise = exercises[index]
+    const exercise = exercises?.[index] ?? null
 
     function moveToQuestion(nextIndex) {
         setIndex(nextIndex)
@@ -47,6 +52,9 @@ export default function PythonPractice() {
         setReasoning('')
         setDiagnosis(null)
         setError('')
+        setShowFollowup(false)
+        setFollowupAnswer('')
+        setFollowupFeedback('')
     }
 
     async function handleSubmit(e) {
@@ -56,6 +64,9 @@ export default function PythonPractice() {
         setLoading(true)
         setError('')
         setDiagnosis(null)
+        setShowFollowup(false)
+        setFollowupAnswer('')
+        setFollowupFeedback('')
 
         try {
             const result = await diagnosePythonAnswer({
@@ -71,6 +82,32 @@ export default function PythonPractice() {
             setLoading(false)
         }
     }
+    async function handleFollowupSubmit() {
+        if (!followupAnswer.trim() || !exercise || checkingFollowup) return
+
+        setCheckingFollowup(true)
+        setFollowupFeedback('')
+        setError('')
+
+        try {
+            const result = await checkPythonFollowup({
+                exampleId: exercise.example_id,
+                studentAnswer: followupAnswer.trim(),
+            })
+
+            setFollowupFeedback(
+                result.feedback || (
+                    result.is_correct
+                        ? 'You have understood this concept.'
+                        : 'Review the concept and try again.'
+                )
+            )
+        } catch (err) {
+            setError(err.message || 'Could not check your follow-up answer.')
+        } finally {
+            setCheckingFollowup(false)
+        }
+    }
 
     if (loadingExercises) {
         return (
@@ -82,14 +119,17 @@ export default function PythonPractice() {
         )
     }
 
-    if (!exercises.length) {
+    if (!exercise) {
         return (
             <Card>
                 <p className="text-sm text-red-400">
-                    {error || 'No exercises are available.'}
+                    Exercise not found. Please reload the page.
                 </p>
-                <Button type="button" onClick={() => window.location.reload()}>
-                    Retry
+                <Button
+                    type="button"
+                    onClick={() => window.location.reload()}
+                >
+                    Reload
                 </Button>
             </Card>
         )
@@ -224,12 +264,58 @@ export default function PythonPractice() {
                                 </p>
                             )}
 
-                        {diagnosis.followup_goal && (
-                            <p className="text-sm text-[#A8B3C4]">
-                                <strong>Next learning goal:</strong>{' '}
-                                {diagnosis.followup_goal}
-                            </p>
-                        )}
+                        {!diagnosis.is_correct &&
+                            diagnosis.misconception_label !== 'uncertain_needs_clarification' &&
+                            diagnosis.followup_goal && (
+                                <div className="space-y-3 rounded-lg border border-[#303846] p-4">
+                                    <h4 className="font-semibold text-[#F8FAFC]">
+                                        Targeted practice
+                                    </h4>
+
+                                    {!showFollowup ? (
+                                        <Button
+                                            type="button"
+                                            onClick={() => setShowFollowup(true)}
+                                        >
+                                            Try Follow-up
+                                        </Button>
+                                    ) : (
+                                        <>
+                                            <p className="text-sm text-[#A8B3C4]">
+                                                {exercise.followup_question}
+                                            </p>
+
+                                            <input
+                                                value={followupAnswer}
+                                                onChange={(e) => setFollowupAnswer(e.target.value)}
+                                                placeholder="Enter your answer..."
+                                                className="w-full rounded-md border border-[#303846] bg-[#1B2028] p-3 text-sm text-white"
+                                            />
+
+                                            <Button
+                                                type="button"
+                                                disabled={!followupAnswer.trim() || checkingFollowup}
+                                                onClick={handleFollowupSubmit}
+                                            >
+                                                {checkingFollowup ? (
+                                                    <>
+                                                        <Loader2 size={14} className="animate-spin" />
+                                                        Checking...
+                                                    </>
+                                                ) : (
+                                                    'Check Follow-up'
+                                                )}
+                                            </Button>
+
+                                            {followupFeedback && (
+                                                <p className="text-sm text-[#A8B3C4]">
+                                                    {followupFeedback}
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                            )}
                     </div>
                 </Card>
             )}
