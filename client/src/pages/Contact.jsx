@@ -13,30 +13,32 @@ export default function Contact() {
   return (
     <div className="space-y-6">
       <Card>
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-bold text-[#F8FAFC]">Contact & Support</h2>
+        <div className="flex items-center gap-2.5">
+          <h2 className="text-lg font-bold text-[var(--text-main)] font-heading">Contact & Support</h2>
           <Badge variant="neutral">Inquiries</Badge>
         </div>
-        <p className="mt-1 text-xs text-[#A8B3C4] max-w-2xl leading-relaxed">
+        <p className="mt-1 text-xs text-[var(--text-muted)] max-w-2xl leading-relaxed">
           Have questions regarding the adaptive tutor, curriculum alignment, or misconception diagnostics? Send a message to the engineering team.
         </p>
       </Card>
 
       <Card className="max-w-xl">
         {submitted ? (
-          <div className="p-4 rounded-[6px] border border-[#166534] bg-[#14291E] text-xs text-[#22C55E]">
-            <p className="font-bold">Thank you for reaching out.</p>
-            <p className="mt-1 text-[#86EFAC]">Your message has been received by the engineering team.</p>
-            <Button
-              variant="secondary"
-              className="mt-4"
-              onClick={() => {
-                setSubmitted(false)
-                setFormData({ name: '', email: '', subject: '', message: '' })
-              }}
-            >
-              Send another note
-            </Button>
+          <div className="p-5 rounded-xl border border-emerald-200 bg-emerald-50 text-xs text-emerald-900 space-y-2">
+            <p className="font-bold text-sm font-heading text-emerald-950">Thank you for reaching out.</p>
+            <p className="text-emerald-800 leading-relaxed">Your message has been received by the engineering team.</p>
+            <div className="pt-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setSubmitted(false)
+                  setFormData({ name: '', email: '', subject: '', message: '' })
+                }}
+              >
+                Send another note
+              </Button>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -65,7 +67,7 @@ export default function Contact() {
               required
             />
             <div>
-              <label className="block text-xs font-semibold text-[#F8FAFC] mb-1.5">
+              <label className="block text-xs font-semibold text-[var(--text-main)] mb-1.5 font-sans">
                 Message
               </label>
               <textarea
@@ -74,7 +76,7 @@ export default function Contact() {
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder="Write your note here..."
-                className="w-full text-xs p-3 rounded-[6px] border border-[#303846] bg-[#1B2028] text-[#F8FAFC] placeholder:text-[#7F8A9B] focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] outline-none"
+                className="w-full text-xs p-3 rounded-lg border border-[var(--border-color)] bg-white text-[var(--text-main)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] outline-none"
               />
             </div>
             <Button type="submit" variant="primary">

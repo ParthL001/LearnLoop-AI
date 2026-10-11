@@ -12,20 +12,20 @@ export function Button({
     'inline-flex items-center justify-center font-medium transition-all duration-150 border select-none disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2'
 
   const sizeStyles = {
-    xs: 'text-[11px] px-2 py-0.5 rounded-[4px] gap-1 font-semibold',
-    sm: 'text-xs px-2.5 py-1 rounded-[4px] gap-1.5 font-medium',
-    md: 'text-xs px-3.5 py-1.5 rounded-[6px] gap-2 font-semibold',
-    lg: 'text-sm px-4.5 py-2.5 rounded-[6px] gap-2 font-semibold',
+    xs: 'text-[11px] px-2 py-0.5 rounded-md gap-1 font-semibold',
+    sm: 'text-xs px-2.5 py-1 rounded-md gap-1.5 font-medium',
+    md: 'text-xs px-3.5 py-1.5 rounded-lg gap-2 font-semibold',
+    lg: 'text-sm px-4.5 py-2.5 rounded-lg gap-2 font-semibold',
   }
 
   const variantStyles = {
-    primary: 'bg-[#3D5F58] text-[#FFFFFF] border-[#3D5F58] hover:bg-[#2E4742] active:bg-[#233834]',
-    secondary: 'bg-[#FFFFFF] text-[#231F20] border-[#D8D8CF] hover:bg-[#F2F2EB] hover:border-[#231F20]',
-    subtle: 'bg-[#E2ECE9] text-[#2E4742] border-[#C2D7D2] hover:bg-[#D1E3DF]',
-    accent: 'bg-[#F5B726] text-[#231F20] border-[#D99B16] hover:bg-[#E5A716]',
-    sky: 'bg-[#8BB2DE] text-[#231F20] border-[#729ECF] hover:bg-[#729ECF]',
-    ghost: 'bg-transparent text-[#231F20] border-transparent hover:bg-[#E5E5DC]',
-    danger: 'bg-[#E97B77] text-[#FFFFFF] border-[#D66965] hover:bg-[#D66965]',
+    primary: 'bg-[var(--accent-primary)] text-white border-[var(--accent-primary)] hover:bg-[var(--accent-hover)] shadow-xs font-semibold',
+    secondary: 'bg-white text-[var(--text-main)] border-[var(--border-color)] hover:bg-[var(--bg-surface-sunken)] shadow-xs font-semibold',
+    subtle: 'bg-[var(--accent-subtle)] text-[var(--accent-primary)] border-[#C7D2FE] hover:bg-[#E0E7FF]',
+    accent: 'bg-[#F59E0B] text-slate-900 border-[#D97706] hover:bg-[#D97706]',
+    sky: 'bg-[#0284C7] text-white border-[#0284C7] hover:bg-[#0369A1]',
+    ghost: 'bg-transparent text-[var(--text-main)] border-transparent hover:bg-[var(--bg-surface-sunken)]',
+    danger: 'bg-[var(--danger)] text-white border-[var(--danger)] hover:opacity-90',
   }
 
   return (
@@ -33,7 +33,7 @@ export function Button({
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
+      className={`${baseStyles} ${sizeStyles[size] || sizeStyles.md} ${variantStyles[variant] || variantStyles.primary} ${className}`}
       {...props}
     >
       {children}
@@ -44,31 +44,31 @@ export function Button({
 export function Card({ children, className = '', header, footer, ...props }) {
   return (
     <div
-      className={`bg-[#FFFFFF] border border-[#D8D8CF] rounded-[8px] text-[#231F20] shadow-[0_1px_3px_rgba(0,0,0,0.04)] ${className}`}
+      className={`bg-white border border-[var(--border-color)] rounded-xl text-[var(--text-main)] shadow-[var(--shadow-card)] ${className}`}
       {...props}
     >
-      {header && <div className="px-5 py-3.5 border-b border-[#D8D8CF] bg-[#FAF9F5] rounded-t-[8px]">{header}</div>}
+      {header && <div className="px-5 py-3.5 border-b border-[var(--border-color)] bg-[var(--bg-surface-sunken)]/60 rounded-t-xl">{header}</div>}
       <div className="p-5">{children}</div>
-      {footer && <div className="px-5 py-3 border-t border-[#D8D8CF] bg-[#FAF9F5] rounded-b-[8px]">{footer}</div>}
+      {footer && <div className="px-5 py-3 border-t border-[var(--border-color)] bg-[var(--bg-surface-sunken)]/60 rounded-b-xl">{footer}</div>}
     </div>
   )
 }
 
 export function Badge({ children, variant = 'neutral', className = '' }) {
   const variantStyles = {
-    neutral: 'bg-[#F2F2EB] text-[#231F20] border-[#D8D8CF]',
-    accent: 'bg-[#E2ECE9] text-[#2E4742] border-[#C2D7D2]',
-    ochre: 'bg-[#FEF3C7] text-[#92400E] border-[#F5B726]',
-    sky: 'bg-[#E0F2FE] text-[#0369A1] border-[#8BB2DE]',
-    pink: 'bg-[#FCE7E7] text-[#991B1B] border-[#E97B77]',
-    success: 'bg-[#ECFDF5] text-[#065F46] border-[#A7F3D0]',
-    warning: 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]',
-    danger: 'bg-[#FEF2F2] text-[#991B1B] border-[#FECACA]',
+    neutral: 'bg-slate-100 text-slate-700 border-slate-200',
+    accent: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+    ochre: 'bg-amber-50 text-amber-800 border-amber-200',
+    sky: 'bg-sky-50 text-sky-800 border-sky-200',
+    pink: 'bg-pink-50 text-pink-800 border-pink-200',
+    success: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+    warning: 'bg-amber-50 text-amber-800 border-amber-200',
+    danger: 'bg-rose-50 text-rose-800 border-rose-200',
   }
 
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase border rounded-[4px] font-mono ${variantStyles[variant] || variantStyles.neutral} ${className}`}
+      className={`inline-flex items-center px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase border rounded-md font-mono ${variantStyles[variant] || variantStyles.neutral} ${className}`}
     >
       {children}
     </span>
@@ -81,9 +81,9 @@ export function ProgressBar({ value = 0, max = 100, label, className = '' }) {
   return (
     <div className={`w-full ${className}`}>
       {label && (
-        <div className="flex justify-between items-center text-xs mb-1.5 font-medium text-[#6B6864]">
+        <div className="flex justify-between items-center text-xs mb-1.5 font-medium text-[var(--text-muted)]">
           <span>{label}</span>
-          <span className="text-[#231F20] font-semibold font-mono">{percentage}%</span>
+          <span className="text-[var(--text-main)] font-semibold font-mono">{percentage}%</span>
         </div>
       )}
       <div
@@ -91,10 +91,10 @@ export function ProgressBar({ value = 0, max = 100, label, className = '' }) {
         aria-valuenow={percentage}
         aria-valuemin="0"
         aria-valuemax="100"
-        className="w-full h-2 bg-[#E5E5DC] border border-[#D8D8CF] rounded-[3px] overflow-hidden"
+        className="w-full h-2 bg-slate-100 border border-[var(--border-color)] rounded-full overflow-hidden"
       >
         <div
-          className="h-full bg-[#3D5F58] transition-all duration-300 rounded-r-[2px]"
+          className="h-full bg-[var(--accent-primary)] transition-all duration-300 rounded-full"
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -108,19 +108,19 @@ export function Input({ label, error, helperText, className = '', id, ...props }
   return (
     <div className="w-full">
       {label && (
-        <label htmlFor={inputId} className="block text-xs font-semibold text-[#231F20] mb-1.5">
+        <label htmlFor={inputId} className="block text-xs font-semibold text-[var(--text-main)] mb-1.5">
           {label}
         </label>
       )}
       <input
         id={inputId}
-        className={`w-full px-3 py-2 text-xs bg-[#FFFFFF] border border-[#D8D8CF] rounded-[6px] text-[#231F20] placeholder:text-[#A8A29E] focus:border-[#3D5F58] focus:outline-none focus:ring-1 focus:ring-[#3D5F58] transition-colors disabled:opacity-50 disabled:bg-[#F2F2EB] ${
-          error ? 'border-[#E97B77] focus:border-[#E97B77] focus:ring-[#E97B77]' : ''
+        className={`w-full px-3 py-2 text-xs bg-white border border-[var(--border-color)] rounded-lg text-[var(--text-main)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] transition-colors disabled:opacity-50 disabled:bg-slate-50 ${
+          error ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500' : ''
         } ${className}`}
         {...props}
       />
-      {error && <p className="mt-1 text-[11px] text-[#E97B77]">{error}</p>}
-      {helperText && !error && <p className="mt-1 text-[11px] text-[#6B6864]">{helperText}</p>}
+      {error && <p className="mt-1 text-[11px] text-rose-600 font-medium">{error}</p>}
+      {helperText && !error && <p className="mt-1 text-[11px] text-[var(--text-muted)]">{helperText}</p>}
     </div>
   )
 }
