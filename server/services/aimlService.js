@@ -1,7 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { ollamaService } from './ollamaService.js'
+import { geminiService } from './geminiService.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -129,7 +129,7 @@ Respond strictly in valid JSON matching this schema:
   "followup_goal": "Next concept or practice step"
 }`
 
-    const rawResponse = await ollamaService.generate({
+    const rawResponse = await geminiService.generate({
       prompt,
       system: 'You are an educational AI evaluator for Python. You strictly respond in pure JSON.',
       options: {

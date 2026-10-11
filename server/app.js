@@ -2,7 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import { configureCors } from './middleware/corsConfig.js'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js'
-import { ollamaService } from './services/ollamaService.js'
+import { geminiService } from './services/geminiService.js'
 import contentRoutes from './routes/contentRoutes.js'
 import tutorRoutes from './routes/tutorRoutes.js'
 import adaptiveRoutes from './routes/adaptiveRoutes.js'
@@ -41,7 +41,7 @@ app.get('/api/health', (req, res) => {
 // 4. GET /api/ai/health - Ollama Availability & Model Health
 app.get('/api/ai/health', async (req, res, next) => {
   try {
-    const health = await ollamaService.checkHealth()
+    const health = await geminiService.checkHealth()
     const isHealthy = health.status === 'connected' && health.modelAvailable
 
     res.status(isHealthy ? 200 : 503).json({
