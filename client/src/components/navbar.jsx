@@ -14,6 +14,7 @@ import {
   CommandShortcut,
 } from '@/components/ui/command'
 import { useApp } from '@/context/AppContext'
+import Logo from './Logo'
 
 export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout }) {
   const [openCommand, setOpenCommand] = useState(false)
@@ -68,6 +69,7 @@ export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout 
           </button>
 
           <div className="flex items-center gap-2">
+            <Logo className="h-5 w-auto lg:hidden shrink-0" />
             <h1 className="text-sm font-bold text-[#181816]">
               {currentTitle || 'Dashboard'}
             </h1>

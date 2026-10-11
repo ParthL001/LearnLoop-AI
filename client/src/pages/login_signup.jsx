@@ -15,6 +15,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import Logo from '@/components/Logo'
 
 export default function LoginSignup({ onLoginSuccess }) {
   const [mode, setMode] = useState('login') // 'login' or 'signup'
@@ -71,9 +72,7 @@ export default function LoginSignup({ onLoginSuccess }) {
       <div className="w-full max-w-md">
         {/* Brand header */}
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-[4px] bg-[#3730a3] text-sm font-bold text-white">
-            C
-          </div>
+          <Logo className="mx-auto mb-2 h-10 w-auto" />
           <h1 className="text-xl font-bold tracking-tight text-[#181816]">Cognara</h1>
           <p className="mt-0.5 text-xs text-[#797973]">AI Adaptive Tutor & Misconception Detector</p>
         </div>

@@ -4,6 +4,7 @@ import {
   ClipboardCheck, BarChart2, X, Shield, FileText
 } from 'lucide-react'
 import { Badge } from './UI'
+import Logo from './Logo'
 
 export const navItems = [
   { name: 'Dashboard', path: '/dashboard', icon: Home },
@@ -36,9 +37,7 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* Brand header */}
         <div className="flex h-14 items-center justify-between border-b border-[#e3e3df] px-5">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-[4px] bg-[#3730a3] text-white font-bold text-xs">
-              C
-            </div>
+            <Logo className="h-7 w-auto shrink-0" />
             <div className="leading-none">
               <span className="text-sm font-bold tracking-tight text-[#181816]">Cognara</span>
               <span className="block text-[10px] text-[#797973] font-medium mt-0.5">Adaptive Tutor</span>
