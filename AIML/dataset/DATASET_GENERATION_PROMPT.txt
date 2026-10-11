@@ -1,0 +1,51 @@
+You are helping create a labelled educational dataset for LearnLoop AI, an adaptive tutor for Python fundamentals.
+
+Generate 100 synthetic student-response examples as JSONL (one valid JSON object per line) for these concepts:
+1) Python loops and range()
+2) conditionals and comparison operators
+3) functions, parameters, arguments, return vs print
+
+Each example must include:
+- example_id
+- topic
+- question
+- correct_answer
+- student_answer
+- student_reasoning (include a mix of clear reasoning, short reasoning, and empty reasoning)
+- is_correct (boolean)
+- misconception_label
+- label_confidence ("high", "medium", or "low")
+- diagnosis_evidence
+- expected_feedback
+- recommended_followup
+
+Use a consistent taxonomy, such as:
+- exclusive_bound_misunderstanding
+- start_value_misunderstanding
+- iteration_count_confusion
+- off_by_one_error
+- comparison_direction_confusion
+- strict_vs_inclusive_comparison
+- boolean_vs_value_confusion
+- return_vs_print_confusion
+- parameter_argument_confusion
+- possible_execution_slip
+- none
+- uncertain_needs_clarification
+
+Dataset quality requirements:
+1. Include correct answers, clear misconception cases, random slips, ambiguous cases, and cases where the student gives a wrong answer but their reasoning shows a different issue.
+2. Do not infer a stable misconception from an incorrect answer alone. When evidence is insufficient, use uncertain_needs_clarification and propose a clarifying question.
+3. Ensure each correct_answer is factually correct for Python.
+4. Vary the question wording, student answers, and reasoning. Do not make all examples templated or repetitive.
+5. Keep labels consistent. diagnosis_evidence must explain the label from the student's reasoning or response.
+6. Use fictional data only. Do not include names or personal information.
+7. Do not use a student's self-reported confidence as proof of mastery.
+8. Include roughly 20% correct responses, 55% clearly diagnosable misconceptions, and 25% slips or ambiguous cases.
+9. Include examples that distinguish two students giving the same wrong answer for different reasons.
+10. Output ONLY valid JSONL, with no Markdown fences, commentary, or trailing commas.
+
+Before returning, internally validate JSON syntax, field consistency, Python answer correctness, and label consistency. Do not claim the data has been empirically validated; these are synthetic examples for testing, not real student observations.
+missing_required_argument_misunderstanding:
+The student believes a required function argument can be omitted
+and will automatically default to zero or another assumed value.
