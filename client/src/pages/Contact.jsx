@@ -14,19 +14,19 @@ export default function Contact() {
     <div className="space-y-6">
       <Card>
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-bold text-[#181816]">Contact the Cognara Team</h2>
-          <Badge variant="neutral">Support & Feedback</Badge>
+          <h2 className="text-lg font-bold text-[#0f172a]">Contact & Support</h2>
+          <Badge variant="neutral">Inquiries</Badge>
         </div>
-        <p className="mt-1 text-xs text-[#575753] max-w-2xl leading-relaxed">
-          Have questions about the adaptive tutor, curriculum alignment, or the VORTEXA 3.0 prototype? Send us a message.
+        <p className="mt-1 text-xs text-[#64748b] max-w-2xl leading-relaxed">
+          Have questions regarding the adaptive tutor, curriculum alignment, or misconception diagnostics? Send a message to the engineering team.
         </p>
       </Card>
 
       <Card className="max-w-xl">
         {submitted ? (
-          <div className="p-4 rounded-[4px] border border-[#a7f3d0] bg-[#ecfdf5] text-xs text-[#065f46]">
+          <div className="p-4 rounded-[5px] border border-[#a7f3d0] bg-[#ecfdf5] text-xs text-[#065f46]">
             <p className="font-bold">Thank you for reaching out.</p>
-            <p className="mt-1 text-[#047857]">Your message has been recorded for the Cognara development team.</p>
+            <p className="mt-1 text-[#047857]">Your message has been received by the engineering team.</p>
             <Button
               variant="secondary"
               className="mt-4"
@@ -59,13 +59,13 @@ export default function Contact() {
             <Input
               label="Subject"
               type="text"
-              placeholder="Tutor feedback or curriculum question"
+              placeholder="Tutor feedback or curriculum inquiry"
               value={formData.subject}
               onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
               required
             />
             <div>
-              <label className="block text-xs font-semibold text-[#181816] mb-1.5">
+              <label className="block text-xs font-semibold text-[#0f172a] mb-1.5">
                 Message
               </label>
               <textarea
@@ -74,7 +74,7 @@ export default function Contact() {
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder="Write your note here..."
-                className="w-full text-xs p-3 rounded-[4px] border border-[#d4d4cf] bg-white text-[#181816] placeholder:text-[#999992] focus:border-[#3730a3] focus:ring-1 focus:ring-[#3730a3] outline-none"
+                className="w-full text-xs p-3 rounded-[5px] border border-[#cbd5e1] bg-white text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] outline-none"
               />
             </div>
             <Button type="submit" variant="primary">

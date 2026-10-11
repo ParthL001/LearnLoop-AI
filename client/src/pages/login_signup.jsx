@@ -68,13 +68,13 @@ export default function LoginSignup({ onLoginSuccess }) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f9f9f7] p-4 sm:p-6">
+    <div className="flex min-h-screen items-center justify-center bg-[#f8fafc] p-4 sm:p-6">
       <div className="w-full max-w-md">
-        {/* Brand header */}
+        {/* Brand header: Logo only, no Cognara text */}
         <div className="mb-6 text-center">
-          <Logo className="mx-auto mb-2 h-10 w-auto" />
-          <h1 className="text-xl font-bold tracking-tight text-[#181816]">Cognara</h1>
-          <p className="mt-0.5 text-xs text-[#797973]">AI Adaptive Tutor & Misconception Detector</p>
+          <Logo className="mx-auto mb-3 h-12 w-auto" />
+          <h2 className="text-base font-bold tracking-tight text-[#0f172a]">Adaptive Learning Platform</h2>
+          <p className="mt-0.5 text-xs text-[#64748b]">AI-Assisted Diagnostic Tutoring & Misconception Detection</p>
         </div>
 
         {/* Auth Card using shadcn components */}
@@ -82,14 +82,14 @@ export default function LoginSignup({ onLoginSuccess }) {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>
-                {mode === 'login' ? 'Sign in to Cognara' : 'Create an account'}
+                {mode === 'login' ? 'Sign In' : 'Create an Account'}
               </CardTitle>
-              <div className="flex rounded-[4px] border border-[#d4d4cf] p-0.5 bg-[#f2f2ef]">
+              <div className="flex rounded-[4px] border border-[#cbd5e1] p-0.5 bg-[#f1f5f9]">
                 <button
                   type="button"
                   onClick={() => { setMode('login'); setError('') }}
                   className={`px-2.5 py-1 text-[11px] font-semibold rounded-[3px] transition-colors ${
-                    mode === 'login' ? 'bg-white text-[#181816] shadow-xs' : 'text-[#797973] hover:text-[#181816]'
+                    mode === 'login' ? 'bg-white text-[#0f172a] shadow-xs' : 'text-[#64748b] hover:text-[#0f172a]'
                   }`}
                 >
                   Sign In
@@ -98,7 +98,7 @@ export default function LoginSignup({ onLoginSuccess }) {
                   type="button"
                   onClick={() => { setMode('signup'); setError('') }}
                   className={`px-2.5 py-1 text-[11px] font-semibold rounded-[3px] transition-colors ${
-                    mode === 'signup' ? 'bg-white text-[#181816] shadow-xs' : 'text-[#797973] hover:text-[#181816]'
+                    mode === 'signup' ? 'bg-white text-[#0f172a] shadow-xs' : 'text-[#64748b] hover:text-[#0f172a]'
                   }`}
                 >
                   Sign Up
@@ -108,7 +108,7 @@ export default function LoginSignup({ onLoginSuccess }) {
             <CardDescription>
               {mode === 'login'
                 ? 'Enter your credentials to access your adaptive learning path.'
-                : 'Enter your information below to begin personalized practice.'}
+                : 'Create an account to begin diagnostic concept analysis.'}
             </CardDescription>
           </CardHeader>
 
@@ -216,7 +216,7 @@ export default function LoginSignup({ onLoginSuccess }) {
                       <button
                         type="button"
                         onClick={() => { setMode('login'); setError('') }}
-                        className="font-semibold text-[#3730a3] hover:underline"
+                        className="font-semibold text-[#2563eb] hover:underline"
                       >
                         Sign in
                       </button>
@@ -228,9 +228,9 @@ export default function LoginSignup({ onLoginSuccess }) {
           </CardContent>
         </Card>
 
-        {/* Simple disclaimer */}
-        <p className="mt-4 text-center text-[11px] text-[#797973]">
-          Cognara formative assessments are calibrated to diagnose reasoning, not test capability.
+        {/* Simple disclaimer without brand name */}
+        <p className="mt-4 text-center text-[11px] text-[#64748b]">
+          Formative diagnostic items are calibrated to detect underlying reasoning patterns, not test capability.
         </p>
       </div>
     </div>

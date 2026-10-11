@@ -42,11 +42,11 @@ export default function Assessments() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-[#181816]">Pre & Post Assessments</h2>
+              <h2 className="text-lg font-bold text-[#0f172a]">Pre & Post Assessments</h2>
               <Badge variant="accent">Standardized Evaluation</Badge>
             </div>
-            <p className="mt-1 text-xs text-[#575753] max-w-2xl leading-relaxed">
-              Cognara compares identical diagnostic items before and after tutor sessions. This measures true conceptual growth rather than test-taking variation.
+            <p className="mt-1 text-xs text-[#64748b] max-w-2xl leading-relaxed">
+              The evaluation framework compares isomorphic diagnostic items before and after tutor sessions. This measures true conceptual growth rather than test-taking variation.
             </p>
           </div>
         </div>
@@ -67,20 +67,20 @@ export default function Assessments() {
                   )}
                 </div>
 
-                <h3 className="text-sm font-bold text-[#181816]">{item.title}</h3>
-                <p className="text-xs text-[#575753] leading-relaxed">
+                <h3 className="text-sm font-bold text-[#0f172a]">{item.title}</h3>
+                <p className="text-xs text-[#334155] leading-relaxed">
                   {item.description}
                 </p>
 
-                <div className="pt-2 text-[11px] text-[#797973] flex gap-3">
+                <div className="pt-2 text-[11px] text-[#64748b] flex gap-3">
                   <span>{item.questionsCount} questions</span>
                   <span>·</span>
                   <span>{item.estimatedTime}</span>
                 </div>
               </div>
 
-              <div className="mt-5 pt-4 border-t border-[#e3e3df] flex items-center justify-between">
-                <span className="text-[11px] font-medium text-[#797973]">{item.status}</span>
+              <div className="mt-5 pt-4 border-t border-[#e2e8f0] flex items-center justify-between">
+                <span className="text-[11px] font-medium text-[#64748b]">{item.status}</span>
                 <Link to="/practice">
                   <Button size="sm" variant={isCompleted ? 'secondary' : 'primary'}>
                     {isCompleted ? 'Review' : 'Start'}
@@ -93,8 +93,8 @@ export default function Assessments() {
       </div>
 
       {/* Methodological Note Card */}
-      <Card header={<h3 className="text-xs font-bold text-[#181816] uppercase">Assessment Methodology</h3>}>
-        <p className="text-xs text-[#575753] leading-relaxed">
+      <Card header={<h3 className="text-xs font-bold text-[#0f172a] uppercase tracking-wider">Assessment Methodology</h3>}>
+        <p className="text-xs text-[#334155] leading-relaxed">
           Pre/post assessment comparisons rely on isomorphic diagnostic probes. Single-attempt scores are not treated as fixed capability labels, but as signals to calibrate adaptive tutor nudges.
         </p>
       </Card>

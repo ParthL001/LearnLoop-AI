@@ -56,21 +56,21 @@ export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout 
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[#e3e3df] bg-[#ffffff] px-4 sm:px-6">
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[#e2e8f0] bg-white px-4 sm:px-6">
         {/* Left side: mobile toggle & current title */}
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onOpenMobileMenu}
             aria-label="Toggle navigation menu"
-            className="rounded-[4px] border border-[#d4d4cf] p-1.5 text-[#494944] hover:bg-[#f2f2ef] lg:hidden"
+            className="rounded-[4px] border border-[#cbd5e1] p-1.5 text-[#334155] hover:bg-[#f8fafc] lg:hidden"
           >
             <Menu size={16} />
           </button>
 
           <div className="flex items-center gap-2">
             <Logo className="h-5 w-auto lg:hidden shrink-0" />
-            <h1 className="text-sm font-bold text-[#181816]">
+            <h1 className="text-sm font-bold text-[#0f172a]">
               {currentTitle || 'Dashboard'}
             </h1>
           </div>
@@ -81,13 +81,13 @@ export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout 
           <button
             type="button"
             onClick={() => setOpenCommand(true)}
-            className="w-full flex items-center justify-between px-3 py-1.5 text-xs text-[#797973] bg-[#f9f9f7] border border-[#d4d4cf] rounded-[4px] hover:bg-[#f2f2ef] hover:text-[#181816] transition-colors"
+            className="w-full flex items-center justify-between px-3 py-1.5 text-xs text-[#64748b] bg-[#f8fafc] border border-[#cbd5e1] rounded-[5px] hover:bg-[#f1f5f9] hover:text-[#0f172a] transition-colors"
           >
             <div className="flex items-center gap-2 min-w-0">
-              <Search size={14} className="shrink-0 text-[#797973]" />
+              <Search size={14} className="shrink-0 text-[#64748b]" />
               <span className="truncate">Search topics, lessons, practice...</span>
             </div>
-            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold text-[#797973] bg-white border border-[#d4d4cf] rounded-[3px] shrink-0 ml-2">
+            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold text-[#64748b] bg-white border border-[#cbd5e1] rounded-[3px] shrink-0 ml-2">
               Ctrl K
             </kbd>
           </button>
@@ -98,7 +98,7 @@ export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout 
           <nav className="flex items-center gap-1 sm:gap-1.5 mr-2">
             <Link
               to="/dashboard"
-              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-[#494944] rounded-[4px] hover:bg-[#f2f2ef] hover:text-[#181816] transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-[#334155] rounded-[4px] hover:bg-[#f1f5f9] hover:text-[#0f172a] transition-colors"
             >
               <Home size={14} />
               <span className="hidden sm:inline">Home</span>
@@ -108,7 +108,7 @@ export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout 
               type="button"
               onClick={onOpenMobileMenu}
               title="Open Dashboard Navigation"
-              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-[#3730a3] bg-[#eef2ff] border border-[#c7d2fe] rounded-[4px] hover:bg-[#e0e7ff] transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-[#1d4ed8] bg-[#eff6ff] border border-[#bfdbfe] rounded-[4px] hover:bg-[#dbeafe] transition-colors"
             >
               <LayoutDashboard size={14} />
               <span>Dashboard</span>
@@ -116,7 +116,7 @@ export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout 
 
             <Link
               to="/about"
-              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-[#494944] rounded-[4px] hover:bg-[#f2f2ef] hover:text-[#181816] transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-[#334155] rounded-[4px] hover:bg-[#f1f5f9] hover:text-[#0f172a] transition-colors"
             >
               <Info size={14} />
               <span className="hidden md:inline">About</span>
@@ -124,27 +124,27 @@ export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout 
 
             <Link
               to="/contact"
-              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-[#494944] rounded-[4px] hover:bg-[#f2f2ef] hover:text-[#181816] transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-[#334155] rounded-[4px] hover:bg-[#f1f5f9] hover:text-[#0f172a] transition-colors"
             >
               <Mail size={14} />
-              <span className="hidden md:inline">Contact Us</span>
+              <span className="hidden md:inline">Contact</span>
             </Link>
           </nav>
 
           {/* User Status and Logout */}
-          <div className="flex items-center gap-2 border-l border-[#e3e3df] pl-3">
-            <div className="flex h-6 w-6 items-center justify-center rounded-[3px] bg-[#3730a3] text-white text-[11px] font-bold">
+          <div className="flex items-center gap-2 border-l border-[#e2e8f0] pl-3">
+            <div className="flex h-6 w-6 items-center justify-center rounded-[3px] bg-[#2563eb] text-white text-[11px] font-bold">
               {(user?.name || 'A').charAt(0).toUpperCase()}
             </div>
-            <span className="font-semibold text-xs text-[#181816] hidden lg:inline truncate max-w-[100px]">
-              {user?.name || 'Alex Rivera'}
+            <span className="font-semibold text-xs text-[#0f172a] hidden lg:inline truncate max-w-[100px]">
+              {user?.name || 'Learner'}
             </span>
 
             <button
               type="button"
               onClick={handleLogout}
               title="Sign out"
-              className="rounded-[4px] p-1 text-[#797973] hover:bg-[#fef2f2] hover:text-[#991b1b] transition-colors"
+              className="rounded-[4px] p-1 text-[#64748b] hover:bg-[#fef2f2] hover:text-[#dc2626] transition-colors"
             >
               <LogOut size={15} />
             </button>
@@ -244,8 +244,8 @@ export default function Navbar({ onOpenMobileMenu, currentTitle, user, onLogout 
             </CommandItem>
             <CommandItem onSelect={() => handleSelectRoute('/about')}>
               <div className="flex items-center gap-2">
-                <Info size={14} className="text-[#797973]" />
-                <span>About Cognara</span>
+                <Info size={14} className="text-[#64748b]" />
+                <span>About Platform</span>
               </div>
             </CommandItem>
           </CommandGroup>

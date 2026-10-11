@@ -115,7 +115,7 @@ function generateOfflineTutorReply(userPrompt, topicId, studentReasoning) {
       note: 'Addressed additive denominator misconception.'
     }
   } else {
-    reply = `I see your point about "${userPrompt.slice(0, 40)}...". As your Cognara adaptive guide, I want to make sure we build lasting intuition rather than memorized tricks. Could you walk me through one specific step of how you reached your conclusion?`
+    reply = `I see your point about "${userPrompt.slice(0, 40)}...". As your adaptive guide, I want to make sure we build lasting intuition rather than memorized tricks. Could you walk me through one specific step of how you reached your conclusion?`
   }
 
   return {

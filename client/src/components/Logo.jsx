@@ -5,7 +5,7 @@ export default function Logo({ className = 'h-7 w-auto', ...props }) {
       viewBox="0 0 240 150"
       className={className}
       role="img"
-      aria-label="Cognara Logo"
+      aria-label="Adaptive Learning Platform Logo"
       {...props}
     >
       <defs>

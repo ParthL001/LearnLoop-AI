@@ -11,12 +11,12 @@ export function Button({
     'inline-flex items-center justify-center text-xs font-semibold select-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
 
   const variants = {
-    default: 'bg-[#3730a3] text-white border border-[#3730a3] hover:bg-[#312e81]',
-    outline: 'bg-white text-[#181816] border border-[#d4d4cf] hover:bg-[#f2f2ef]',
-    secondary: 'bg-[#f2f2ef] text-[#181816] border border-[#e3e3df] hover:bg-[#e8e8e4]',
-    ghost: 'bg-transparent text-[#494944] hover:bg-[#f2f2ef] hover:text-[#181816]',
-    destructive: 'bg-[#991b1b] text-white border border-[#991b1b] hover:bg-[#7f1d1d]',
-    subtle: 'bg-[#eef2ff] text-[#3730a3] border border-[#c7d2fe] hover:bg-[#e0e7ff]',
+    default: 'bg-[#2563eb] text-white border border-[#2563eb] hover:bg-[#1d4ed8]',
+    outline: 'bg-white text-[#0f172a] border border-[#cbd5e1] hover:bg-[#f8fafc]',
+    secondary: 'bg-[#f1f5f9] text-[#0f172a] border border-[#e2e8f0] hover:bg-[#e2e8f0]',
+    ghost: 'bg-transparent text-[#334155] hover:bg-[#f1f5f9] hover:text-[#0f172a]',
+    destructive: 'bg-[#dc2626] text-white border border-[#dc2626] hover:bg-[#b91c1c]',
+    subtle: 'bg-[#eff6ff] text-[#1d4ed8] border border-[#bfdbfe] hover:bg-[#dbeafe]',
   }
 
   const sizes = {

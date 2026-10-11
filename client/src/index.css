@@ -1,20 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --bg-app: #f9f9f7;
+  --bg-app: #f8fafc;
   --bg-surface: #ffffff;
-  --bg-subtle: #f2f2ef;
-  --border-color: #e3e3df;
-  --border-strong: #c8c8c2;
+  --bg-subtle: #f1f5f9;
+  --border-color: #e2e8f0;
+  --border-strong: #cbd5e1;
   
-  --text-main: #181816;
-  --text-body: #494944;
-  --text-muted: #797973;
+  --text-main: #0f172a;
+  --text-body: #334155;
+  --text-muted: #64748b;
 
-  --accent: #3730a3;
-  --accent-hover: #312e81;
-  --accent-subtle: #eef2ff;
-  --accent-border: #c7d2fe;
+  /* Solid educational blue accent */
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-subtle: #eff6ff;
+  --accent-border: #bfdbfe;
 
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -54,18 +55,18 @@ a {
   text-decoration: none;
 }
 
-/* Accessible, prominent focus states */
+/* Accessible focus ring */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
 ::selection {
-  background-color: #e0e7ff;
-  color: #1e1b4b;
+  background-color: #dbeafe;
+  color: #1e3a8a;
 }
 
-/* Respect user reduced-motion preferences */
+/* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;

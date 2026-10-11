@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Card, Button, Badge } from '../components/UI'
 import { useApp } from '../context/AppContext'
+import { CheckCircle2, Circle, Clock, ArrowRight } from 'lucide-react'
 
 export default function LearningPath() {
   const { milestones, topics } = useApp()
@@ -13,28 +14,29 @@ export default function LearningPath() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-[#181816]">Adaptive Learning Path</h2>
+              <h2 className="text-lg font-bold text-[#0f172a]">Adaptive Learning Path</h2>
               <Badge variant="accent">{activeTopic.title}</Badge>
             </div>
-            <p className="mt-1 text-xs text-[#575753] max-w-2xl leading-relaxed">
-              Cognara sequences learning steps according to concept dependencies and individual reasoning patterns.
-              Milestones adapt when misconceptions are detected or resolved.
+            <p className="mt-1 text-xs text-[#64748b] max-w-2xl leading-relaxed">
+              Curriculum milestones sequence learning steps according to concept dependencies and individual reasoning patterns. Milestones adapt dynamically when misconceptions are detected or resolved.
             </p>
           </div>
-          <Link to="/tutor/fractions">
-            <Button variant="primary">Consult Tutor</Button>
+          <Link to="/tutor">
+            <Button variant="primary">
+              <span>Consult AI Tutor</span>
+              <ArrowRight size={14} />
+            </Button>
           </Link>
         </div>
       </Card>
 
       {/* Rationale Note */}
-      <div className="p-4 rounded-[6px] border border-[#c7d2fe] bg-[#eef2ff] text-xs text-[#1e1b4b]">
-        <span className="font-bold">Pedagogical Rationale: </span>
-        The sequence introduces unit fraction meaning before symbolic procedures.
-        Milestone 3 serves as an adaptive probe before introducing common denominators.
+      <div className="p-4 rounded-[6px] border border-[#bfdbfe] bg-[#eff6ff] text-xs text-[#1e3a8a]">
+        <span className="font-bold">Pedagogical Framework: </span>
+        Foundational intuition on unit fraction partition size is verified before symbolic addition algorithms are introduced. Milestone 3 functions as a formative diagnostic probe before common denominator operations.
       </div>
 
-      {/* Milestones List */}
+      {/* Milestones Sequence */}
       <div className="space-y-3">
         {milestones.map((milestone, index) => {
           const isCompleted = milestone.status === 'completed'
@@ -53,17 +55,20 @@ export default function LearningPath() {
           return (
             <Card
               key={milestone.id}
-              className={isInProgress ? 'border-[#3730a3] ring-1 ring-[#3730a3]' : ''}
+              className={isInProgress ? 'border-[#2563eb] ring-1 ring-[#2563eb]' : ''}
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#797973]">Step {index + 1}</span>
+                    <span className="text-xs font-bold text-[#64748b]">Step {index + 1}</span>
                     <Badge variant={badgeVariant}>{milestone.status.replace('_', ' ')}</Badge>
-                    <span className="text-xs text-[#797973]">· {milestone.duration}</span>
+                    <span className="text-xs text-[#64748b] flex items-center gap-1">
+                      <Clock size={12} />
+                      <span>{milestone.duration}</span>
+                    </span>
                   </div>
-                  <h3 className="text-sm font-bold text-[#181816]">{milestone.title}</h3>
-                  <p className="text-xs text-[#575753] leading-relaxed max-w-2xl">
+                  <h3 className="text-sm font-bold text-[#0f172a]">{milestone.title}</h3>
+                  <p className="text-xs text-[#334155] leading-relaxed max-w-2xl">
                     {milestone.description}
                   </p>
                 </div>
@@ -77,12 +82,14 @@ export default function LearningPath() {
 
                   {!isLocked ? (
                     <Link to={milestone.type === 'diagnostic' ? '/practice/fractions' : '/lessons/fractions'}>
-                      <Button variant={isInProgress ? 'primary' : 'secondary'}>
-                        {isCompleted ? 'Review' : 'Continue'}
+                      <Button variant={isInProgress ? 'primary' : 'secondary'} size="sm">
+                        {isCompleted ? 'Review Concept' : isInProgress ? 'Continue Milestone' : 'Start Step'}
                       </Button>
                     </Link>
                   ) : (
-                    <span className="text-xs text-[#797973] font-medium">Locked</span>
+                    <span className="text-xs font-medium text-[#94a3b8] px-3 py-1 bg-[#f1f5f9] rounded-[4px] border border-[#e2e8f0]">
+                      Locked
+                    </span>
                   )}
                 </div>
               </div>

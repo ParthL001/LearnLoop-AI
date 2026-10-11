@@ -24,13 +24,13 @@ export default function AppLayout({ user, onLogout }) {
     '/practice': 'Targeted Practice',
     '/assessments': 'Assessments',
     '/progress': 'Progress & Mastery',
-    '/about': 'About Cognara',
+    '/about': 'About Platform',
     '/contact': 'Contact Us',
     '/privacy': 'Privacy Policy',
     '/terms': 'Terms and Conditions',
   }
 
-  const currentTitle = pathTitles[location.pathname] || currentNav?.name || 'Cognara'
+  const currentTitle = pathTitles[location.pathname] || currentNav?.name || 'Adaptive Learning'
 
   const handleDashboardClick = () => {
     setMobileMenuOpen(true)
@@ -40,7 +40,7 @@ export default function AppLayout({ user, onLogout }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f9f9f7] text-[#181816]">
+    <div className="min-h-screen bg-[#f8fafc] text-[#0f172a]">
       {/* Sidebar (Desktop and Mobile Drawer) */}
       <Sidebar isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
@@ -60,23 +60,23 @@ export default function AppLayout({ user, onLogout }) {
         </main>
 
         {/* Simple Footer with Privacy Policy and Terms and Conditions */}
-        <footer className="border-t border-[#e3e3df] bg-[#ffffff] px-6 py-4 text-xs text-[#797973]">
+        <footer className="border-t border-[#e2e8f0] bg-white px-6 py-4 text-xs text-[#64748b]">
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p>© 2026 Cognara · Adaptive Learning Platform</p>
+            <p>© 2026 Adaptive Learning Platform · Diagnostic Tutoring System</p>
             <div className="flex items-center gap-4">
-              <Link to="/about" className="hover:text-[#181816] hover:underline">
+              <Link to="/about" className="hover:text-[#0f172a] hover:underline">
                 About
               </Link>
               <span>·</span>
-              <Link to="/contact" className="hover:text-[#181816] hover:underline">
+              <Link to="/contact" className="hover:text-[#0f172a] hover:underline">
                 Contact
               </Link>
               <span>·</span>
-              <Link to="/privacy" className="hover:text-[#181816] hover:underline">
+              <Link to="/privacy" className="hover:text-[#0f172a] hover:underline">
                 Privacy Policy
               </Link>
               <span>·</span>
-              <Link to="/terms" className="hover:text-[#181816] hover:underline">
+              <Link to="/terms" className="hover:text-[#0f172a] hover:underline">
                 Terms and Conditions
               </Link>
             </div>

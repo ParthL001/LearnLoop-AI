@@ -21,7 +21,7 @@ export function CommandDialog({ open, onOpenChange, children }) {
         className="fixed inset-0"
         onClick={() => onOpenChange(false)}
       />
-      <div className="relative z-50 w-full max-w-xl overflow-hidden rounded-[6px] border border-[#d4d4cf] bg-white text-[#181816] shadow-xl">
+      <div className="relative z-50 w-full max-w-xl overflow-hidden rounded-[6px] border border-[#cbd5e1] bg-white text-[#0f172a] shadow-xl">
         {children}
       </div>
     </div>
@@ -36,26 +36,26 @@ export function CommandInput({ value, onValueChange, placeholder = 'Search topic
   }, [])
 
   return (
-    <div className="flex h-11 items-center border-b border-[#e3e3df] px-3.5 bg-white">
-      <Search size={16} className="shrink-0 text-[#797973] mr-2.5" />
+    <div className="flex h-11 items-center border-b border-[#e2e8f0] px-3.5 bg-white">
+      <Search size={16} className="shrink-0 text-[#64748b] mr-2.5" />
       <input
         ref={inputRef}
         type="text"
         value={value}
         onChange={(e) => onValueChange(e.target.value)}
         placeholder={placeholder}
-        className="flex-1 bg-transparent text-xs text-[#181816] placeholder:text-[#999992] outline-none"
+        className="flex-1 bg-transparent text-xs text-[#0f172a] placeholder:text-[#94a3b8] outline-none"
       />
       {value && (
         <button
           type="button"
           onClick={() => onValueChange('')}
-          className="p-1 text-[#797973] hover:text-[#181816] mr-1"
+          className="p-1 text-[#64748b] hover:text-[#0f172a] mr-1"
         >
           <X size={14} />
         </button>
       )}
-      <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold text-[#797973] bg-[#f2f2ef] border border-[#d4d4cf] rounded-[3px]">
+      <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold text-[#64748b] bg-[#f1f5f9] border border-[#cbd5e1] rounded-[3px]">
         ESC
       </kbd>
     </div>
@@ -72,7 +72,7 @@ export function CommandList({ children, className = '' }) {
 
 export function CommandEmpty({ children = 'No matching topics found.' }) {
   return (
-    <div className="py-8 text-center text-xs text-[#797973]">
+    <div className="py-8 text-center text-xs text-[#64748b]">
       {children}
     </div>
   )
@@ -82,7 +82,7 @@ export function CommandGroup({ heading, children }) {
   return (
     <div className="px-1 py-1">
       {heading && (
-        <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#797973]">
+        <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#64748b]">
           {heading}
         </div>
       )}
@@ -96,7 +96,7 @@ export function CommandItem({ onSelect, children, className = '' }) {
     <button
       type="button"
       onClick={onSelect}
-      className={`w-full flex items-center justify-between px-3 py-2 text-left text-xs rounded-[4px] text-[#181816] hover:bg-[#f2f2ef] transition-colors focus-visible:bg-[#eef2ff] focus-visible:text-[#3730a3] ${className}`}
+      className={`w-full flex items-center justify-between px-3 py-2 text-left text-xs rounded-[4px] text-[#0f172a] hover:bg-[#f1f5f9] transition-colors focus-visible:bg-[#eff6ff] focus-visible:text-[#1d4ed8] ${className}`}
     >
       {children}
     </button>
@@ -105,7 +105,7 @@ export function CommandItem({ onSelect, children, className = '' }) {
 
 export function CommandShortcut({ children }) {
   return (
-    <span className="ml-auto text-[10px] text-[#797973] bg-[#f2f2ef] border border-[#d4d4cf] px-1.5 py-0.5 rounded-[3px]">
+    <span className="ml-auto text-[10px] text-[#64748b] bg-[#f1f5f9] border border-[#cbd5e1] px-1.5 py-0.5 rounded-[3px]">
       {children}
     </span>
   )
