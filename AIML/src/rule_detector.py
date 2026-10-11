@@ -325,6 +325,80 @@ def _has_list_indexing_misconception(
 
     return None
 
+
+def _detect_exercise_misconception(
+    question, student_answer, student_reasoning, correct_answer
+):
+    q = (question or "").lower()
+    answer = (student_answer or "").strip().lower()
+    reasoning = (student_reasoning or "").lower()
+    expected = str(correct_answer or "").strip().lower()
+    text = f"{answer} {reasoning}"
+
+    # PY003: len() returns the number of elements.
+    if "len(" in q and expected.isdigit() and answer.isdigit():
+        if int(answer) == int(expected) - 1:
+            return "length_vs_last_index_confusion"
+
+    # PY004: accessing an undefined variable raises NameError.
+    if "never been defined" in q:
+        if any(term in text for term in (
+            "nameerror", "undefined variable",
+            "not defined", "doesn't exist", "does not exist"
+        )):
+            return None
+        if any(term in text for term in (
+            "none", "0", "zero", "empty string",
+            "prints nothing", "no error"
+        )):
+            return "variable_undefined_confusion"
+
+    # PY005: adding two strings concatenates them.
+    if "'5' + '2'" in q or '"5" + "2"' in q:
+        if answer in {"7", "7.0"} or any(term in reasoning for term in (
+            "add the numbers", "numeric addition",
+            "integer addition", "convert to numbers"
+        )):
+            return "string_vs_number_confusion"
+
+    # PY006: x = 3 does not satisfy x > 5.
+    if "x > 5" in q and "which branch" in q:
+        if answer.strip("'\" ") == "a":
+            return "conditional_branch_confusion"
+
+    # PY007: equality comparison of 7 with 7 is True.
+    if "7 == 7" in q and answer in {"false", "false."}:
+        return "comparison_operator_confusion"
+
+    # PY008: range(3) starts at zero.
+    if "range(3)" in q and "list(" in q:
+        if answer.replace(" ", "") in {
+            "[1,2,3]", "(1,2,3)", "1,2,3"
+        } or any(term in reasoning for term in (
+            "starts at one", "starts from one",
+            "starts at 1", "starts from 1"
+        )):
+            return "start_value_misunderstanding"
+
+    # PY009: range(4) executes four iterations: 0, 1, 2, 3.
+    if "range(4)" in q and "how many times" in q:
+        if answer.isdigit() and int(answer) == 3:
+            return "exclusive_bound_misunderstanding"
+
+    # PY010–PY011: functions return the result of their expression.
+    if "def add(a, b)" in q and answer in {"4", "6", "23"}:
+        return "function_call_as_object_misconception"
+
+    if "def greet(name)" in q and answer.strip("'\" ") != "hi sam":
+        if "print" in reasoning or "displays" in reasoning:
+            return "return_vs_print_confusion"
+
+    # PY012: print(3) displays the value 3.
+    if "print(3)" in q and answer in {"none", "null", "no return value"}:
+        return "return_vs_print_confusion"
+
+    return None
+
 def detect_misconception(
     question,
     student_answer,
@@ -343,6 +417,14 @@ def detect_misconception(
         student_reasoning,
         correct_answer,
     )
+    exercise_label = _detect_exercise_misconception(
+        question,
+        student_answer,
+        student_reasoning,
+        correct_answer,
+    )
+    if exercise_label:
+        return exercise_label
     if indexing_label:
         return indexing_label
 

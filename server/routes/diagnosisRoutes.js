@@ -3,6 +3,7 @@ import { Router } from 'express'
 import {
     diagnosePythonAnswer,
     fetchPythonExercises,
+    checkPythonFollowup,
 } from '../services/aimlService.js'
 
 const router = Router()
@@ -11,7 +12,8 @@ const router = Router()
 router.get('/python/exercises', async (req, res, next) => {
     try {
         const result = await fetchPythonExercises()
-        res.status(200).json({
+
+        return res.status(200).json({
             success: true,
             exercises: result.exercises,
         })
@@ -33,14 +35,28 @@ router.post('/python/diagnose', async (req, res, next) => {
             recommendedFollowup = '',
         } = req.body || {}
 
+        // Require question and studentAnswer.
+        // correctAnswer is optional when exampleId is provided.
         if (
             typeof question !== 'string' ||
-            typeof studentAnswer !== 'string' ||
             !question.trim() ||
-            !studentAnswer.trim()
+            typeof studentAnswer !== 'string' ||
+            !studentAnswer.trim() ||
+            (
+                correctAnswer !== undefined &&
+                correctAnswer !== null &&
+                typeof correctAnswer !== 'string'
+            ) ||
+            (
+                !String(exampleId || '').trim() &&
+                (typeof correctAnswer !== 'string' ||
+                    !correctAnswer.trim())
+            )
         ) {
             return res.status(400).json({
-                error: 'question and studentAnswer are required strings',
+                success: false,
+                error:
+                    'A question, studentAnswer, and either exampleId or correctAnswer are required',
             })
         }
 
@@ -57,6 +73,37 @@ router.post('/python/diagnose', async (req, res, next) => {
         return res.status(200).json({
             success: true,
             diagnosis: result,
+        })
+    } catch (error) {
+        next(error)
+    }
+})
+
+// POST /api/python/followup/check
+router.post('/python/followup/check', async (req, res, next) => {
+    try {
+        const { exampleId, studentAnswer } = req.body || {}
+
+        if (
+            typeof exampleId !== 'string' ||
+            !exampleId.trim() ||
+            typeof studentAnswer !== 'string' ||
+            !studentAnswer.trim()
+        ) {
+            return res.status(400).json({
+                success: false,
+                error: 'exampleId and studentAnswer are required',
+            })
+        }
+
+        const result = await checkPythonFollowup({
+            exampleId,
+            studentAnswer,
+        })
+
+        return res.status(200).json({
+            success: true,
+            result,
         })
     } catch (error) {
         next(error)
