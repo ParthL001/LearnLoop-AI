@@ -335,3 +335,51 @@ export async function fetchCohortAssessmentReport() {
     return null
   }
 }
+
+/**
+ * Diagnose a Python exercise using the AIML service.
+ */
+export async function diagnosePythonAnswer({
+  exampleId,
+  question,
+  correctAnswer,
+  studentAnswer,
+  studentReasoning = '',
+}) {
+  const response = await fetch(`${API_BASE_URL}/python/diagnose`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      exampleId,
+      question,
+      correctAnswer,
+      studentAnswer,
+      studentReasoning,
+    }),
+  })
+
+  const data = await response.json().catch(() => ({}))
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.error || `Diagnosis failed: ${response.status}`)
+  }
+
+  return data.diagnosis
+}
+
+/**
+ * Fetch Python exercises for misconception practice.
+ */
+export async function fetchPythonExercises() {
+  const response = await fetch(`${API_BASE_URL}/python/exercises`)
+  const data = await response.json().catch(() => ({}))
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.error || 'Failed to load Python exercises')
+  }
+
+  return data.exercises
+}
+

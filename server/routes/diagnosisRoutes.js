@@ -1,8 +1,24 @@
 
 import { Router } from 'express'
-import { diagnosePythonAnswer } from '../services/aimlService.js'
+import {
+    diagnosePythonAnswer,
+    fetchPythonExercises,
+} from '../services/aimlService.js'
 
 const router = Router()
+
+// GET /api/python/exercises
+router.get('/python/exercises', async (req, res, next) => {
+    try {
+        const result = await fetchPythonExercises()
+        res.status(200).json({
+            success: true,
+            exercises: result.exercises,
+        })
+    } catch (error) {
+        next(error)
+    }
+})
 
 // POST /api/python/diagnose
 router.post('/python/diagnose', async (req, res, next) => {

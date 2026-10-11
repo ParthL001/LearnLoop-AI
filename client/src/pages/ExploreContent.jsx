@@ -72,6 +72,12 @@ export default function ExploreContent() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link to="/python-practice">
+            <Button variant="secondary" size="sm">
+              <Code2 size={13} className="text-[#3B82F6]" />
+              <span>Python Diagnostic Practice</span>
+            </Button>
+          </Link>
           <Link to="/tutor">
             <Button variant="secondary" size="sm">
               <Sparkles size={13} className="text-[#3B82F6]" />

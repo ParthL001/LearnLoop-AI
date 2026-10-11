@@ -577,7 +577,8 @@ export default function Lessons() {
                       {lesson.practiceQuestions.map((q, qIdx) => {
                         const isSubmitted = submittedAnswers[qIdx]
                         const selectedOpt = selectedAnswers[qIdx]
-                        const isCorrect = selectedOpt === q.correctAnswerIndex
+                        const targetCorrect = q.correctIndex !== undefined ? q.correctIndex : (q.correctAnswerIndex !== undefined ? q.correctAnswerIndex : q.correct_answer ?? 0)
+                        const isCorrect = selectedOpt === targetCorrect
 
                         return (
                           <div
@@ -586,7 +587,7 @@ export default function Lessons() {
                           >
                             <div className="flex items-start justify-between gap-3">
                               <span className="text-xs font-bold text-[#F8FAFC]">
-                                {qIdx + 1}. {q.question}
+                                {qIdx + 1}. {q.prompt || q.question}
                               </span>
                               {isSubmitted && (
                                 <Badge variant={isCorrect ? 'success' : 'warning'}>
@@ -602,7 +603,7 @@ export default function Lessons() {
                                 let optClass = 'border-[#303846] bg-[#14171C] text-[#A8B3C4] hover:border-[#3B82F6]/50'
 
                                 if (isSubmitted) {
-                                  if (optIdx === q.correctAnswerIndex) {
+                                  if (optIdx === targetCorrect) {
                                     optClass = 'border-[#22C55E] bg-[#052E16] text-[#86EFAC]'
                                   } else if (isOptionSelected && !isCorrect) {
                                     optClass = 'border-[#EF4444] bg-[#450A0A] text-[#FCA5A5]'
