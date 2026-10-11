@@ -8,12 +8,14 @@ import tutorRoutes from './routes/tutorRoutes.js'
 import adaptiveRoutes from './routes/adaptiveRoutes.js'
 import progressRoutes from './routes/progressRoutes.js'
 import assessmentRoutes from './routes/assessmentRoutes.js'
+import diagnosisRoutes from './routes/diagnosisRoutes.js'
 
 const app = express()
 
 // 1. Security & Parsing Middleware
 app.use(configureCors())
 app.use(express.json({ limit: '1mb' }))
+
 
 // 2. Request Logger Middleware
 app.use((req, res, next) => {
@@ -58,6 +60,7 @@ app.use('/api', tutorRoutes)
 app.use('/api', adaptiveRoutes)
 app.use('/api', progressRoutes)
 app.use('/api', assessmentRoutes)
+app.use('/api', diagnosisRoutes)
 
 // 6. 404 & Centralized Error Handlers
 app.use(notFoundHandler)
