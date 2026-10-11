@@ -61,11 +61,30 @@ DEFAULT_FEEDBACK = {
     "followup_goal": "Try a similar exercise and explain each step.",
 }
 
+def get_correct_answer(example_id):
+    dataset_path = DATA_DIR / "python_exercises.jsonl"
+
+    with dataset_path.open(encoding="utf-8-sig") as file:
+        for line in file:
+            if not line.strip():
+                continue
+
+            exercise = json.loads(line)
+
+            if exercise.get("example_id") == example_id:
+                return str(exercise.get("correct_answer", "")).strip()
+
+    return ""
 
 def predict(row: dict) -> dict:
     """Return a consistent, integration-ready diagnosis."""
     question = row.get("question", "")
     correct_answer = row.get("correct_answer", "")
+
+    if row.get("example_id"):
+        dataset_answer = get_correct_answer(row["example_id"])
+    if dataset_answer:
+        correct_answer = dataset_answer
     student_answer = row.get("student_answer", "")
     reasoning = row.get("student_reasoning", "")
 

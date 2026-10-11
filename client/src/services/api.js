@@ -13,7 +13,30 @@ export { API_BASE_URL }
 
 /**
  * Check general backend service health
+ * 
  */
+
+export async function checkPythonFollowup({
+  exampleId,
+  studentAnswer,
+}) {
+  const response = await fetch(
+    `${API_BASE_URL}/python/followup/check`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ exampleId, studentAnswer }),
+    }
+  )
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(data.error || 'Could not check follow-up answer.')
+  }
+
+  return data.result
+}
 export async function checkBackendHealth() {
   try {
     const res = await fetch(`${API_BASE_URL}/health`)
@@ -70,9 +93,8 @@ export async function fetchSubjectById(subjectId) {
  * Fetch dynamically generated lesson from Ollama (with backend caching)
  */
 export async function fetchDynamicLesson(subjectId, topicId, forceRefresh = false) {
-  const url = `${API_BASE_URL}/lessons/${encodeURIComponent(subjectId)}/${encodeURIComponent(topicId)}${
-    forceRefresh ? '?refresh=true' : ''
-  }`
+  const url = `${API_BASE_URL}/lessons/${encodeURIComponent(subjectId)}/${encodeURIComponent(topicId)}${forceRefresh ? '?refresh=true' : ''
+    }`
   const res = await fetch(url)
   if (!res.ok) {
     const errData = await res.json().catch(() => ({}))
@@ -374,12 +396,24 @@ export async function diagnosePythonAnswer({
  */
 export async function fetchPythonExercises() {
   const response = await fetch(`${API_BASE_URL}/python/exercises`)
-  const data = await response.json().catch(() => ({}))
+
+  const contentType = response.headers.get('content-type') || ''
+
+  if (!contentType.includes('application/json')) {
+    throw new Error(
+      'The backend returned HTML instead of JSON. Check that Express is running on port 5000.'
+    )
+  }
+
+  const data = await response.json()
 
   if (!response.ok || !data.success) {
-    throw new Error(data.error || 'Failed to load Python exercises')
+    throw new Error(data.error || 'Failed to load Python exercises.')
+  }
+
+  if (!Array.isArray(data.exercises)) {
+    throw new Error('The backend response is missing the exercises array.')
   }
 
   return data.exercises
 }
-

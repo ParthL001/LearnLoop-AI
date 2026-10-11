@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   fetchPythonExercises,
   diagnosePythonAnswer,
+  checkPythonFollowup,
 } from '../services/api'
 import {
   AlertTriangle,
@@ -12,7 +13,6 @@ import {
   ChevronRight,
   Sparkles,
   BookOpen,
-  ArrowRight,
   Terminal,
   Target,
   BrainCircuit,
@@ -27,6 +27,10 @@ export default function PythonPractice() {
   const [loading, setLoading] = useState(false)
   const [loadingExercises, setLoadingExercises] = useState(true)
   const [error, setError] = useState('')
+  const [showFollowup, setShowFollowup] = useState(false)
+  const [followupAnswer, setFollowupAnswer] = useState('')
+  const [followupFeedback, setFollowupFeedback] = useState('')
+  const [checkingFollowup, setCheckingFollowup] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -34,13 +38,9 @@ export default function PythonPractice() {
     async function loadExercises() {
       try {
         const data = await fetchPythonExercises()
-        if (active) {
-          setExercises(data || [])
-        }
+        if (active) setExercises(Array.isArray(data) ? data : [])
       } catch (err) {
-        if (active) {
-          setError(err.message || 'Could not load exercises from the server.')
-        }
+        if (active) setError(err.message || 'Could not load exercises from the server.')
       } finally {
         if (active) setLoadingExercises(false)
       }
@@ -52,7 +52,7 @@ export default function PythonPractice() {
     }
   }, [])
 
-  const exercise = exercises[index]
+  const exercise = exercises[index] ?? null
 
   function moveToQuestion(nextIndex) {
     if (nextIndex < 0 || nextIndex >= exercises.length) return
@@ -61,372 +61,333 @@ export default function PythonPractice() {
     setReasoning('')
     setDiagnosis(null)
     setError('')
+    setShowFollowup(false)
+    setFollowupAnswer('')
+    setFollowupFeedback('')
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault()
+  async function handleSubmit(event) {
+    event.preventDefault()
     if (!answer.trim() || !exercise || loading) return
 
     setLoading(true)
     setError('')
+    setDiagnosis(null)
+    setShowFollowup(false)
+    setFollowupAnswer('')
+    setFollowupFeedback('')
 
     try {
       const result = await diagnosePythonAnswer({
         exampleId: exercise.example_id,
         question: exercise.question,
-        correctAnswer: exercise.correct_answer || '',
         studentAnswer: answer.trim(),
         studentReasoning: reasoning.trim(),
       })
       setDiagnosis(result)
     } catch (err) {
-      setError(
-        err.message ||
-          'Could not evaluate your answer. Please ensure the local Ollama server is running with qwen3:4b.'
-      )
+      setError(err.message || 'Could not evaluate your answer.')
     } finally {
       setLoading(false)
     }
   }
 
+  async function handleFollowupSubmit() {
+    if (!followupAnswer.trim() || !exercise || checkingFollowup) return
+
+    setCheckingFollowup(true)
+    setFollowupFeedback('')
+    setError('')
+
+    try {
+      const result = await checkPythonFollowup({
+        exampleId: exercise.example_id,
+        studentAnswer: followupAnswer.trim(),
+      })
+      setFollowupFeedback(
+        result.feedback ||
+        (result.is_correct
+          ? 'You have understood this concept.'
+          : 'Review the concept and try again.')
+      )
+    } catch (err) {
+      setError(err.message || 'Could not check your follow-up answer.')
+    } finally {
+      setCheckingFollowup(false)
+    }
+  }
+
   if (loadingExercises) {
     return (
-      <div className="card text-center p-12 space-y-3">
-        <div className="icon-tile mx-auto">
-          <Loader2 className="w-6 h-6 text-[var(--accent-primary)] animate-spin" />
-        </div>
-        <h3 className="font-heading text-xl font-bold text-[var(--text-main)]">
-          Loading Python Exercises
-        </h3>
-        <p className="text-xs text-[var(--text-muted)] font-mono">
-          Connecting to diagnostic database...
-        </p>
+      <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-[#D8D8CF] bg-white p-8 text-center shadow-xs">
+        <Loader2 className="mb-3 h-8 w-8 animate-spin text-[#3D5F58]" />
+        <h3 className="font-heading text-xl font-bold text-[#231F20]">Loading Python Exercises</h3>
+        <p className="font-sans text-sm text-[#6B7280]">Connecting to exercise database...</p>
       </div>
     )
   }
 
   if (!exercises.length) {
     return (
-      <div className="card text-center p-10 space-y-4">
-        <div className="icon-tile mx-auto text-[var(--danger)]">
-          <AlertTriangle size={24} />
-        </div>
-        <h3 className="font-heading text-xl font-bold text-[var(--text-main)]">
-          No Exercises Available
-        </h3>
-        <p className="text-xs text-[var(--text-muted)] max-w-md mx-auto">
-          {error || 'Could not retrieve exercises from the backend.'}
-        </p>
+      <div className="rounded-lg border border-[#D8D8CF] bg-white p-6 shadow-xs">
+        <p className="mb-4 text-sm text-red-600">{error || 'No exercises are available.'}</p>
         <button
+          type="button"
           onClick={() => window.location.reload()}
-          className="btn btn-primary btn-sm mx-auto"
+          className="rounded-md bg-[#3D5F58] px-4 py-2 text-sm font-bold text-white"
         >
-          Retry Connection
+          Retry
         </button>
       </div>
     )
   }
 
-  const progressPercent = ((index + 1) / exercises.length) * 100
+  if (!exercise) {
+    return (
+      <div className="rounded-lg border border-[#D8D8CF] bg-white p-6">
+        <p className="mb-4 text-sm text-red-600">Exercise not found.</p>
+        <button
+          type="button"
+          onClick={() => moveToQuestion(0)}
+          className="rounded-md bg-[#3D5F58] px-4 py-2 text-sm font-bold text-white"
+        >
+          Return to first question
+        </button>
+      </div>
+    )
+  }
+
+  const progress = ((index + 1) / exercises.length) * 100
+  const canShowFollowup =
+    diagnosis &&
+    !diagnosis.is_correct &&
+    diagnosis.misconception_label !== 'uncertain_needs_clarification' &&
+    exercise.followup_question
 
   return (
-    <div className="reveal-stagger space-y-6">
-      {/* Exercise Subtitle & Progress Header */}
-      <div className="card">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6">
+      <div className="rounded-lg border border-[#D8D8CF] bg-white p-5 shadow-xs">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <div className="eyebrow mb-1">
-              Curriculum & Tools · Diagnostic Engine
+            <div className="mb-1 flex items-center gap-2">
+              <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#F5B726]" />
+              <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#3D5F58]">
+                Curriculum &amp; Tools · Python Practice
+              </span>
             </div>
-            <h1 className="font-heading text-lg sm:text-xl font-bold tracking-tight text-[var(--text-main)]">
+            <h1 className="font-heading text-2xl font-extrabold uppercase tracking-tight text-[#231F20] sm:text-3xl">
               Python Misconception Detector
             </h1>
-            <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-1 max-w-2xl leading-relaxed">
-              Type your answer or code freely. Our local Ollama AI evaluates mental models, diagnoses underlying misconceptions, and suggests tailored next learning goals.
+            <p className="mt-1 text-sm text-[#4B5563]">
+              Submit your answer and reasoning to identify possible misunderstandings.
             </p>
           </div>
-
-          <div className="sm:text-right shrink-0 space-y-1.5">
-            <div className="font-mono text-xs font-semibold text-[var(--text-muted)]">
-              QUESTION <span className="text-[var(--text-main)] font-bold">{index + 1}</span> OF{' '}
-              <span className="text-[var(--text-main)] font-bold">{exercises.length}</span>
+          <div className="shrink-0 sm:text-right">
+            <div className="mb-1.5 font-mono text-xs font-semibold text-[#6B7280]">
+              QUESTION <span className="font-bold text-[#231F20]">{index + 1}</span> OF{' '}
+              <span className="font-bold text-[#231F20]">{exercises.length}</span>
             </div>
-            <div className="progress w-44 sm:w-52">
-              <span style={{ width: `${progressPercent}%` }} />
+            <div className="h-2 w-40 overflow-hidden rounded-full border border-[#D8D8CF] bg-[#F2F2EB] sm:w-48">
+              <div className="h-full bg-[#3D5F58] transition-all duration-300" style={{ width: `${progress}%` }} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Two-Column Layout (Desktop) / Stacked (Mobile) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Question Panel & Controls */}
-        <div className="lg:col-span-6 space-y-4">
-          <div className="card space-y-4">
-            {/* Header tags */}
-            <div className="flex items-center justify-between gap-3 pb-3 border-b border-[var(--border-soft)]">
-              <span className="badge badge-forest flex items-center gap-1.5">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+        <div className="space-y-4 lg:col-span-6">
+          <div className="relative rounded-lg border border-[#D8D8CF] bg-white p-6 shadow-xs">
+            <div className="mb-4 flex items-center justify-between gap-3 border-b border-[#D8D8CF] pb-3">
+              <span className="inline-flex items-center gap-1.5 rounded border border-[#D8D8CF] bg-[#F2F2EB] px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-wider text-[#3D5F58]">
                 <BookOpen size={12} />
                 {exercise.topic ? exercise.topic.replaceAll('_', ' ') : 'PYTHON CONCEPT'}
               </span>
-              <span className="badge badge-neutral">
+              <span className="rounded border border-[#E5E5DC] bg-[#FAF9F5] px-2 py-0.5 font-mono text-xs font-bold text-[#6B7280]">
                 {exercise.example_id || `PY${String(index + 1).padStart(3, '0')}`}
               </span>
             </div>
 
-            {/* Question Text */}
-            <div>
-              <span className="eyebrow text-xs mb-1">
-                Exercise Prompt
-              </span>
-              <h2 className="font-heading text-base sm:text-lg font-bold text-[var(--text-main)] leading-snug">
-                {exercise.question}
-              </h2>
+            <div className="mb-6">
+              <h2 className="font-heading text-lg font-bold leading-snug text-[#231F20] sm:text-xl">{exercise.question}</h2>
             </div>
 
-            {/* Answer Form */}
-            <form onSubmit={handleSubmit} className="space-y-4 pt-1">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[var(--accent-primary)] mb-1.5">
-                  Your Answer <span className="text-[var(--danger)]">*</span>
+                <label className="mb-1.5 block font-mono text-xs font-bold uppercase tracking-wider text-[#3D5F58]">
+                  Your Answer <span className="text-[#E97B77]">*</span>
                 </label>
                 <div className="relative">
                   <input
                     type="text"
                     value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
-                    placeholder="Enter answer (e.g. 'a', [1, 2], or code snippet)..."
+                    onChange={(event) => setAnswer(event.target.value)}
+                    placeholder="Enter your exact answer or code..."
                     disabled={loading}
                     required
-                    className="input font-mono text-sm pr-9"
+                    className="w-full rounded-md border border-[#D8D8CF] bg-[#FAF9F5] px-3.5 py-2.5 pr-10 font-mono text-sm text-[#231F20] placeholder-[#9CA3AF] transition focus:border-[#3D5F58] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#3D5F58]"
                   />
-                  <Terminal className="w-4 h-4 text-[var(--text-faint)] absolute right-3 top-3.5 pointer-events-none" />
+                  <Terminal className="pointer-events-none absolute right-3 top-3 h-4 w-4 text-[#9CA3AF]" />
                 </div>
               </div>
-
               <div>
-                <label className="block font-mono text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
-                  Explain Your Reasoning <span className="text-[11px] font-normal font-sans text-[var(--text-faint)]">(Helps AI diagnose cognitive traps)</span>
+                <label className="mb-1.5 block font-mono text-xs font-bold uppercase tracking-wider text-[#4B5563]">
+                  Explain Your Reasoning{' '}
+                  <span className="font-sans text-xs font-normal text-[#9CA3AF]">(Helps AI detect subtle misconceptions)</span>
                 </label>
                 <textarea
                   value={reasoning}
-                  onChange={(e) => setReasoning(e.target.value)}
-                  placeholder="Why did you choose this answer? (e.g. 'Zero-based indexing places the first element at index 0')..."
+                  onChange={(event) => setReasoning(event.target.value)}
+                  placeholder="Why did you choose this answer?"
                   rows={3}
                   disabled={loading}
-                  className="textarea font-sans text-sm"
+                  className="w-full rounded-md border border-[#D8D8CF] bg-[#FAF9F5] p-3 font-sans text-sm text-[#231F20] placeholder-[#9CA3AF] transition focus:border-[#3D5F58] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#3D5F58]"
                 />
               </div>
-
               {error && (
-                <div className="alert alert-danger text-xs">
-                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                <div className="flex items-start gap-2 rounded-md border border-[#FCA5A5] bg-[#FEF2F2] p-3 text-xs text-[#991B1B]">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                   <span>{error}</span>
                 </div>
               )}
-
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={loading || !answer.trim()}
-                  className="btn btn-primary btn-lg w-full"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin text-white" />
-                      Diagnosing with Local Ollama...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 text-[#F5B726]" />
-                      Diagnose My Answer
-                      <ArrowRight size={14} />
-                    </>
-                  )}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={loading || !answer.trim()}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#3D5F58] px-5 py-3 font-sans text-sm font-bold text-white shadow-xs transition hover:bg-[#2E4742] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {loading ? (
+                  <><Loader2 className="h-4 w-4 animate-spin" /> Analyzing...</>
+                ) : (
+                  <><Sparkles className="h-4 w-4 text-[#F5B726]" /> Diagnose My Answer</>
+                )}
+              </button>
             </form>
 
-            {/* Navigation Controls */}
-            <div className="pt-4 border-t border-[var(--border-soft)] flex items-center justify-between gap-3">
+            <div className="mt-6 flex items-center justify-between gap-3 border-t border-[#D8D8CF] pt-4">
               <button
                 type="button"
                 onClick={() => moveToQuestion(index - 1)}
                 disabled={index === 0 || loading}
-                className="btn btn-secondary btn-sm"
+                className="inline-flex items-center gap-1.5 rounded-md border border-[#D8D8CF] bg-white px-4 py-2 font-mono text-xs font-bold text-[#231F20] transition hover:bg-[#F2F2EB] disabled:cursor-not-allowed disabled:opacity-40"
               >
-                <ChevronLeft size={15} />
-                Previous Question
+                <ChevronLeft size={14} /> Previous
               </button>
-
               <button
                 type="button"
                 onClick={() => moveToQuestion(index + 1)}
                 disabled={index === exercises.length - 1 || loading}
-                className="btn btn-secondary btn-sm"
+                className="inline-flex items-center gap-1.5 rounded-md border border-[#D8D8CF] bg-white px-4 py-2 font-mono text-xs font-bold text-[#231F20] transition hover:bg-[#F2F2EB] disabled:cursor-not-allowed disabled:opacity-40"
               >
-                Next Question
-                <ChevronRight size={15} />
+                Next <ChevronRight size={14} />
               </button>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Result & Misconception Diagnosis Panel */}
-        <div className="lg:col-span-6 space-y-4">
+        <div className="space-y-4 lg:col-span-6">
           {loading ? (
-            <div className="card text-center p-10 space-y-4">
-              <div className="icon-tile mx-auto">
-                <BrainCircuit className="w-6 h-6 animate-pulse text-[var(--accent-primary)]" />
-              </div>
-              <div>
-                <h3 className="font-heading text-base font-bold text-[var(--text-main)]">
-                  Running Misconception Classifier
-                </h3>
-                <p className="text-xs text-[var(--text-muted)] font-sans mt-1 max-w-sm mx-auto">
-                  Parsing student answer and reasoning against verified Python language semantics and mental model traps...
-                </p>
-              </div>
-              <div className="skeleton h-2 w-48 mx-auto mt-2" />
+            <div className="space-y-4 rounded-lg border border-[#D8D8CF] bg-white p-8 text-center shadow-xs">
+              <Loader2 className="mx-auto h-6 w-6 animate-spin text-[#3D5F58]" />
+              <h3 className="font-heading text-lg font-bold text-[#231F20]">Running Misconception Classifier</h3>
+              <p className="text-xs text-[#6B7280]">Analyzing your answer and reasoning...</p>
             </div>
           ) : diagnosis ? (
-            <div className="card space-y-4">
-              {/* Header Status Alert */}
-              <div
-                className={`alert ${
-                  diagnosis.is_correct
-                    ? 'alert-success'
-                    : diagnosis.needs_clarification
-                    ? 'alert-warning'
-                    : 'alert-danger'
-                } flex items-center justify-between`}
-              >
-                <div className="flex items-center gap-2.5">
+            <div className="space-y-5 rounded-lg border border-[#D8D8CF] bg-white p-6 shadow-xs">
+              <div className={`flex items-center justify-between gap-3 rounded-md border p-4 ${diagnosis.is_correct
+                  ? 'border-[#86EFAC] bg-[#F0FDF4] text-[#166534]'
+                  : diagnosis.needs_clarification
+                    ? 'border-[#FDE047] bg-[#FEFCE8] text-[#854D0E]'
+                    : 'border-[#FECDD3] bg-[#FFF1F2] text-[#9F1239]'
+                }`}>
+                <div className="flex items-center gap-3">
                   {diagnosis.is_correct ? (
-                    <CheckCircle className="w-5 h-5 shrink-0" />
+                    <CheckCircle className="h-6 w-6 shrink-0 text-[#16A34A]" />
                   ) : diagnosis.needs_clarification ? (
-                    <HelpCircle className="w-5 h-5 shrink-0" />
+                    <HelpCircle className="h-6 w-6 shrink-0 text-[#CA8A04]" />
                   ) : (
-                    <AlertTriangle className="w-5 h-5 shrink-0" />
+                    <AlertTriangle className="h-6 w-6 shrink-0 text-[#E11D48]" />
                   )}
                   <div>
-                    <h3 className="font-heading text-sm font-extrabold uppercase tracking-wide">
-                      {diagnosis.is_correct
-                        ? 'Correct Understanding'
-                        : diagnosis.needs_clarification
-                        ? 'Clarification Needed'
-                        : 'Misconception Identified'}
+                    <h3 className="font-heading text-base font-extrabold uppercase tracking-wide">
+                      {diagnosis.is_correct ? 'Correct Understanding' : diagnosis.needs_clarification ? 'Needs Clarification' : 'Misconception Identified'}
                     </h3>
-                    <p className="text-xs opacity-90 font-sans">
+                    <p className="text-xs opacity-90">
                       {diagnosis.is_correct
-                        ? 'Your mental model aligns with Python language specifications.'
+                        ? 'Your answer is correct.'
                         : diagnosis.needs_clarification
-                        ? 'Your reasoning requires further elaboration.'
-                        : 'A conceptual misalignment was detected in your reasoning.'}
+                          ? 'Your response needs further explanation.'
+                          : 'A possible conceptual misunderstanding was detected.'}
                     </p>
                   </div>
                 </div>
-
-                <span className="badge badge-neutral text-[10px] ml-2 shrink-0">
-                  {diagnosis.is_correct ? 'CORRECT' : 'NEEDS ATTENTION'}
+                <span className="rounded border border-current bg-white/80 px-2.5 py-1 font-mono text-xs font-bold">
+                  {diagnosis.is_correct ? 'CORRECT' : 'REVIEW'}
                 </span>
               </div>
 
-              {/* Detected Misconception Field */}
-              <div className="p-4 bg-[var(--bg-surface-elevated)] border border-[var(--border-soft)] rounded-md space-y-1">
-                <span className="eyebrow text-[10px]">
-                  Detected Misconception
-                </span>
-                <div className="font-heading text-base font-bold text-[var(--text-main)]">
-                  {diagnosis.misconception_label ||
-                    (diagnosis.is_correct ? 'None detected — accurate mental model' : 'General conceptual gap')}
-                </div>
-              </div>
+              <p className="text-sm text-[#4B5563]"><strong>Detected misconception:</strong> {diagnosis.misconception_label || 'Not identified'}</p>
+              {diagnosis.evidence && <p className="text-sm text-[#4B5563]"><strong>Evidence:</strong> {diagnosis.evidence}</p>}
+              {diagnosis.feedback && <p className="text-sm text-[#231F20]"><strong>Feedback:</strong> {diagnosis.feedback}</p>}
+              {diagnosis.needs_clarification && diagnosis.clarifying_question && (
+                <p className="text-sm text-[#3D5F58]"><strong>Clarifying question:</strong> {diagnosis.clarifying_question}</p>
+              )}
+              {diagnosis.followup_goal && (
+                <p className="text-sm text-[#4B5563]"><strong>Next learning goal:</strong> {diagnosis.followup_goal}</p>
+              )}
 
-              {/* Evidence Field */}
-              <div className="p-4 bg-[var(--bg-surface-elevated)] border border-[var(--border-soft)] rounded-md space-y-1">
-                <span className="eyebrow text-[10px]">
-                  Evidence from Your Answer & Reasoning
-                </span>
-                <p className="text-xs font-mono text-[var(--text-body)] leading-relaxed">
-                  {diagnosis.evidence || `Submitted answer: "${answer}".`}
-                </p>
-              </div>
-
-              {/* Explanatory Feedback Field */}
-              <div className="p-4 bg-[var(--bg-surface)] border-l-4 border-l-[var(--accent-primary)] border border-[var(--border-soft)] rounded-md space-y-1.5">
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--accent-primary)] flex items-center gap-1.5">
-                  <BookOpen size={13} />
-                  Concept Explanation & Feedback
-                </span>
-                <p className="text-xs text-[var(--text-body)] font-sans leading-relaxed">
-                  {diagnosis.feedback || 'The Python interpreter evaluates this expression directly based on object semantics.'}
-                </p>
-
-                {diagnosis.needs_clarification && diagnosis.clarifying_question && (
-                  <div className="mt-2.5 pt-2.5 border-t border-[var(--border-soft)]">
-                    <span className="font-mono text-xs font-bold text-[var(--warning)] uppercase block mb-1">
-                      Clarifying Question:
-                    </span>
-                    <div className="alert alert-warning text-xs p-2.5">
-                      {diagnosis.clarifying_question}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Next Learning Goal */}
-              <div className="alert alert-info flex items-start gap-3">
-                <Target size={18} className="shrink-0 mt-0.5" />
-                <div className="space-y-0.5">
-                  <span className="font-mono text-xs font-bold uppercase tracking-wider block">
-                    Next Learning Goal
-                  </span>
-                  <p className="text-xs font-sans">
-                    {diagnosis.followup_goal ||
-                      (diagnosis.is_correct
-                        ? `Advance to the next exercise (${exercises[index + 1]?.example_id || 'Advanced Concepts'})`
-                        : 'Review index boundaries and practice with slicing rules.')}
-                  </p>
-                </div>
-              </div>
-
-              {/* Action to proceed to next question */}
-              {index < exercises.length - 1 && (
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={() => moveToQuestion(index + 1)}
-                    className="btn btn-secondary w-full"
-                  >
-                    <span>Proceed to Next Question ({exercises[index + 1]?.example_id})</span>
-                    <ChevronRight size={15} />
-                  </button>
+              {canShowFollowup && (
+                <div className="space-y-3 rounded-lg border border-[#D8D8CF] bg-[#FAF9F5] p-4">
+                  <h4 className="font-heading font-bold text-[#231F20]"><BookOpen className="mr-2 inline h-4 w-4" />Targeted Practice</h4>
+                  {!showFollowup ? (
+                    <button type="button" onClick={() => setShowFollowup(true)} className="rounded-md bg-[#3D5F58] px-4 py-2 text-sm font-bold text-white hover:bg-[#2E4742]">
+                      Try Follow-up
+                    </button>
+                  ) : (
+                    <>
+                      <p className="text-sm text-[#231F20]">{exercise.followup_question}</p>
+                      <input
+                        type="text"
+                        value={followupAnswer}
+                        onChange={(event) => {
+                          setFollowupAnswer(event.target.value)
+                          setFollowupFeedback('')
+                        }}
+                        placeholder="Enter your answer..."
+                        disabled={checkingFollowup}
+                        className="w-full rounded-md border border-[#D8D8CF] bg-white p-3 font-mono text-sm text-[#231F20] focus:outline-none focus:ring-2 focus:ring-[#3D5F58]"
+                      />
+                      <button
+                        type="button"
+                        disabled={!followupAnswer.trim() || checkingFollowup}
+                        onClick={handleFollowupSubmit}
+                        className="inline-flex items-center gap-2 rounded-md bg-[#3D5F58] px-4 py-2 text-sm font-bold text-white hover:bg-[#2E4742] disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {checkingFollowup && <Loader2 className="h-4 w-4 animate-spin" />}
+                        {checkingFollowup ? 'Checking...' : 'Check Follow-up'}
+                      </button>
+                      {followupFeedback && <p className="text-sm font-medium text-[#3D5F58]">{followupFeedback}</p>}
+                    </>
+                  )}
                 </div>
               )}
             </div>
           ) : (
-            /* Empty State / Initial Prompt */
-            <div className="card text-center p-8 space-y-4">
-              <div className="icon-tile mx-auto">
-                <Sparkles size={20} className="text-[#F5B726]" />
+            <div className="space-y-4 rounded-lg border border-[#D8D8CF] bg-white p-8 text-center shadow-xs">
+              <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full border border-[#D8D8CF] bg-[#FAF9F5] text-[#3D5F58]">
+                <Sparkles className="h-6 w-6 text-[#F5B726]" />
               </div>
-              <div className="max-w-sm mx-auto">
-                <h3 className="font-heading text-base font-bold text-[var(--text-main)]">
-                  Awaiting Your Answer
-                </h3>
-                <p className="text-xs text-[var(--text-muted)] font-sans mt-1.5 leading-relaxed">
-                  Submit your answer on the left. The diagnostic engine will analyze your mental model, identify specific misconceptions, and provide targeted feedback.
+              <div className="mx-auto max-w-sm">
+                <h3 className="font-heading text-lg font-bold text-[#231F20]">Awaiting Your Answer</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-[#6B7280]">
+                  Submit your answer to analyze your understanding, identify possible misconceptions, and receive targeted feedback.
                 </p>
               </div>
-
-              <div className="p-4 bg-[var(--bg-surface-elevated)] rounded-md border border-[var(--border-soft)] text-left text-xs text-[var(--text-body)] space-y-2 max-w-sm mx-auto">
-                <div className="eyebrow text-[10px]">Diagnostic Features:</div>
-                <ul className="list-disc list-inside space-y-1 text-xs text-[var(--text-muted)] font-sans">
-                  <li>Detects zero-based vs one-based index confusion</li>
-                  <li>Highlights slice boundary misconceptions</li>
-                  <li>Distinguishes mutable list mutation vs reassignment</li>
-                  <li>Prescribes tailored remedial follow-up goals</li>
+              <div className="mx-auto max-w-sm space-y-2 rounded-md border border-[#E5E5DC] bg-[#FAF9F5] p-4 text-left text-xs text-[#4B5563]">
+                <div className="font-mono font-bold uppercase text-[#3D5F58]">Diagnostic Features</div>
+                <ul className="list-inside list-disc space-y-1">
+                  <li>Detects zero-based vs one-based indexing confusion</li>
+                  <li>Highlights common Python concept misconceptions</li>
+                  <li>Analyzes student reasoning</li>
+                  <li>Offers targeted follow-up practice</li>
                 </ul>
               </div>
             </div>
