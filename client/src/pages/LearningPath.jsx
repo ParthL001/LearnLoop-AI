@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
 import { Card, Button, Badge } from '../components/UI'
-import { learningPathMilestones, topics } from '../services/mockData'
+import { useApp } from '../context/AppContext'
 
 export default function LearningPath() {
-  const activeTopic = topics[0]
+  const { milestones, topics } = useApp()
+  const activeTopic = topics[0] || {}
 
   return (
     <div className="space-y-6">
@@ -35,7 +36,7 @@ export default function LearningPath() {
 
       {/* Milestones List */}
       <div className="space-y-3">
-        {learningPathMilestones.map((milestone, index) => {
+        {milestones.map((milestone, index) => {
           const isCompleted = milestone.status === 'completed'
           const isInProgress = milestone.status === 'in_progress'
           const isNextUp = milestone.status === 'next_up'

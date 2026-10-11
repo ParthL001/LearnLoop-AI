@@ -122,8 +122,8 @@ export const learningPathMilestones = [
   {
     id: 'm3',
     topicId: 'fractions',
-    title: 'Milestone 3: Misconception Checkpoint — Unlike Denominators',
-    description: 'Diagnostic probe: why can’t we simply compute 1/2 + 1/3 as (1+1)/(2+3)? Unpack the common unit requirement.',
+    title: 'Milestone 3: Misconception Checkpoint: Unlike Denominators',
+    description: 'Diagnostic probe: why cannot we simply compute 1/2 + 1/3 as (1+1)/(2+3)? Unpack the common unit requirement.',
     status: 'in_progress',
     type: 'diagnostic',
     duration: '25 mins',
@@ -193,10 +193,10 @@ export const practiceQuestions = [
     concept: 'Fraction Addition & Common Units',
     question: 'Evaluate the sum: 1/4 + 2/4. What is the resulting quantity?',
     options: [
-      '3/8 — add both numerators and denominators',
-      '3/4 — the units are identical (fourths), so we combine parts',
-      '2/16 — multiply denominators and add numerators',
-      '1/2 — simplify immediately'
+      '3/8: add both numerators and denominators',
+      '3/4: the units are identical (fourths), so we combine parts',
+      '2/16: multiply denominators and add numerators',
+      '1/2: simplify immediately'
     ],
     correctIndex: 1,
     misconceptionTags: {

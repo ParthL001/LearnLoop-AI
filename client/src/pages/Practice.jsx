@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Card, Button, Badge } from '../components/UI'
+import { useApp } from '../context/AppContext'
 import { practiceQuestions } from '../services/mockData'
 
 export default function Practice() {
   const { id } = useParams()
+  const { recordPracticeResult, mastery } = useApp()
   const [currentIdx, setCurrentIdx] = useState(0)
   const [selectedOpt, setSelectedOpt] = useState(null)
   const [reasoning, setReasoning] = useState('')
   const [submitted, setSubmitted] = useState(false)
-  const [sessionResults, setSessionResults] = useState([])
 
   const question = practiceQuestions[currentIdx] || practiceQuestions[0]
   const isCorrect = selectedOpt === question.correctIndex
@@ -18,15 +19,14 @@ export default function Practice() {
   const handleSubmit = () => {
     if (selectedOpt === null) return
     setSubmitted(true)
-    setSessionResults((prev) => [
-      ...prev,
-      {
-        questionId: question.id,
-        isCorrect,
-        selectedOpt,
-        misconception
-      }
-    ])
+
+    // Dynamically update real-time mastery and misconception log
+    recordPracticeResult({
+      questionId: question.id,
+      isCorrect,
+      reasoning,
+      misconception
+    })
   }
 
   const handleNext = () => {
@@ -59,9 +59,14 @@ export default function Practice() {
               Answer the prompt and write your step-by-step thinking so Cognara can diagnose your mental model.
             </p>
           </div>
-          <Link to="/tutor">
-            <Button size="sm" variant="secondary">Discuss with Tutor</Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-[#797973]">
+              Current Mastery: <strong className="text-[#3730a3]">{mastery?.[question.topicId || 'fractions'] || 68}%</strong>
+            </span>
+            <Link to="/tutor">
+              <Button size="sm" variant="secondary">Discuss with Tutor</Button>
+            </Link>
+          </div>
         </div>
       </Card>
 
@@ -135,6 +140,9 @@ export default function Practice() {
               <div className="text-[#065f46] space-y-1">
                 <p className="font-bold">Correct Reasoning Verified</p>
                 <p className="text-[#047857]">{question.explanation}</p>
+                <p className="text-[11px] text-[#065f46] pt-1 font-semibold">
+                  +6% mastery recorded dynamically to your learning profile!
+                </p>
               </div>
             ) : (
               <div className="space-y-2 text-[#991b1b]">
@@ -159,7 +167,7 @@ export default function Practice() {
         {/* Footer actions */}
         <div className="mt-6 pt-4 border-t border-[#e3e3df] flex items-center justify-between">
           <span className="text-xs text-[#797973]">
-            {submitted ? 'Review diagnosis and continue' : 'Select an option to evaluate'}
+            {submitted ? 'Diagnosis updated dynamically' : 'Select an option to evaluate'}
           </span>
           {!submitted ? (
             <Button

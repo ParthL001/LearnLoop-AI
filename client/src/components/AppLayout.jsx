@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Outlet, useLocation, Link } from 'react-router-dom'
+import { Outlet, useLocation, Link, useNavigate } from 'react-router-dom'
 import Sidebar, { navItems } from './Sidebar'
 import Navbar from './navbar'
 
-export default function AppLayout() {
+export default function AppLayout({ user, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
 
   const currentNav = navItems.find((item) => {
     if (item.path === '/dashboard' && (location.pathname === '/' || location.pathname === '/dashboard')) {
@@ -23,11 +24,20 @@ export default function AppLayout() {
     '/practice': 'Targeted Practice',
     '/assessments': 'Assessments',
     '/progress': 'Progress & Mastery',
+    '/about': 'About Cognara',
+    '/contact': 'Contact Us',
     '/privacy': 'Privacy Policy',
     '/terms': 'Terms and Conditions',
   }
 
   const currentTitle = pathTitles[location.pathname] || currentNav?.name || 'Cognara'
+
+  const handleDashboardClick = () => {
+    setMobileMenuOpen(true)
+    if (location.pathname !== '/dashboard') {
+      navigate('/dashboard')
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#f9f9f7] text-[#181816]">
@@ -36,10 +46,12 @@ export default function AppLayout() {
 
       {/* Main Column */}
       <div className="flex min-h-screen flex-col lg:pl-64">
-        {/* Sticky Header with Current Page Title */}
+        {/* Sticky Header with Current Page Title, Home, Dashboard, About, Contact */}
         <Navbar
-          onOpenMobileMenu={() => setMobileMenuOpen(true)}
+          onOpenMobileMenu={handleDashboardClick}
           currentTitle={currentTitle}
+          user={user}
+          onLogout={onLogout}
         />
 
         {/* Page Content */}
@@ -50,8 +62,16 @@ export default function AppLayout() {
         {/* Simple Footer with Privacy Policy and Terms and Conditions */}
         <footer className="border-t border-[#e3e3df] bg-[#ffffff] px-6 py-4 text-xs text-[#797973]">
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p>© 2026 Cognara — Adaptive Learning Platform</p>
+            <p>© 2026 Cognara · Adaptive Learning Platform</p>
             <div className="flex items-center gap-4">
+              <Link to="/about" className="hover:text-[#181816] hover:underline">
+                About
+              </Link>
+              <span>·</span>
+              <Link to="/contact" className="hover:text-[#181816] hover:underline">
+                Contact
+              </Link>
+              <span>·</span>
               <Link to="/privacy" className="hover:text-[#181816] hover:underline">
                 Privacy Policy
               </Link>

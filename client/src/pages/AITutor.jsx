@@ -2,17 +2,18 @@ import { useState, useRef, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Card, Button, Badge } from '../components/UI'
 import { chatWithTutor } from '../services/api'
-import { topics } from '../services/mockData'
+import { useApp } from '../context/AppContext'
 
 export default function AITutor() {
+  const { topics, user } = useApp()
   const { id } = useParams()
-  const activeTopic = topics.find((t) => t.id === id) || topics[0]
+  const activeTopic = topics.find((t) => t.id === id) || topics[0] || {}
 
   const [messages, setMessages] = useState([
     {
       id: 'init',
       sender: 'tutor',
-      text: `Hello Alex. I am your Cognara adaptive tutor for ${activeTopic.title}. Tell me what concept you are working through, or explain how you solved a recent problem so we can check your underlying reasoning.`,
+      text: `Hello ${user?.name || 'Alex'}. I am your Cognara adaptive tutor for ${activeTopic.title || 'Fractional Reasoning'}. Tell me what concept you are working through, or explain how you solved a recent problem so we can check your underlying reasoning.`,
       time: 'Ready'
     }
   ])
@@ -123,7 +124,7 @@ export default function AITutor() {
                     {m.misconception && (
                       <div className="mt-3 pt-2.5 border-t border-[#fde68a] bg-[#fffbeb] text-[#92400e] p-2 rounded-[3px]">
                         <span className="font-bold">Detected Misconception: </span>
-                        {m.misconception.name} — {m.misconception.note}
+                        {m.misconception.name}: {m.misconception.note}
                       </div>
                     )}
                   </div>

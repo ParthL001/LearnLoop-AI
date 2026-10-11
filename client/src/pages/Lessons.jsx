@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Card, Button, Badge, ProgressBar } from '../components/UI'
-import { topics } from '../services/mockData'
+import { useApp } from '../context/AppContext'
 
 export default function Lessons() {
+  const { topics, mastery } = useApp()
   const { id } = useParams()
   const [selectedSubject, setSelectedSubject] = useState('All')
 

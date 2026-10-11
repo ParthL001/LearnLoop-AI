@@ -1,9 +1,17 @@
 import { Link } from 'react-router-dom'
 import { Card, Button, Badge, ProgressBar } from '../components/UI'
-import { topics } from '../services/mockData'
+import { useApp } from '../context/AppContext'
 
 export default function Dashboard() {
-  const currentTopic = topics[0]
+  const { user, topics, mastery, misconceptions } = useApp()
+  const currentTopic = topics[0] || {}
+
+  const overallMastery = Math.round(
+    Object.values(mastery || {}).reduce((acc, curr) => acc + curr, 0) /
+    Math.max(1, Object.keys(mastery || {}).length)
+  )
+
+  const activeMisconception = misconceptions.find((m) => m.status === 'In Remediation')
 
   return (
     <div className="space-y-6">
@@ -12,8 +20,10 @@ export default function Dashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-[#181816]">Learner Dashboard</h2>
-              <Badge variant="accent">In Progress</Badge>
+              <h2 className="text-lg font-bold text-[#181816]">
+                Welcome, {user?.name || 'Learner'}
+              </h2>
+              <Badge variant="accent">Active Session</Badge>
             </div>
             <p className="mt-1 text-xs text-[#575753] max-w-xl">
               Cognara analyzes your responses and reasoning to detect underlying conceptual gaps and suggest targeted practice.
@@ -33,27 +43,31 @@ export default function Dashboard() {
       {/* Metrics Row */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <p className="text-xs font-semibold text-[#797973]">Active Subject</p>
-          <p className="mt-2 text-xl font-bold text-[#181816]">Mathematics</p>
-          <p className="mt-1 text-[11px] text-[#575753]">Fractional Reasoning</p>
+          <p className="text-xs font-semibold text-[#797973]">Current Topic</p>
+          <p className="mt-2 text-xl font-bold text-[#181816]">{currentTopic.subject || 'Math'}</p>
+          <p className="mt-1 text-[11px] text-[#575753] truncate">{currentTopic.title}</p>
         </Card>
 
         <Card>
-          <p className="text-xs font-semibold text-[#797973]">Overall Mastery</p>
-          <p className="mt-2 text-xl font-bold text-[#181816]">68%</p>
-          <p className="mt-1 text-[11px] text-[#065f46]">4 of 6 units validated</p>
+          <p className="text-xs font-semibold text-[#797973]">Average Mastery</p>
+          <p className="mt-2 text-xl font-bold text-[#181816]">{overallMastery}%</p>
+          <p className="mt-1 text-[11px] text-[#065f46]">Updates in real time</p>
         </Card>
 
         <Card>
-          <p className="text-xs font-semibold text-[#797973]">Misconceptions Identified</p>
-          <p className="mt-2 text-xl font-bold text-[#181816]">1 Pending</p>
-          <p className="mt-1 text-[11px] text-[#92400e]">Denominator Size Inversion</p>
+          <p className="text-xs font-semibold text-[#797973]">Active Misconception</p>
+          <p className="mt-2 text-xl font-bold text-[#181816]">
+            {activeMisconception ? '1 Detected' : 'All Clear'}
+          </p>
+          <p className="mt-1 text-[11px] text-[#92400e] truncate">
+            {activeMisconception ? activeMisconception.concept : 'No active misconceptions'}
+          </p>
         </Card>
 
         <Card>
-          <p className="text-xs font-semibold text-[#797973]">Recommended Step</p>
+          <p className="text-xs font-semibold text-[#797973]">Next Recommended Step</p>
           <p className="mt-2 text-xl font-bold text-[#181816]">Milestone 3</p>
-          <p className="mt-1 text-[11px] text-[#575753]">Unlike Denominator Check</p>
+          <p className="mt-1 text-[11px] text-[#575753]">Diagnostic Reasoning Check</p>
         </Card>
       </div>
 
@@ -68,7 +82,7 @@ export default function Dashboard() {
                   <h3 className="text-sm font-bold text-[#181816]">Current Focus Unit</h3>
                   <p className="text-xs text-[#797973]">{currentTopic.title}</p>
                 </div>
-                <Badge variant="accent">Topic 1</Badge>
+                <Badge variant="accent">Active</Badge>
               </div>
             }
           >
@@ -77,18 +91,21 @@ export default function Dashboard() {
             </p>
 
             <div className="mt-4">
-              <ProgressBar value={currentTopic.mastery} label="Concept Mastery" />
+              <ProgressBar
+                value={mastery?.[currentTopic.id] || currentTopic.mastery || 68}
+                label="Concept Mastery"
+              />
             </div>
 
             <div className="mt-4 pt-4 border-t border-[#e3e3df] flex flex-wrap items-center justify-between gap-3">
               <span className="text-xs text-[#797973]">
-                Estimated time: {currentTopic.duration}
+                Estimated time: {currentTopic.duration || '25 mins'}
               </span>
               <div className="flex gap-2">
-                <Link to="/lessons/fractions">
+                <Link to={`/lessons/${currentTopic.id || 'fractions'}`}>
                   <Button variant="secondary">View Lesson</Button>
                 </Link>
-                <Link to="/tutor/fractions">
+                <Link to={`/tutor/${currentTopic.id || 'fractions'}`}>
                   <Button variant="primary">Work with Tutor</Button>
                 </Link>
               </div>
@@ -99,9 +116,9 @@ export default function Dashboard() {
           <Card
             header={
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-[#181816]">Curriculum Overview</h3>
+                <h3 className="text-sm font-bold text-[#181816]">Curriculum Progress</h3>
                 <Link to="/lessons" className="text-xs font-semibold text-[#3730a3] hover:underline">
-                  View all
+                  View all lessons
                 </Link>
               </div>
             }
@@ -117,7 +134,9 @@ export default function Dashboard() {
                     <p className="text-[11px] text-[#575753] truncate mt-0.5">{topic.description}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="text-xs font-bold text-[#181816]">{topic.mastery}%</span>
+                    <span className="text-xs font-bold text-[#181816]">
+                      {mastery?.[topic.id] || topic.mastery || 50}%
+                    </span>
                     <span className="block text-[10px] text-[#797973]">mastery</span>
                   </div>
                 </div>
@@ -133,34 +152,50 @@ export default function Dashboard() {
               <h3 className="text-sm font-bold text-[#181816]">Diagnostic Signal</h3>
             }
           >
-            <Badge variant="warning">Misconception Flagged</Badge>
-            <h4 className="mt-2 text-xs font-bold text-[#181816]">
-              Whole-Number Denominator Comparison
-            </h4>
-            <p className="mt-1 text-xs text-[#575753] leading-relaxed">
-              When comparing 2/3 and 2/5, student reasoning referenced 5 &gt; 3 rather than piece partition size.
-            </p>
-            <div className="mt-4 pt-3 border-t border-[#e3e3df]">
-              <Link to="/practice/fractions">
-                <Button variant="secondary" className="w-full">
-                  Resolve in Practice
-                </Button>
-              </Link>
-            </div>
+            {activeMisconception ? (
+              <div className="space-y-2">
+                <Badge variant="warning">Misconception Flagged</Badge>
+                <h4 className="text-xs font-bold text-[#181816]">{activeMisconception.concept}</h4>
+                <p className="text-xs text-[#575753] leading-relaxed">
+                  {activeMisconception.studentHypothesis}
+                </p>
+                <div className="pt-2">
+                  <Link to="/practice/fractions">
+                    <Button variant="secondary" className="w-full">
+                      Practice This Concept
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2 text-xs text-[#065f46]">
+                <Badge variant="success">All Concepts Clear</Badge>
+                <p className="text-[#575753]">
+                  No active misconceptions detected in recent sessions. Try a diagnostic check to verify retention.
+                </p>
+                <div className="pt-2">
+                  <Link to="/practice">
+                    <Button variant="secondary" className="w-full">
+                      Start Diagnostic Check
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            )}
           </Card>
 
           <Card
             header={
-              <h3 className="text-sm font-bold text-[#181816]">System Status</h3>
+              <h3 className="text-sm font-bold text-[#181816]">System Health</h3>
             }
           >
             <div className="space-y-2 text-xs">
               <div className="flex justify-between text-[#575753]">
-                <span>Tutor Inference Engine</span>
-                <span className="font-semibold text-[#065f46]">Operational</span>
+                <span>Adaptive Tutor Engine</span>
+                <span className="font-semibold text-[#065f46]">Ready</span>
               </div>
               <div className="flex justify-between text-[#575753]">
-                <span>Misconception Detector</span>
+                <span>Misconception Classifier</span>
                 <span className="font-semibold text-[#065f46]">Active</span>
               </div>
               <div className="flex justify-between text-[#575753]">
