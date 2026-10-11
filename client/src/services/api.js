@@ -125,3 +125,75 @@ function generateOfflineTutorReply(userPrompt, topicId, studentReasoning) {
     suggestedAction: 'Explore visual model'
   }
 }
+
+/**
+ * Fetch deterministic learner progress and mastery calibration from backend
+ */
+export async function fetchLearnerProgress(learnerId) {
+  try {
+    const url = learnerId
+      ? `${API_BASE_URL}/progress/${encodeURIComponent(learnerId)}`
+      : `${API_BASE_URL}/progress`
+    const res = await fetch(url)
+    if (!res.ok) throw new Error(`Progress request failed with status ${res.status}`)
+    return await res.json()
+  } catch (err) {
+    return null
+  }
+}
+
+/**
+ * Fetch sanitized pre or post assessment items (answer keys never exposed)
+ */
+export async function fetchAssessment(type = 'pre') {
+  try {
+    const res = await fetch(`${API_BASE_URL}/assessments/${type}`)
+    if (!res.ok) throw new Error(`Assessment request failed with status ${res.status}`)
+    return await res.json()
+  } catch (err) {
+    return null
+  }
+}
+
+/**
+ * Submit pre or post assessment for backend deterministic scoring
+ */
+export async function submitAssessment({ learnerId, type, itemResponses }) {
+  const res = await fetch(`${API_BASE_URL}/assessment/submit`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ learnerId, type, itemResponses })
+  })
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}))
+    throw new Error(errData.error || `Assessment submission failed: ${res.status}`)
+  }
+  return await res.json()
+}
+
+/**
+ * Fetch paired pre/post assessment comparison report for a learner
+ */
+export async function fetchAssessmentResults(learnerId) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/assessment/results/${encodeURIComponent(learnerId)}`)
+    if (!res.ok) throw new Error(`Assessment report request failed with status ${res.status}`)
+    return await res.json()
+  } catch (err) {
+    return null
+  }
+}
+
+/**
+ * Fetch cohort evaluation report with paired analysis and attrition metrics
+ */
+export async function fetchCohortAssessmentReport() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/assessment/report`)
+    if (!res.ok) throw new Error(`Cohort report failed with status ${res.status}`)
+    return await res.json()
+  } catch (err) {
+    return null
+  }
+}
+

@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { evaluatorService } from '../services/evaluatorService.js'
+import { storageService } from '../services/storageService.js'
 
 const router = Router()
 
@@ -39,7 +40,7 @@ router.post('/tutor/chat', async (req, res, next) => {
 // POST /api/analyze/misconception - Evaluates answer & reasoning against backend answer key
 router.post('/analyze/misconception', async (req, res, next) => {
   try {
-    const { questionId, selectedAnswerIndex, studentReasoning, topicId } = req.body
+    const { questionId, selectedAnswerIndex, studentReasoning, topicId, learnerId } = req.body
 
     if (!questionId) {
       return res.status(400).json({
@@ -62,8 +63,27 @@ router.post('/analyze/misconception', async (req, res, next) => {
       topicId,
     })
 
+    // If learnerId is provided, record attempt to persistence store
+    let savedAttempt = null
+    if (learnerId && typeof learnerId === 'string' && learnerId.trim()) {
+      savedAttempt = await storageService.recordAttempt({
+        learnerId: learnerId.trim(),
+        questionId,
+        conceptId: evaluation.conceptId || topicId || 'fractions',
+        isCorrect: evaluation.isCorrect,
+        diagnosisStatus: evaluation.detectedMisconception ? 'misconception' : (evaluation.isCorrect ? 'correct' : 'incorrect'),
+        misconception: evaluation.detectedMisconception?.name || null,
+        followUpActivity: evaluation.remediationAdvice ? { advice: evaluation.remediationAdvice } : null,
+        studentReasoning,
+        selectedAnswerIndex
+      })
+    }
+
     // Returns exact contract expected by frontend
-    res.status(200).json(evaluation)
+    res.status(200).json({
+      ...evaluation,
+      savedAttemptId: savedAttempt ? savedAttempt.id : null
+    })
   } catch (err) {
     next(err)
   }
@@ -72,7 +92,7 @@ router.post('/analyze/misconception', async (req, res, next) => {
 // POST /api/tutor/submit - Alternative alias for question submission evaluation
 router.post('/tutor/submit', async (req, res, next) => {
   try {
-    const { questionId, selectedAnswerIndex, studentReasoning, topicId } = req.body
+    const { questionId, selectedAnswerIndex, studentReasoning, topicId, learnerId } = req.body
 
     const evaluation = await evaluatorService.evaluateSubmission({
       questionId,
@@ -81,9 +101,25 @@ router.post('/tutor/submit', async (req, res, next) => {
       topicId,
     })
 
+    let savedAttempt = null
+    if (learnerId && typeof learnerId === 'string' && learnerId.trim()) {
+      savedAttempt = await storageService.recordAttempt({
+        learnerId: learnerId.trim(),
+        questionId,
+        conceptId: evaluation.conceptId || topicId || 'fractions',
+        isCorrect: evaluation.isCorrect,
+        diagnosisStatus: evaluation.detectedMisconception ? 'misconception' : (evaluation.isCorrect ? 'correct' : 'incorrect'),
+        misconception: evaluation.detectedMisconception?.name || null,
+        followUpActivity: evaluation.remediationAdvice ? { advice: evaluation.remediationAdvice } : null,
+        studentReasoning,
+        selectedAnswerIndex
+      })
+    }
+
     res.status(200).json({
       success: true,
       evaluation,
+      savedAttemptId: savedAttempt ? savedAttempt.id : null
     })
   } catch (err) {
     next(err)

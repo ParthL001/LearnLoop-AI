@@ -6,6 +6,8 @@ import { ollamaService } from './services/ollamaService.js'
 import contentRoutes from './routes/contentRoutes.js'
 import tutorRoutes from './routes/tutorRoutes.js'
 import adaptiveRoutes from './routes/adaptiveRoutes.js'
+import progressRoutes from './routes/progressRoutes.js'
+import assessmentRoutes from './routes/assessmentRoutes.js'
 
 const app = express()
 
@@ -50,10 +52,12 @@ app.get('/api/ai/health', async (req, res, next) => {
   }
 })
 
-// 5. Mount Learning Content, Tutor, and Adaptive Routes under /api
+// 5. Mount Learning Content, Tutor, Adaptive, Progress, and Assessment Routes under /api
 app.use('/api', contentRoutes)
 app.use('/api', tutorRoutes)
 app.use('/api', adaptiveRoutes)
+app.use('/api', progressRoutes)
+app.use('/api', assessmentRoutes)
 
 // 6. 404 & Centralized Error Handlers
 app.use(notFoundHandler)
