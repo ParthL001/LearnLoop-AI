@@ -175,36 +175,50 @@ Respond strictly in valid JSON matching this schema:
  * Fetch available Python exercises
  */
 export async function fetchPythonExercises() {
-  try {
-    const response = await fetch(
-      `${AIML_BASE_URL}/internal/v1/exercises`,
-      { signal: AbortSignal.timeout(4000) }
-    )
+  const response = await fetch(
+    `${AIML_BASE_URL}/internal/v1/exercises`,
+    { signal: AbortSignal.timeout(10000) }
+  )
 
-    if (response.ok) {
-      return await response.json()
-    }
-  } catch {
-    // Fall back to reading local python_exercises.jsonl
+  if (!response.ok) {
+    throw new Error(`AIML service returned HTTP ${response.status}`)
   }
 
-  try {
-    const fs = await import('fs/promises')
-    const path = await import('path')
-    const { fileURLToPath } = await import('url')
-    const __filename = fileURLToPath(import.meta.url)
-    const __dirname = path.dirname(__filename)
-    const filePath = path.resolve(__dirname, '../../AIML/dataset/python_exercises.jsonl')
-    const content = await fs.readFile(filePath, 'utf8')
-    const exercises = content
-      .split('\n')
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .map((line) => JSON.parse(line))
+  const exercises = await response.json()
 
-    return { success: true, exercises }
-  } catch (err) {
-    throw new Error(`Could not load Python exercises: ${err.message}`)
+  if (!Array.isArray(exercises)) {
+    throw new Error('Invalid exercises response from AIML service')
   }
+
+  return { exercises }
 }
+
+export async function checkPythonFollowup({
+  exampleId,
+  studentAnswer,
+}) {
+  const response = await fetch(
+    `${AIML_BASE_URL} /internal/v1 / followup / check`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        example_id: exampleId,
+        student_answer: studentAnswer,
+      }),
+      signal: AbortSignal.timeout(10000),
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error(
+      `AIML follow - up service returned HTTP ${response.status} `
+    )
+  }
+
+  return response.json()
+}
+
 

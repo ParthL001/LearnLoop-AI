@@ -1,10 +1,10 @@
+
 import { Router } from 'express'
 import {
     diagnosePythonAnswer,
     fetchPythonExercises,
     checkPythonFollowup,
 } from '../services/aimlService.js'
-
 
 const router = Router()
 
@@ -13,7 +13,7 @@ router.get('/python/exercises', async (req, res, next) => {
     try {
         const result = await fetchPythonExercises()
 
-        res.json({
+        return res.status(200).json({
             success: true,
             exercises: result.exercises,
         })
@@ -35,16 +35,28 @@ router.post('/python/diagnose', async (req, res, next) => {
             recommendedFollowup = '',
         } = req.body || {}
 
+        // Require question and studentAnswer.
+        // correctAnswer is optional when exampleId is provided.
         if (
             typeof question !== 'string' ||
-            typeof correctAnswer !== 'string' ||
-            typeof studentAnswer !== 'string' ||
             !question.trim() ||
-            !correctAnswer.trim() ||
-            !studentAnswer.trim()
+            typeof studentAnswer !== 'string' ||
+            !studentAnswer.trim() ||
+            (
+                correctAnswer !== undefined &&
+                correctAnswer !== null &&
+                typeof correctAnswer !== 'string'
+            ) ||
+            (
+                !String(exampleId || '').trim() &&
+                (typeof correctAnswer !== 'string' ||
+                    !correctAnswer.trim())
+            )
         ) {
             return res.status(400).json({
-                error: 'question, correctAnswer and studentAnswer are required strings',
+                success: false,
+                error:
+                    'A question, studentAnswer, and either exampleId or correctAnswer are required',
             })
         }
 
@@ -66,6 +78,7 @@ router.post('/python/diagnose', async (req, res, next) => {
         next(error)
     }
 })
+
 // POST /api/python/followup/check
 router.post('/python/followup/check', async (req, res, next) => {
     try {

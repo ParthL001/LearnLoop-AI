@@ -396,12 +396,24 @@ export async function diagnosePythonAnswer({
  */
 export async function fetchPythonExercises() {
   const response = await fetch(`${API_BASE_URL}/python/exercises`)
-  const data = await response.json().catch(() => ({}))
+
+  const contentType = response.headers.get('content-type') || ''
+
+  if (!contentType.includes('application/json')) {
+    throw new Error(
+      'The backend returned HTML instead of JSON. Check that Express is running on port 5000.'
+    )
+  }
+
+  const data = await response.json()
 
   if (!response.ok || !data.success) {
-    throw new Error(data.error || 'Failed to load Python exercises')
+    throw new Error(data.error || 'Failed to load Python exercises.')
+  }
+
+  if (!Array.isArray(data.exercises)) {
+    throw new Error('The backend response is missing the exercises array.')
   }
 
   return data.exercises
 }
-
