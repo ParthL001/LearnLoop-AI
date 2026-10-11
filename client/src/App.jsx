@@ -5,6 +5,7 @@ import AppLayout from './components/AppLayout'
 // Pages
 import LoginSignup from './pages/login_signup'
 import Dashboard from './pages/Dashboard'
+import ExploreContent from './pages/ExploreContent'
 import LearningPath from './pages/LearningPath'
 import Lessons from './pages/Lessons'
 import AITutor from './pages/AITutor'
@@ -43,9 +44,11 @@ export default function App() {
         {/* Default route: Dashboard if logged in, otherwise redirects to /login above */}
         <Route path="/" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/learning-path" element={<LearningPath />} />
+        <Route path="/explore" element={<ExploreContent />} />
+        <Route path="/learning-path" element={<Navigate to="/explore" replace />} />
         <Route path="/lessons" element={<Lessons />} />
-        <Route path="/lessons/:id" element={<Lessons />} />
+        <Route path="/lessons/:subject" element={<Lessons />} />
+        <Route path="/lessons/:subject/:topicId" element={<Lessons />} />
         <Route path="/tutor" element={<AITutor />} />
         <Route path="/tutor/:id" element={<AITutor />} />
         <Route path="/practice" element={<Practice />} />

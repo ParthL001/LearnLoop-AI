@@ -10,7 +10,11 @@ import { ollamaService } from './ollamaService.js'
  */
 export function stripThinkingTags(text) {
   if (!text || typeof text !== 'string') return ''
-  return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim()
+  let cleaned = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim()
+  if (!cleaned) {
+    cleaned = text.replace(/<\/?think>/gi, '').trim()
+  }
+  return cleaned
 }
 
 /**
@@ -194,17 +198,17 @@ Return strictly a JSON object with this exact shape:
   }
 
   /**
-   * Socratic interactive chat handler with the AI tutor.
-   * Grounded in verified concepts and lessons.
+   * Socratic interactive chat handler with the AI tutor for Python, C++, and computer science.
    *
    * @param {object} params
    * @param {string} params.message
+   * @param {string} [params.subject]
    * @param {string} [params.topicId]
    * @param {Array} [params.history]
    * @param {string} [params.studentReasoning]
    * @returns {Promise<object>}
    */
-  async tutorChat({ message, topicId = 'fractions', history = [], studentReasoning = '' }) {
+  async tutorChat({ message, subject = 'python', topicId = null, history = [], studentReasoning = '' }) {
     const trimmedMessage = (message || '').trim()
     if (!trimmedMessage) {
       const err = new Error('Message cannot be empty.')
@@ -212,79 +216,62 @@ Return strictly a JSON object with this exact shape:
       throw err
     }
 
-    // Check relevant concept
-    const concept = concepts.find((c) => c.id === topicId) || concepts[0]
-    const lesson = lessons.find((l) => l.conceptId === concept.id) || lessons[0]
+    const currentSubject = (subject || '').toLowerCase() === 'cpp' ? 'C++' : 'Python'
+    const subjectCode = currentSubject === 'C++' ? 'cpp' : 'python'
 
-    // Rule-based diagnostic keyword check
-    const lower = `${trimmedMessage} ${studentReasoning}`.toLowerCase()
-    let detectedMisconception = null
+    // Bound conversation history to last 6 messages to prevent excessive prompt sizes
+    const boundedHistory = Array.isArray(history) ? history.slice(-6) : []
 
-    if (
-      (lower.includes('denominator') && (lower.includes('bigger') || lower.includes('smaller') || lower.includes('5 > 3') || lower.includes('5 is bigger'))) ||
-      (lower.includes('2/3') && lower.includes('2/5')) ||
-      ((lower.includes('bigger number') || lower.includes('larger number')) && (lower.includes('5') || lower.includes('3') || lower.includes('denominator') || lower.includes('bottom')))
-    ) {
-      detectedMisconception = {
-        name: 'Whole Number Value Bias',
-        note: 'Learner transferring whole-number magnitude directly to denominator value.'
-      }
-    } else if (lower.includes('add') && (lower.includes('1+1') || lower.includes('2+3') || lower.includes('bottom') || lower.includes('both numbers') || lower.includes('denominators'))) {
-      detectedMisconception = {
-        name: 'Additive Denominators Misconception',
-        note: 'Learner attempting to add denominators across unlike unit partitions.'
-      }
-    }
+    const systemPrompt = `You are LearnLoop AI, a patient, encouraging, and pedagogically rigorous coding tutor for beginner students learning ${currentSubject}.
+Core Teaching Guidelines:
+1. Explain programming and data structure concepts using clear, step-by-step logic and intuitive analogies.
+2. Provide short, clean, beginner-friendly code examples in ${currentSubject} when helpful.
+3. For data structures like Stack (LIFO) and Queue (FIFO), explain their actual behavioral principles, push/pop mechanics, and real-world uses (like undo buffers or printer spools).
+4. Do NOT claim you executed, compiled, or tested the student's code in a live shell.
+5. If the student has a conceptual misunderstanding or syntax error, gently guide them to see why and how to fix it.
+6. Keep explanations focused, concise, and easy to scan.`
+
+    const conversationContext = boundedHistory
+      .map((h) => {
+        const role = h.sender === 'user' ? 'Student' : 'Tutor'
+        const text = typeof h.text === 'string' ? h.text : (h.message || '')
+        return `${role}: ${text}`
+      })
+      .filter(Boolean)
+      .join('\n')
+
+    const promptContext = [
+      conversationContext ? `Conversation History:\n${conversationContext}\n` : '',
+      topicId ? `Current Focus Topic: ${topicId}\n` : '',
+      studentReasoning ? `Student Stated Reasoning: ${studentReasoning}\n` : '',
+      `Student: ${trimmedMessage}`,
+      `Tutor (${currentSubject} explanation):`
+    ].filter(Boolean).join('\n')
 
     try {
-      const systemPrompt = `You are a friendly, rigorous Socratic adaptive tutor in an educational platform.
-Curriculum Unit: "${concept.title}"
-Core Principles:
-1. Denominators represent partition density: more partitions make individual pieces smaller.
-2. Fractions require common unit names before combining or separating.
-3. If student reasoning is unclear, ask a gentle clarifying question rather than inventing claims.
-4. Keep answers concise, clear, and focused on physical bar/slice models.`
-
-      const conversationContext = history
-        .map((h) => `${h.sender === 'user' ? 'Student' : 'Tutor'}: ${h.text}`)
-        .join('\n')
-
-      const prompt = `${conversationContext ? conversationContext + '\n' : ''}Student: ${trimmedMessage}
-${studentReasoning ? `Student stated reasoning: ${studentReasoning}\n` : ''}Tutor (concise Socratic reply):`
-
       const aiResponse = await ollamaService.generate({
-        prompt,
+        prompt: promptContext,
         system: systemPrompt,
-        options: { temperature: 0.3, num_predict: 250 }
+        options: { temperature: 0.3, num_predict: 1200 }
       })
 
-      const cleanedReply = stripThinkingTags(aiResponse.response)
+      const cleanedReply = stripThinkingTags(aiResponse.response).trim()
+
+      if (!cleanedReply) {
+        throw new Error('Ollama returned empty response.')
+      }
 
       return {
-        reply: cleanedReply || this.getDeterministicFallbackReply(lower, concept),
-        misconceptionDetected: detectedMisconception,
-        suggestedAction: detectedMisconception ? 'Review visual partition diagram' : null,
+        reply: cleanedReply,
+        subject: subjectCode,
         isLiveBackend: true,
       }
     } catch (aiErr) {
-      console.warn(`[EvaluatorService] Ollama chat unavailable: ${aiErr.message}. Serving deterministic fallback.`)
-      return {
-        reply: this.getDeterministicFallbackReply(lower, concept),
-        misconceptionDetected: detectedMisconception,
-        suggestedAction: 'Explore visual model in lesson',
-        isLiveBackend: false,
-      }
+      console.error(`[EvaluatorService] Tutor chat error with Ollama: ${aiErr.message}`)
+      const error = new Error(`AI Tutor service is currently unavailable (${aiErr.message}). Please verify local Ollama is running and retry.`)
+      error.status = 503
+      throw error
     }
-  }
-
-  getDeterministicFallbackReply(lower, concept) {
-    if (lower.includes('why') && (lower.includes('denominator') || lower.includes('smaller') || lower.includes('bigger'))) {
-      return "Let's test this with a picture! Imagine a chocolate bar. If you divide it into 3 equal pieces, each piece is relatively chunky (1/3). But if you divide that exact same bar into 5 equal pieces (1/5), each slice must get skinnier to fit all 5. So even though 5 is a larger number, each fifth (1/5) is actually smaller than a third (1/3). Does this visualization help clarify why 2/3 is greater than 2/5?"
-    }
-    if (lower.includes('add') || lower.includes('plus') || lower.includes('unlike')) {
-      return "When adding fractions like 1/2 + 1/3, we cannot add across to get 2/5. Denominators are unit names: 1 half + 1 third requires converting both into shared sixths first: 3/6 + 2/6 = 5/6."
-    }
-    return `As your adaptive tutor for ${concept.title}, let us build lasting intuition rather than memorized tricks. Could you walk me through one specific step of how you reached your conclusion?`
   }
 }
 

@@ -20,6 +20,38 @@ router.get(['/progress/:learnerId', '/progress'], async (req, res, next) => {
 })
 
 /**
+ * POST /api/progress/track-topic
+ * Records when a learner opens a lesson topic or completes practice on it.
+ */
+router.post('/progress/track-topic', async (req, res, next) => {
+  try {
+    const { learnerId, subjectId, topicId, topicTitle, action = 'opened_lesson' } = req.body
+
+    if (!learnerId || !subjectId || !topicId) {
+      return res.status(400).json({
+        success: false,
+        error: 'learnerId, subjectId, and topicId are required.',
+      })
+    }
+
+    const record = await storageService.trackTopicAccess({
+      learnerId,
+      subjectId,
+      topicId,
+      topicTitle,
+      action,
+    })
+
+    res.status(200).json({
+      success: true,
+      record,
+    })
+  } catch (err) {
+    next(err)
+  }
+})
+
+/**
  * POST /api/attempts
  * Explicitly records a practice attempt with backend verification.
  */

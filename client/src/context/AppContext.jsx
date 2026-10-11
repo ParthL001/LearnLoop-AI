@@ -41,46 +41,43 @@ export function AppProvider({ children }) {
     }
   })
 
-  // 4. Dynamic mastery map
+  // 4. Dynamic mastery map (honest - no fake scores)
   const [mastery, setMastery] = useState(() => {
     try {
       const saved = localStorage.getItem('cognara_mastery')
-      return saved ? JSON.parse(saved) : { fractions: 68, algebra: 54, logic: 82, probability: 38 }
+      return saved ? JSON.parse(saved) : {}
     } catch {
-      return { fractions: 68, algebra: 54, logic: 82, probability: 38 }
+      return {}
     }
   })
 
-  // 5. Dynamic practice attempts history
+  // 5. Dynamic practice attempts history (only real attempts)
   const [practiceHistory, setPracticeHistory] = useState(() => {
     try {
       const saved = localStorage.getItem('cognara_history')
-      return saved ? JSON.parse(saved) : [
-        { id: 1, title: 'Unit Fraction Comparison', isCorrect: true, date: 'Today, 10:15 AM' },
-        { id: 2, title: 'Unlike Denominators Probe', isCorrect: false, date: 'Today, 10:28 AM', misconception: 'Whole Number Value Bias' }
-      ]
+      return saved ? JSON.parse(saved) : []
     } catch {
       return []
     }
   })
 
-  // 6. Dynamic misconceptions log
+  // 6. Dynamic misconceptions log (only real diagnoses)
   const [misconceptions, setMisconceptions] = useState(() => {
     try {
       const saved = localStorage.getItem('cognara_misconceptions')
-      return saved ? JSON.parse(saved) : defaultMisconceptions
+      return saved ? JSON.parse(saved) : []
     } catch {
-      return defaultMisconceptions
+      return []
     }
   })
 
-  // 7. Dynamic activity trend data (for Recharts)
+  // 7. Dynamic activity trend data
   const [activityData, setActivityData] = useState(() => {
     try {
       const saved = localStorage.getItem('cognara_activity')
-      return saved ? JSON.parse(saved) : defaultActivityData
+      return saved ? JSON.parse(saved) : []
     } catch {
-      return defaultActivityData
+      return []
     }
   })
 

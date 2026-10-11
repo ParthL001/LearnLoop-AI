@@ -128,9 +128,21 @@ class ProgressService {
       }
     }
     const recentMisconceptions = Array.from(misconceptionsMap.values())
+    const topicHistory = await storageService.getTopicHistory(cleanId)
+
+    // Deduplicate topic history by topicId preserving most recent timestamp
+    const topicMap = new Map()
+    for (const th of topicHistory.slice().reverse()) {
+      const key = `${th.subjectId}:${th.topicId}`
+      if (!topicMap.has(key)) {
+        topicMap.set(key, th)
+      }
+    }
+    const recentlyStudiedTopics = Array.from(topicMap.values())
 
     return {
       learnerId: cleanId,
+      hasRecordedHistory: totalAttempts > 0 || recentlyStudiedTopics.length > 0,
       overallMasteryScore,
       overallAccuracy,
       totalAttempts,
@@ -141,6 +153,7 @@ class ProgressService {
       mastery: masteryMap,
       practiceHistory,
       recentMisconceptions,
+      recentlyStudiedTopics,
       masteryRule: MASTERY_RULE_SPEC,
       disclaimer: DISCLAIMER_NOTE
     }
@@ -149,7 +162,17 @@ class ProgressService {
   /**
    * Helper to build empty progress payload for empty history or unknown learner.
    */
-  buildEmptyProgressPayload(learnerId, note = '') {
+  async buildEmptyProgressPayload(learnerId, note = '') {
+    const topicHistory = learnerId ? await storageService.getTopicHistory(learnerId).catch(() => []) : []
+    const topicMap = new Map()
+    for (const th of topicHistory.slice().reverse()) {
+      const key = `${th.subjectId}:${th.topicId}`
+      if (!topicMap.has(key)) {
+        topicMap.set(key, th)
+      }
+    }
+    const recentlyStudiedTopics = Array.from(topicMap.values())
+
     const masteryMap = {}
     const conceptProgressList = concepts.map((concept) => {
       masteryMap[concept.id] = 0
@@ -169,6 +192,7 @@ class ProgressService {
 
     return {
       learnerId,
+      hasRecordedHistory: recentlyStudiedTopics.length > 0,
       overallMasteryScore: 0,
       overallAccuracy: 0,
       totalAttempts: 0,
@@ -179,6 +203,7 @@ class ProgressService {
       mastery: masteryMap,
       practiceHistory: [],
       recentMisconceptions: [],
+      recentlyStudiedTopics,
       note,
       masteryRule: MASTERY_RULE_SPEC,
       disclaimer: DISCLAIMER_NOTE

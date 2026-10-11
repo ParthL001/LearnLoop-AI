@@ -1,0 +1,72 @@
+{
+  "python:variables": {
+    "subjectId": "python",
+    "subjectName": "Python",
+    "topicId": "variables",
+    "generatedAt": "2026-10-11T11:29:50.461Z",
+    "simple_examples": [
+      "A variable is like a labeled box that holds a value. For example, if you have a box labeled 'age' that contains the number 30, then 'age' is the variable and 30 is the value.",
+      "Variables can be changed. If you have a box labeled 'count' that initially holds 5, you can later change it to 10 by putting 10 in the box."
+    ],
+    "code_example": "num1 = 10\nnum2 = 5\ntotal = num1 + num2\nprint(f\"The sum of {num1} and {num2} is {total}.\")",
+    "practice_questions": [
+      {
+        "question": "What is the primary purpose of a variable in programming?",
+        "options": [
+          "To store data temporarily",
+          "To run code automatically",
+          "To define functions",
+          "To handle input from users"
+        ],
+        "correct_answer": 0
+      },
+      {
+        "question": "What will be printed by the following code?",
+        "options": [
+          "The sum of 10 and 5 is 15.",
+          "The sum of 10 and 5 is 10.",
+          "The sum of 10 and 5 is 5.",
+          "The sum of 10 and 5 is 10 and 5."
+        ],
+        "correct_answer": 0
+      },
+      {
+        "question": "If we change `num1` to 20 in the code, what will be the new value of `total`?",
+        "options": [
+          "15",
+          "25",
+          "30",
+          "20"
+        ],
+        "correct_answer": 1
+      }
+    ],
+    "topicTitle": "Variables in Python",
+    "shortIntroduction": "Learn about Variables in Python.",
+    "learningObjectives": [
+      "Declare and manipulate Python variables following PEP 8 naming conventions and scoping basics."
+    ],
+    "conceptExplanation": "Variables is an essential programming concept in Python.",
+    "codeExamples": "# Example: Variables\nprint(\"Understanding Variables\")",
+    "codeExplanation": "The code demonstrates basic usage and syntax.",
+    "commonMistakes": [
+      "Overlooking boundary conditions or edge cases."
+    ],
+    "shortRecap": "Mastering Variables establishes a strong foundation in Python.",
+    "practiceQuestions": [
+      {
+        "id": "q1",
+        "prompt": "What is the primary role of Variables in Python?",
+        "options": [
+          "To organize logic and data safely",
+          "To slow down program execution",
+          "To replace operating system drivers",
+          "None of the above"
+        ],
+        "correctIndex": 0,
+        "explanation": "Variables provides structured logic and data control in Python."
+      }
+    ],
+    "cachedAt": "2026-10-11T11:29:50.462Z"
+  }
+}

@@ -1,116 +1,229 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, Button, Badge, ProgressBar } from '../components/UI'
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts'
+import { Card, Button, Badge } from '../components/UI'
+import { fetchLearnerProgress } from '../services/api'
 import { useApp } from '../context/AppContext'
-import { Target, CheckCircle2, AlertTriangle } from 'lucide-react'
+import {
+  Compass, Clock, BookOpen, Terminal, Code2,
+  ArrowRight, CheckCircle2, AlertCircle, RefreshCw
+} from 'lucide-react'
 
 export default function Progress() {
-  const { topics, activityData, misconceptions, practiceHistory } = useApp()
+  const { user } = useApp()
+  const learnerId = user?.id || user?.email || 'learner-local'
+
+  const [progressData, setProgressData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  const loadProgress = () => {
+    setLoading(true)
+    setError(null)
+    fetchLearnerProgress(learnerId)
+      .then((data) => {
+        setProgressData(data)
+        setLoading(false)
+      })
+      .catch((err) => {
+        console.warn('Progress load warning:', err.message)
+        setError('Unable to load progress telemetry.')
+        setLoading(false)
+      })
+  }
+
+  useEffect(() => {
+    loadProgress()
+  }, [learnerId])
+
+  const recentTopics = progressData?.recentlyStudiedTopics || []
+  const practiceHistory = progressData?.practiceHistory || []
+  const hasHistory = progressData?.hasRecordedHistory || recentTopics.length > 0 || practiceHistory.length > 0
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <Card>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-[#F8FAFC]">Progress & Mastery Evidence</h2>
-              <Badge variant="accent">Dynamic Telemetry</Badge>
-            </div>
-            <p className="mt-1 text-xs text-[#A8B3C4] max-w-2xl leading-relaxed">
-              Tracks concept-level understanding across diagnostic items rather than generic activity streaks. Calibrated dynamically with each completed item.
-            </p>
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#303846] pb-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-[#F8FAFC] tracking-tight">My Progress</h1>
+            <Badge variant="accent">Verified Telemetry</Badge>
           </div>
-          <Link to="/practice">
-            <Button size="sm" variant="primary">
-              <Target size={13} />
-              <span>Continue Practice</span>
+          <p className="mt-0.5 text-xs text-[#A8B3C4]">
+            Real tracked records of your studied topics and practice exercises. No simulated metrics.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" size="sm" onClick={loadProgress}>
+            <RefreshCw size={12} />
+            <span>Refresh</span>
+          </Button>
+          <Link to="/explore">
+            <Button variant="primary" size="sm">
+              <Compass size={13} />
+              <span>Explore Content</span>
             </Button>
           </Link>
         </div>
-      </Card>
-
-      {/* Mastery by Topic & Activity Chart */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card header={<h3 className="text-sm font-bold text-[#F8FAFC]">Concept Mastery Calibration</h3>}>
-          <div className="space-y-4">
-            {topics.map((t) => (
-              <div key={t.id} className="space-y-1.5">
-                <div className="flex justify-between text-xs">
-                  <span className="font-semibold text-[#F8FAFC]">{t.title}</span>
-                  <span className="font-bold text-[#3B82F6]">{t.mastery}%</span>
-                </div>
-                <ProgressBar value={t.mastery} />
-                <p className="text-[11px] text-[#7F8A9B]">{t.subject} · {t.level} Level</p>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Practice Time Distribution Chart */}
-        <Card header={<h3 className="text-sm font-bold text-[#F8FAFC]">Diagnostic Practice Time (Minutes)</h3>}>
-          <div className="h-48 w-full pt-2">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={activityData} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="2 2" vertical={false} stroke="#303846" />
-                <XAxis dataKey="day" axisLine={{ stroke: '#303846' }} tickLine={false} tick={{ fontSize: 11, fill: '#7F8A9B' }} />
-                <YAxis axisLine={{ stroke: '#303846' }} tickLine={false} tick={{ fontSize: 11, fill: '#7F8A9B' }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#14171C',
-                    border: '1px solid #303846',
-                    borderRadius: '6px',
-                    fontSize: '12px',
-                    color: '#F8FAFC'
-                  }}
-                />
-                <Bar dataKey="minutes" fill="#3B82F6" radius={[3, 3, 0, 0]} maxBarSize={24} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <p className="mt-3 text-[11px] text-[#7F8A9B]">
-            Practice duration recorded across diagnostic probes and structured tutor interactions.
-          </p>
-        </Card>
       </div>
 
-      {/* Verified Practice & Reasoning Log */}
-      <Card header={<h3 className="text-sm font-bold text-[#F8FAFC]">Verified Practice & Reasoning Log</h3>}>
-        <div className="divide-y divide-[#303846]">
-          {practiceHistory && practiceHistory.length > 0 ? (
-            practiceHistory.slice(0, 5).map((item) => (
-              <div key={item.id} className="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#F8FAFC]">{item.title}</span>
-                    <Badge variant={item.isCorrect ? 'success' : 'warning'}>
-                      {item.isCorrect ? 'Correct' : 'Needs Review'}
-                    </Badge>
-                  </div>
-                  {item.misconception && (
-                    <p className="text-[11px] text-[#FDE68A] mt-0.5">
-                      Flagged: {item.misconception}
-                    </p>
-                  )}
-                  {item.reasoning && (
-                    <p className="text-[11px] text-[#A8B3C4] italic mt-0.5">
-                      &quot;{item.reasoning}&quot;
-                    </p>
-                  )}
+      {loading ? (
+        <div className="rounded-[8px] border border-[#303846] bg-[#14171C] p-12 text-center text-xs text-[#7F8A9B]">
+          <RefreshCw size={18} className="animate-spin text-[#3B82F6] mx-auto mb-2" />
+          <span>Loading verified learning records...</span>
+        </div>
+      ) : !hasHistory ? (
+        /* Honest Empty State */
+        <div className="rounded-[8px] border border-dashed border-[#303846] bg-[#14171C]/50 p-12 text-center space-y-4">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#1B2028] text-[#3B82F6] border border-[#303846]">
+            <BookOpen size={24} />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm font-bold text-[#F8FAFC]">No Learning Records Yet</h3>
+            <p className="text-xs text-[#A8B3C4] max-w-md mx-auto leading-relaxed">
+              We only show honest progress derived from real lessons you open and practice activities you complete. Start learning a topic in Python or C++ to record your first achievement.
+            </p>
+          </div>
+          <div className="pt-2">
+            <Link to="/explore">
+              <Button variant="primary" size="sm">
+                <Compass size={14} />
+                <span>Explore Python & C++</span>
+                <ArrowRight size={13} />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      ) : (
+        /* Real Progress Data */
+        <div className="space-y-6">
+          {/* Summary Metric Cards (Honest numbers only) */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-[6px] border border-[#303846] bg-[#14171C] p-4 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#7F8A9B]">
+                  Topics Studied
+                </span>
+                <div className="text-2xl font-bold text-[#F8FAFC] mt-0.5">
+                  {recentTopics.length}
                 </div>
-                <span className="text-[11px] text-[#7F8A9B] shrink-0">{item.date}</span>
               </div>
-            ))
-          ) : (
-            <div className="py-6 text-center text-xs text-[#7F8A9B]">
-              <p>No practice attempts recorded yet.</p>
-              <p className="text-[11px] text-[#7F8A9B] mt-1">
-                Completed questions and verified reasoning traces will appear here.
-              </p>
+              <div className="h-10 w-10 rounded-[6px] bg-[#152746] border border-[#1E3A8A] text-[#3B82F6] flex items-center justify-center">
+                <BookOpen size={20} />
+              </div>
             </div>
+
+            <div className="rounded-[6px] border border-[#303846] bg-[#14171C] p-4 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#7F8A9B]">
+                  Practice Attempts
+                </span>
+                <div className="text-2xl font-bold text-[#F8FAFC] mt-0.5">
+                  {practiceHistory.length}
+                </div>
+              </div>
+              <div className="h-10 w-10 rounded-[6px] bg-[#1B2028] border border-[#303846] text-[#A8B3C4] flex items-center justify-center">
+                <CheckCircle2 size={20} />
+              </div>
+            </div>
+          </div>
+
+          {/* Recently Studied Topics Table */}
+          {recentTopics.length > 0 && (
+            <Card
+              header={
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Clock size={15} className="text-[#3B82F6]" />
+                    <h3 className="text-sm font-bold text-[#F8FAFC]">Studied Topics</h3>
+                  </div>
+                  <Badge variant="neutral">{recentTopics.length} Logged</Badge>
+                </div>
+              }
+            >
+              <div className="divide-y divide-[#303846]">
+                {recentTopics.map((topic, idx) => {
+                  const isPython = topic.subjectId === 'python'
+                  const Icon = isPython ? Terminal : Code2
+
+                  return (
+                    <div
+                      key={`${topic.topicId}-${idx}`}
+                      className="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-4"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-[4px] border border-[#303846] bg-[#1B2028] text-[#3B82F6]">
+                          <Icon size={16} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-[#F8FAFC]">
+                              {topic.topicTitle}
+                            </span>
+                            <Badge variant="neutral">{isPython ? 'Python' : 'C++'}</Badge>
+                          </div>
+                          <span className="text-[11px] text-[#7F8A9B]">
+                            {new Date(topic.timestamp).toLocaleString([], {
+                              dateStyle: 'medium',
+                              timeStyle: 'short'
+                            })}
+                          </span>
+                        </div>
+                      </div>
+
+                      <Link to={`/lessons/${topic.subjectId}/${topic.topicId}`}>
+                        <Button variant="secondary" size="sm">
+                          <span>Review</span>
+                          <ArrowRight size={12} />
+                        </Button>
+                      </Link>
+                    </div>
+                  )
+                })}
+              </div>
+            </Card>
+          )}
+
+          {/* Actual Practice History Log */}
+          {practiceHistory.length > 0 && (
+            <Card
+              header={
+                <h3 className="text-sm font-bold text-[#F8FAFC]">
+                  Practice Activity Log
+                </h3>
+              }
+            >
+              <div className="divide-y divide-[#303846]">
+                {practiceHistory.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-4"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-[#F8FAFC]">
+                          {item.title || `Item ${item.questionId}`}
+                        </span>
+                        <Badge variant={item.isCorrect ? 'success' : 'warning'}>
+                          {item.isCorrect ? 'Correct' : 'Needs Review'}
+                        </Badge>
+                      </div>
+                      {item.timestamp && (
+                        <span className="text-[11px] text-[#7F8A9B]">
+                          {new Date(item.timestamp).toLocaleString([], {
+                            dateStyle: 'short',
+                            timeStyle: 'short'
+                          })}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
           )}
         </div>
-      </Card>
+      )}
     </div>
   )
 }

@@ -8,7 +8,7 @@ export class OllamaService {
   constructor() {
     this.baseUrl = (process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434').replace(/\/$/, '')
     this.model = process.env.OLLAMA_MODEL || 'qwen3:4b'
-    this.defaultTimeoutMs = parseInt(process.env.OLLAMA_TIMEOUT_MS || '60000', 10)
+    this.defaultTimeoutMs = parseInt(process.env.OLLAMA_TIMEOUT_MS || '240000', 10)
   }
 
   /**
@@ -88,11 +88,12 @@ export class OllamaService {
    * @param {object} params
    * @param {string} params.prompt
    * @param {string} [params.system]
+   * @param {string} [params.format]
    * @param {object} [params.options]
    * @param {number} [params.timeoutMs]
    * @returns {Promise<object>}
    */
-  async generate({ prompt, system, options = {}, timeoutMs }) {
+  async generate({ prompt, system, format, options = {}, timeoutMs }) {
     if (!prompt || typeof prompt !== 'string') {
       throw new Error('A non-empty prompt string is required for Ollama generate.')
     }
@@ -112,6 +113,7 @@ export class OllamaService {
           model: this.model,
           prompt,
           system: system || undefined,
+          format: format || undefined,
           stream: false,
           options,
         }),

@@ -1,0 +1,16 @@
+{
+  "watch": [
+    "routes",
+    "services",
+    "middleware",
+    "data/subjects.js",
+    "app.js",
+    "server.js"
+  ],
+  "ignore": [
+    "data/cache/**",
+    "data/storage/**",
+    "*.tmp.*"
+  ],
+  "ext": "js,json"
+}

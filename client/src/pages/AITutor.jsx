@@ -1,39 +1,82 @@
 import { useState, useRef, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { Card, Button, Badge } from '../components/UI'
-import { chatWithTutor } from '../services/api'
+import { chatWithTutor, checkAIHealth } from '../services/api'
 import { useApp } from '../context/AppContext'
-import { MessageSquare, ArrowRight, Target, HelpCircle, CheckCircle2 } from 'lucide-react'
+import {
+  MessageSquare, Terminal, Code2, Send, Trash2,
+  RefreshCw, Sparkles, AlertCircle, Copy, Check, Lightbulb
+} from 'lucide-react'
+
+const STARTER_PROMPTS = {
+  python: [
+    'How does a Stack work in Python using lists?',
+    'What is the difference between for loops and while loops?',
+    'Why is collections.deque preferred for Queues in Python?',
+    'How do Python variables reference objects in memory?'
+  ],
+  cpp: [
+    'How do I use std::stack in C++ and what is LIFO?',
+    'What is the difference between int, double, and char in C++?',
+    'How does std::queue work in C++ STL?',
+    'When should I use a while loop vs a for loop in C++?'
+  ]
+}
 
 export default function AITutor() {
-  const { topics, user } = useApp()
-  const { id } = useParams()
-  const activeTopic = topics.find((t) => t.id === id) || topics[0] || {}
+  const { id: routeSubject } = useParams()
+  const { user } = useApp()
 
+  const initialSubject = (routeSubject === 'cpp' || routeSubject === 'python') ? routeSubject : 'python'
+  const [selectedSubject, setSelectedSubject] = useState(initialSubject)
   const [messages, setMessages] = useState([
     {
       id: 'init',
       sender: 'tutor',
-      text: `Hello ${user?.name || 'Learner'}. I am your adaptive tutor for ${activeTopic.title || 'Fractional Reasoning'}. Explain how you arrived at an answer, or tell me what step feels counterintuitive so we can evaluate your mental model together.`,
+      text: `Hello ${user?.name || 'there'}! I am your AI programming tutor powered by local Ollama (qwen3:4b). I can help you understand ${initialSubject === 'python' ? 'Python' : 'C++'} concepts, debug logic, or explain data structures like Stacks and Queues. What would you like to explore?`,
       time: 'Ready'
     }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [diagnosticRecord, setDiagnosticRecord] = useState({
-    question: 'A recipe calls for 2/3 cup of flour. Your measuring cup has markings for 2/5 cup. Which quantity is greater, and why?',
-    studentAnswer: '2/5 cup is greater because 5 is greater than 3.',
-    studentReasoning: 'In whole numbers, 5 is bigger than 3, so fifths must be larger portions than thirds.',
-    clarificationNeeded: false,
-    misconception: 'Whole Number Value Bias (Transferring whole-number properties to denominators)',
-    explanation: 'Denominator values denote division density rather than standalone quantity. 3 divisions yield larger portions than 5 divisions.',
-    followUp: 'If you divide a ribbon into 3 equal pieces versus 5 equal pieces, which piece is longer?'
-  })
+  const [lastFailedMessage, setLastFailedMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [copiedId, setCopiedId] = useState(null)
+
   const endRef = useRef(null)
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
+
+  // Switch subject and provide welcome message
+  const handleSubjectChange = (newSubject) => {
+    if (newSubject === selectedSubject) return
+    setSelectedSubject(newSubject)
+    setMessages([
+      {
+        id: `init-${newSubject}`,
+        sender: 'tutor',
+        text: `Switched to ${newSubject === 'python' ? 'Python' : 'C++'} tutor mode. Ask me any question about ${newSubject === 'python' ? 'Python' : 'C++'} syntax, variables, loops, or linear data structures!`,
+        time: 'Ready'
+      }
+    ])
+    setErrorMessage(null)
+    setLastFailedMessage(null)
+  }
+
+  const handleClearChat = () => {
+    setMessages([
+      {
+        id: `init-${Date.now()}`,
+        sender: 'tutor',
+        text: `Conversation cleared. Ask me any question about ${selectedSubject === 'python' ? 'Python' : 'C++'}!`,
+        time: 'Ready'
+      }
+    ])
+    setErrorMessage(null)
+    setLastFailedMessage(null)
+  }
 
   const handleSend = async (textToSend = input) => {
     const text = textToSend.trim()
@@ -49,242 +92,267 @@ export default function AITutor() {
     setMessages((prev) => [...prev, userMessage])
     setInput('')
     setLoading(true)
+    setErrorMessage(null)
+    setLastFailedMessage(null)
+
+    // Bound conversation history to last 6 messages to keep context window manageable
+    const historyPayload = messages
+      .filter((m) => m.id !== 'init' && !m.id.startsWith('init-'))
+      .slice(-6)
+      .map((m) => ({
+        role: m.sender === 'user' ? 'user' : 'assistant',
+        content: m.text
+      }))
 
     try {
       const result = await chatWithTutor(text, {
-        topicId: activeTopic.id,
-        history: messages.slice(-4),
-        studentReasoning: text
+        subject: selectedSubject,
+        history: historyPayload
       })
 
-      const tutorMessage = {
-        id: `tut-${Date.now()}`,
-        sender: 'tutor',
-        text: result.text,
-        misconception: result.misconceptionDetected,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      }
-
-      setMessages((prev) => [...prev, tutorMessage])
-
-      if (result.misconceptionDetected) {
-        setDiagnosticRecord((prev) => ({
-          ...prev,
-          studentReasoning: text,
-          misconception: result.misconceptionDetected.name || prev.misconception,
-          explanation: result.misconceptionDetected.note || prev.explanation,
-        }))
-      }
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `tut-fallback-${Date.now()}`,
+      if (result.isOffline || !result.isLiveBackend) {
+        // Honest error handling: no fake responses
+        setErrorMessage(result.error || 'Ollama AI service is currently unavailable.')
+        setLastFailedMessage(text)
+      } else {
+        const tutorMessage = {
+          id: `tut-${Date.now()}`,
           sender: 'tutor',
-          text: 'Notice that when the denominator increases, the whole is partitioned into more pieces, making each individual piece smaller. Consider whether that applies to your question.',
-          time: 'Now'
+          text: result.text,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
-      ])
+        setMessages((prev) => [...prev, tutorMessage])
+      }
+    } catch (err) {
+      setErrorMessage(err.message || 'Failed to contact AI tutor.')
+      setLastFailedMessage(text)
     } finally {
       setLoading(false)
     }
   }
 
+  const handleRetry = () => {
+    if (lastFailedMessage) {
+      handleSend(lastFailedMessage)
+    }
+  }
+
+  const handleCopyMessage = (text, id) => {
+    if (navigator?.clipboard) {
+      navigator.clipboard.writeText(text)
+      setCopiedId(id)
+      setTimeout(() => setCopiedId(null), 2000)
+    }
+  }
+
+  const isPython = selectedSubject === 'python'
+  const SubjectIcon = isPython ? Terminal : Code2
+  const starters = STARTER_PROMPTS[selectedSubject] || []
+
   return (
     <div className="space-y-6">
-      {/* Top Context Bar */}
-      <Card>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-[#F8FAFC]">AI Adaptive Tutor</h2>
-              <Badge variant="accent">{activeTopic.title}</Badge>
-            </div>
-            <p className="mt-1 text-xs text-[#A8B3C4]">
-              The tutor asks probing questions to differentiate between accidental calculation slips and systematic conceptual misconceptions.
-            </p>
-          </div>
-
+      {/* Header & Controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#303846] pb-4">
+        <div>
           <div className="flex items-center gap-2">
-            <Link to="/practice">
-              <Button size="sm" variant="secondary">
-                <Target size={13} />
-                <span>Diagnostic Practice</span>
-              </Button>
-            </Link>
+            <h1 className="text-xl font-bold text-[#F8FAFC] tracking-tight">AI Tutor</h1>
+            <Badge variant="accent">Local qwen3:4b</Badge>
           </div>
+          <p className="mt-0.5 text-xs text-[#A8B3C4]">
+            Ask questions, explore code snippets, and review concepts with multi-turn context.
+          </p>
         </div>
-      </Card>
 
-      {/* Main Tutor Workspace */}
-      <div className="grid gap-6 lg:grid-cols-12">
-        {/* Chat Window (7 cols) */}
-        <div className="lg:col-span-7 flex flex-col h-[580px] bg-[#14171C] border border-[#303846] rounded-[8px] overflow-hidden">
-          {/* Header */}
-          <div className="px-4 py-3 border-b border-[#303846] bg-[#1B2028] flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#F8FAFC]">
-              <MessageSquare size={14} className="text-[#3B82F6]" />
-              <span>Interactive Dialogue</span>
-            </div>
-            <span className="text-[11px] text-[#22C55E] font-medium bg-[#14291E] border border-[#166534] px-2 py-0.5 rounded-[4px]">
-              Adaptive Engine Active
-            </span>
-          </div>
-
-          {/* Messages feed */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#0B0D10]">
-            {messages.map((m) => {
-              const isUser = m.sender === 'user'
-
-              return (
-                <div key={m.id} className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
-                  <div className="text-[10px] font-semibold text-[#7F8A9B] mb-1">
-                    {isUser ? 'You' : 'AI Tutor'} · {m.time}
-                  </div>
-                  <div
-                    className={`max-w-[85%] sm:max-w-[80%] p-3.5 text-xs rounded-[6px] leading-relaxed border ${
-                      isUser
-                        ? 'bg-[#3B82F6] text-white border-[#3B82F6]'
-                        : 'bg-[#1B2028] text-[#F8FAFC] border-[#303846]'
-                    }`}
-                  >
-                    <p className="whitespace-pre-line">{m.text}</p>
-
-                    {m.misconception && (
-                      <div className="mt-3 pt-2 border-t border-[#78350F] bg-[#2A2318] text-[#FDE68A] p-2.5 rounded-[4px]">
-                        <span className="font-bold">Detected Misconception: </span>
-                        {m.misconception.name}: {m.misconception.note}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-
-            {loading && (
-              <div className="text-xs text-[#A8B3C4] font-medium p-3 bg-[#1B2028] border border-[#303846] rounded-[6px] inline-block animate-pulse">
-                Formulating adaptive response...
-              </div>
-            )}
-            <div ref={endRef} />
-          </div>
-
-          {/* Quick Prompts */}
-          <div className="px-4 py-2 border-t border-[#303846] bg-[#14171C] flex gap-2 overflow-x-auto text-xs">
-            {[
-              'Why is 2/3 bigger than 2/5?',
-              'Why can I not add denominators directly?',
-              'Give me a problem to test my reasoning.'
-            ].map((p, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => handleSend(p)}
-                className="shrink-0 text-[11px] font-medium px-2.5 py-1 rounded-[4px] border border-[#303846] bg-[#1B2028] text-[#A8B3C4] hover:bg-[#202733] hover:text-[#F8FAFC] hover:border-[#3B82F6] transition-colors"
-              >
-                {p}
-              </button>
-            ))}
-          </div>
-
-          {/* Input Row */}
-          <div className="p-3 border-t border-[#303846] bg-[#14171C]">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                handleSend()
-              }}
-              className="flex gap-2"
+        {/* Subject switcher and Clear button */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center bg-[#14171C] p-1 rounded-[6px] border border-[#303846]">
+            <button
+              type="button"
+              onClick={() => handleSubjectChange('python')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium transition-all ${
+                selectedSubject === 'python'
+                  ? 'bg-[#152746] text-[#3B82F6] font-semibold border border-[#1E3A8A]'
+                  : 'text-[#A8B3C4] hover:text-[#F8FAFC]'
+              }`}
             >
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Explain your step-by-step thinking or why you made a choice..."
-                className="flex-1 text-xs px-3 py-2 rounded-[6px] border border-[#303846] bg-[#1B2028] text-[#F8FAFC] placeholder:text-[#7F8A9B] focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] outline-none"
-              />
-              <Button type="submit" variant="primary" disabled={!input.trim() || loading}>
-                Send
-              </Button>
-            </form>
+              <Terminal size={13} />
+              <span>Python</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSubjectChange('cpp')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] text-xs font-medium transition-all ${
+                selectedSubject === 'cpp'
+                  ? 'bg-[#152746] text-[#3B82F6] font-semibold border border-[#1E3A8A]'
+                  : 'text-[#A8B3C4] hover:text-[#F8FAFC]'
+              }`}
+            >
+              <Code2 size={13} />
+              <span>C++</span>
+            </button>
           </div>
-        </div>
 
-        {/* Structured Misconception Feedback Panel (5 cols) */}
-        <div className="lg:col-span-5 space-y-4">
-          <Card
-            header={
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#7F8A9B]">
-                  Diagnostic Reasoning Breakdown
-                </span>
-                <Badge variant="accent">Live Context</Badge>
-              </div>
-            }
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleClearChat}
+            title="Start new conversation"
           >
-            <div className="space-y-3.5 text-xs">
-              {/* 1. Current Question */}
-              <div>
-                <span className="font-bold text-[#7F8A9B] text-[11px] uppercase tracking-wider">
-                  1. Current Question
-                </span>
-                <p className="mt-1 text-[#F8FAFC] font-medium leading-relaxed bg-[#1B2028] p-2.5 rounded-[4px] border border-[#303846]">
-                  {diagnosticRecord.question}
-                </p>
-              </div>
+            <Trash2 size={13} />
+            <span className="hidden sm:inline">Clear</span>
+          </Button>
+        </div>
+      </div>
 
-              {/* 2. Submitted Answer */}
-              <div>
-                <span className="font-bold text-[#7F8A9B] text-[11px] uppercase tracking-wider">
-                  2. Student Submitted Answer
-                </span>
-                <p className="mt-1 text-[#FDE68A] bg-[#2A2318] p-2 rounded-[4px] border border-[#78350F]">
-                  {diagnosticRecord.studentAnswer}
-                </p>
-              </div>
+      {/* Main Chat Container */}
+      <div className="rounded-[8px] border border-[#303846] bg-[#14171C] flex flex-col h-[600px] overflow-hidden">
+        {/* Messages Stream */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {messages.map((m) => {
+            const isUser = m.sender === 'user'
 
-              {/* 3. Stated Reasoning */}
-              <div>
-                <span className="font-bold text-[#7F8A9B] text-[11px] uppercase tracking-wider">
-                  3. Stated Reasoning
-                </span>
-                <p className="mt-1 text-[#A8B3C4] italic bg-[#1B2028] p-2 rounded-[4px] border border-[#303846]">
-                  &quot;{diagnosticRecord.studentReasoning}&quot;
-                </p>
-              </div>
+            return (
+              <div
+                key={m.id}
+                className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}
+              >
+                {!isUser && (
+                  <div className="flex h-7 w-7 items-center justify-center rounded-[4px] bg-[#152746] text-[#3B82F6] border border-[#1E3A8A] shrink-0 mt-0.5">
+                    <Sparkles size={14} />
+                  </div>
+                )}
 
-              {/* 4. Supported Possible Misconception */}
-              <div>
-                <span className="font-bold text-[#7F8A9B] text-[11px] uppercase tracking-wider">
-                  4. Supported Misconception Hypothesis
-                </span>
-                <div className="mt-1 p-2.5 rounded-[4px] border border-[#1E3A8A] bg-[#152746] text-[#93C5FD]">
-                  <p className="font-semibold">{diagnosticRecord.misconception}</p>
+                <div
+                  className={`max-w-[82%] sm:max-w-[75%] rounded-[6px] p-3.5 text-xs leading-relaxed ${
+                    isUser
+                      ? 'bg-[#152746] text-[#F8FAFC] border border-[#1E3A8A]'
+                      : 'bg-[#1B2028] text-[#F8FAFC] border border-[#303846]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-4 mb-1.5 text-[10px] text-[#7F8A9B]">
+                    <span className="font-semibold uppercase tracking-wider">
+                      {isUser ? 'You' : `${selectedSubject === 'python' ? 'Python' : 'C++'} Tutor`}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span>{m.time}</span>
+                      {!isUser && (
+                        <button
+                          type="button"
+                          onClick={() => handleCopyMessage(m.text, m.id)}
+                          className="hover:text-[#F8FAFC] transition-colors"
+                          title="Copy response"
+                        >
+                          {copiedId === m.id ? (
+                            <Check size={11} className="text-[#22C55E]" />
+                          ) : (
+                            <Copy size={11} />
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Message body with preserved formatting */}
+                  <div className="whitespace-pre-line text-[#F8FAFC] font-sans">
+                    {m.text}
+                  </div>
                 </div>
-              </div>
 
-              {/* 5. Grounded Explanation */}
-              <div>
-                <span className="font-bold text-[#7F8A9B] text-[11px] uppercase tracking-wider">
-                  5. Grounded Explanation
-                </span>
-                <p className="mt-1 text-[#A8B3C4] leading-relaxed">
-                  {diagnosticRecord.explanation}
-                </p>
+                {isUser && (
+                  <div className="flex h-7 w-7 items-center justify-center rounded-[4px] bg-[#303846] text-[#F8FAFC] text-[11px] font-bold shrink-0 mt-0.5">
+                    {user?.name ? user.name[0].toUpperCase() : 'U'}
+                  </div>
+                )}
               </div>
+            )
+          })}
 
-              {/* 6. Targeted Follow-up Question */}
-              <div className="pt-2 border-t border-[#303846]">
-                <span className="font-bold text-[#3B82F6] text-[11px] uppercase tracking-wider flex items-center gap-1">
-                  <CheckCircle2 size={13} />
-                  <span>Targeted Follow-up Probe</span>
-                </span>
-                <p className="mt-1 text-[#F8FAFC] font-medium">
-                  {diagnosticRecord.followUp}
-                </p>
+          {/* Loading Indicator */}
+          {loading && (
+            <div className="flex gap-3 justify-start">
+              <div className="flex h-7 w-7 items-center justify-center rounded-[4px] bg-[#152746] text-[#3B82F6] border border-[#1E3A8A] shrink-0 mt-0.5">
+                <Sparkles size={14} className="animate-spin" />
+              </div>
+              <div className="rounded-[6px] p-3.5 bg-[#1B2028] border border-[#303846] text-xs text-[#7F8A9B] flex items-center gap-2">
+                <RefreshCw size={12} className="animate-spin text-[#3B82F6]" />
+                <span>Generating thoughtful explanation with qwen3:4b...</span>
               </div>
             </div>
-          </Card>
+          )}
+
+          {/* Error Banner with Retry */}
+          {errorMessage && (
+            <div className="rounded-[6px] p-3.5 bg-[#450A0A]/40 border border-[#EF4444]/40 text-xs text-[#FCA5A5] space-y-2">
+              <div className="flex items-center gap-2 font-semibold">
+                <AlertCircle size={14} className="text-[#EF4444]" />
+                <span>Ollama AI Tutor Unavailable</span>
+              </div>
+              <p className="text-[11px] text-[#FCA5A5]/80">
+                {errorMessage}
+              </p>
+              {lastFailedMessage && (
+                <div className="pt-1 flex items-center gap-2">
+                  <Button size="xs" variant="primary" onClick={handleRetry}>
+                    <RefreshCw size={11} />
+                    <span>Retry Question</span>
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div ref={endRef} />
+        </div>
+
+        {/* Starter Prompts Bar (when only initial message exists) */}
+        {messages.length <= 1 && starters.length > 0 && (
+          <div className="border-t border-[#303846] bg-[#0B0D10]/50 p-3 space-y-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#7F8A9B] flex items-center gap-1.5">
+              <Lightbulb size={12} className="text-[#3B82F6]" />
+              Suggested Questions
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {starters.map((prompt, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => handleSend(prompt)}
+                  className="rounded-[4px] border border-[#303846] bg-[#14171C] px-2.5 py-1 text-[11px] text-[#A8B3C4] hover:border-[#3B82F6] hover:text-[#F8FAFC] transition-colors"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Input Bar */}
+        <div className="border-t border-[#303846] p-3 bg-[#14171C]">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleSend()
+            }}
+            className="flex items-center gap-2"
+          >
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={`Ask a question about ${selectedSubject === 'python' ? 'Python' : 'C++'} (e.g. explain Stack, Loops)...`}
+              disabled={loading}
+              className="flex-1 rounded-[6px] border border-[#303846] bg-[#1B2028] px-3.5 py-2.5 text-xs text-[#F8FAFC] placeholder-[#7F8A9B] focus:border-[#3B82F6] focus:outline-hidden disabled:opacity-50"
+            />
+            <Button
+              type="submit"
+              variant="primary"
+              size="md"
+              disabled={loading || !input.trim()}
+            >
+              <Send size={14} />
+              <span className="hidden sm:inline">Send</span>
+            </Button>
+          </form>
         </div>
       </div>
     </div>

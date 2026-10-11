@@ -8,12 +8,9 @@ import Logo from './Logo'
 
 export const navItems = [
   { name: 'Dashboard', path: '/dashboard', icon: Home },
-  { name: 'Learning Path', path: '/learning-path', icon: Compass },
-  { name: 'Lessons', path: '/lessons', icon: BookOpen },
+  { name: 'Explore Content', path: '/explore', icon: Compass },
   { name: 'AI Tutor', path: '/tutor', icon: MessageSquare, badge: 'Adaptive' },
-  { name: 'Practice', path: '/practice', icon: Target },
-  { name: 'Assessments', path: '/assessments', icon: ClipboardCheck },
-  { name: 'Progress', path: '/progress', icon: BarChart2 },
+  { name: 'My Progress', path: '/progress', icon: BarChart2 },
 ]
 
 export default function Sidebar({ isOpen, onClose }) {

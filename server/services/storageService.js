@@ -8,6 +8,7 @@ const __dirname = path.dirname(__filename)
 const STORAGE_DIR = path.resolve(__dirname, '../data/storage')
 const ATTEMPTS_FILE = path.join(STORAGE_DIR, 'attempts.json')
 const ASSESSMENTS_FILE = path.join(STORAGE_DIR, 'assessments.json')
+const TOPIC_HISTORY_FILE = path.join(STORAGE_DIR, 'topic_history.json')
 
 // Write lock queue to prevent concurrent file write collisions
 const writeLocks = new Map()
@@ -45,6 +46,11 @@ async function ensureStorageReady() {
     await fs.access(ASSESSMENTS_FILE)
   } catch {
     await atomicWriteFile(ASSESSMENTS_FILE, [])
+  }
+  try {
+    await fs.access(TOPIC_HISTORY_FILE)
+  } catch {
+    await atomicWriteFile(TOPIC_HISTORY_FILE, [])
   }
 }
 
@@ -263,10 +269,42 @@ class StorageService {
   }
 
   /**
-   * Retrieve all assessments across all learners.
+   * Track real learner interaction with a topic (opened lesson, completed practice).
    */
-  async getAllAssessments() {
-    return await readJsonFile(ASSESSMENTS_FILE)
+  async trackTopicAccess({ learnerId, subjectId, topicId, topicTitle, action = 'opened_lesson' }) {
+    if (!learnerId || !subjectId || !topicId) {
+      throw new Error('learnerId, subjectId, and topicId are required.')
+    }
+
+    const cleanLearnerId = String(learnerId).trim()
+
+    return await withLock('topic_history', async () => {
+      const records = await readJsonFile(TOPIC_HISTORY_FILE)
+
+      const entry = {
+        id: `th-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        learnerId: cleanLearnerId,
+        subjectId: subjectId.toLowerCase(),
+        topicId: topicId.toLowerCase(),
+        topicTitle: topicTitle || topicId,
+        action,
+        timestamp: new Date().toISOString()
+      }
+
+      records.push(entry)
+      await atomicWriteFile(TOPIC_HISTORY_FILE, records)
+      return entry
+    })
+  }
+
+  /**
+   * Retrieve real topic access history for a learner.
+   */
+  async getTopicHistory(learnerId = null) {
+    const records = await readJsonFile(TOPIC_HISTORY_FILE)
+    if (!learnerId) return records
+    const cleanId = String(learnerId).trim()
+    return records.filter((r) => r.learnerId === cleanId)
   }
 }
 

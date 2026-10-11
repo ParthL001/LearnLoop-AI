@@ -11,7 +11,7 @@ const aiRateLimiter = createRateLimiter({ windowMs: 60000, max: 60 })
 // POST /api/tutor/chat - Socratic interactive AI Tutor endpoint (expected by frontend chatWithTutor)
 router.post('/tutor/chat', aiRateLimiter, async (req, res, next) => {
   try {
-    const { message, topicId, history, studentReasoning } = req.body
+    const { message, subject, topicId, history, studentReasoning } = req.body
 
     if (!message || typeof message !== 'string' || !message.trim()) {
       return res.status(400).json({
@@ -22,7 +22,8 @@ router.post('/tutor/chat', aiRateLimiter, async (req, res, next) => {
 
     const response = await evaluatorService.tutorChat({
       message,
-      topicId: topicId || 'fractions',
+      subject: subject || 'python',
+      topicId: topicId || null,
       history: Array.isArray(history) ? history : [],
       studentReasoning: typeof studentReasoning === 'string' ? studentReasoning : '',
     })
@@ -32,8 +33,7 @@ router.post('/tutor/chat', aiRateLimiter, async (req, res, next) => {
       success: true,
       reply: response.reply,
       message: response.reply,
-      misconceptionDetected: response.misconceptionDetected,
-      suggestedAction: response.suggestedAction,
+      subject: response.subject,
       isLiveBackend: response.isLiveBackend,
     })
   } catch (err) {

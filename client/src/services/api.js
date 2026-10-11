@@ -47,7 +47,63 @@ export async function checkAIHealth() {
 }
 
 /**
- * Fetch verified fraction curriculum concepts
+ * Fetch available subjects and their topics (Python, C++)
+ */
+export async function fetchSubjects() {
+  const res = await fetch(`${API_BASE_URL}/content/subjects`)
+  if (!res.ok) throw new Error(`Failed to fetch subjects: ${res.status}`)
+  const data = await res.json()
+  return data.subjects || []
+}
+
+/**
+ * Fetch a specific subject by ID
+ */
+export async function fetchSubjectById(subjectId) {
+  const res = await fetch(`${API_BASE_URL}/content/subjects/${encodeURIComponent(subjectId)}`)
+  if (!res.ok) throw new Error(`Subject not found: ${res.status}`)
+  const data = await res.json()
+  return data.subject
+}
+
+/**
+ * Fetch dynamically generated lesson from Ollama (with backend caching)
+ */
+export async function fetchDynamicLesson(subjectId, topicId, forceRefresh = false) {
+  const url = `${API_BASE_URL}/lessons/${encodeURIComponent(subjectId)}/${encodeURIComponent(topicId)}${
+    forceRefresh ? '?refresh=true' : ''
+  }`
+  const res = await fetch(url)
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}))
+    const err = new Error(errData.error || `Failed to fetch lesson: ${res.status}`)
+    err.status = res.status
+    err.details = errData.details
+    throw err
+  }
+  return await res.json()
+}
+
+/**
+ * Track learner topic access / study progress
+ */
+export async function trackTopicAccess({ learnerId, subjectId, topicId, topicTitle, action = 'opened' }) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/progress/track-topic`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ learnerId, subjectId, topicId, topicTitle, action })
+    })
+    if (!res.ok) return null
+    return await res.json()
+  } catch (err) {
+    console.warn('Unable to track topic access:', err.message)
+    return null
+  }
+}
+
+/**
+ * Fetch verified fraction curriculum concepts (legacy compatibility)
  */
 export async function fetchConcepts() {
   const res = await fetch(`${API_BASE_URL}/concepts`)
@@ -57,7 +113,7 @@ export async function fetchConcepts() {
 }
 
 /**
- * Fetch structured lessons with visual partition models
+ * Fetch structured lessons with visual partition models (legacy compatibility)
  */
 export async function fetchLessons() {
   const res = await fetch(`${API_BASE_URL}/lessons`)
@@ -67,7 +123,7 @@ export async function fetchLessons() {
 }
 
 /**
- * Fetch a specific lesson by concept ID
+ * Fetch a specific lesson by concept ID (legacy compatibility)
  */
 export async function fetchLessonById(id) {
   const res = await fetch(`${API_BASE_URL}/lessons/${encodeURIComponent(id)}`)
@@ -107,20 +163,20 @@ export async function fetchNextAdaptiveQuestion({
 }
 
 /**
- * Interactive Socratic chat with backend AI Tutor (grounded in verified curriculum)
+ * Interactive chat with backend AI Tutor powered by Ollama (qwen3:4b)
  */
 export async function chatWithTutor(
   message,
-  { topicId = 'fractions', history = [], studentReasoning = '' } = {}
+  { subject = 'python', topicId = null, history = [] } = {}
 ) {
   const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), 20000)
+  const timeoutId = setTimeout(() => controller.abort(), 45000)
 
   try {
     const response = await fetch(`${API_BASE_URL}/tutor/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, topicId, history, studentReasoning }),
+      body: JSON.stringify({ message, subject, topicId, history }),
       signal: controller.signal
     })
     clearTimeout(timeoutId)
@@ -134,22 +190,19 @@ export async function chatWithTutor(
     return {
       text: data.reply || data.message,
       isLiveBackend: true,
-      misconceptionDetected: data.misconceptionDetected || null,
-      suggestedAction: data.suggestedAction || null
+      subject: data.subject || subject,
+      model: data.model || 'qwen3:4b'
     }
   } catch (err) {
     clearTimeout(timeoutId)
-    // Honest offline handling - never fabricate AI responses
     const isTimeout = err.name === 'AbortError'
     return {
       text: isTimeout
         ? 'The AI tutor request timed out. Please try asking a more focused question.'
-        : 'AI Tutor service is currently unavailable. Ensure the backend and Ollama (qwen3:4b) are running.',
+        : `AI Tutor is unavailable: ${err.message}. Please ensure the backend and Ollama (qwen3:4b) are running.`,
       isLiveBackend: false,
       isOffline: true,
-      error: err.message,
-      misconceptionDetected: null,
-      suggestedAction: 'Review the visual model in the lesson.'
+      error: err.message
     }
   }
 }
