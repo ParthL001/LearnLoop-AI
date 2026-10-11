@@ -1,0 +1,6 @@
+node_modules/
+.env
+*.log
+data/storage/*.json
+data/storage/*.tmp.*
+
