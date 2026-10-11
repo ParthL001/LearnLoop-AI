@@ -3,7 +3,13 @@ from typing import Optional
 
 from fastapi import FastAPI
 from pydantic import BaseModel
-from .predict import predict
+try:
+    from .predict import predict
+except (ImportError, ValueError):
+    try:
+        from src.predict import predict
+    except ImportError:
+        from predict import predict
 
 app = FastAPI(
     title="LearnLoop AI - AIML API",

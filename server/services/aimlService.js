@@ -6,26 +6,30 @@ import { ollamaService } from './ollamaService.js'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const AIML_BASE_URL = process.env.AIML_BASE_URL || 'http://127.0.0.1:8000'
-const DATASET_PATH = path.resolve(__dirname, '../../AIML/dataset/python_exercises.jsonl')
+const AIML_BASE_URL = process.env.AIML_URL || process.env.AIML_BASE_URL || 'http://127.0.0.1:8000'
+const PRIMARY_DATASET_PATH = path.resolve(__dirname, '../data/python_exercises.jsonl')
+const FALLBACK_DATASET_PATH = path.resolve(__dirname, '../../AIML/dataset/python_exercises.jsonl')
 
 // Cache loaded exercises in memory for fast lookup
 let cachedExercises = null
 
 async function loadExercisesFromFile() {
   if (cachedExercises) return cachedExercises
-  try {
-    const content = await fs.readFile(DATASET_PATH, 'utf8')
-    cachedExercises = content
-      .split('\n')
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .map((line) => JSON.parse(line))
-    return cachedExercises
-  } catch (err) {
-    console.warn(`[AIMLService] Could not read dataset file: ${err.message}`)
-    return []
+  for (const filePath of [PRIMARY_DATASET_PATH, FALLBACK_DATASET_PATH]) {
+    try {
+      const content = await fs.readFile(filePath, 'utf8')
+      cachedExercises = content
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => JSON.parse(line))
+      if (cachedExercises.length > 0) return cachedExercises
+    } catch {
+      // try next path
+    }
   }
+  console.warn(`[AIMLService] Could not read dataset file from data/ or AIML/dataset`)
+  return []
 }
 
 /**
@@ -66,9 +70,10 @@ export async function diagnosePythonAnswer({
   const guidanceFeedback = expectedFeedback || matchedExercise?.expected_feedback || ''
   const guidanceFollowup = recommendedFollowup || matchedExercise?.recommended_followup || ''
 
-  // 1. If an AIML microservice is running on port 8000, attempt fast query
+  // 1. If an AIML microservice is running (via Vercel binding or localhost), attempt fast query
   try {
-    const res = await fetch(`${AIML_BASE_URL}/internal/v1/diagnose`, {
+    const aimlEndpoint = new URL('/internal/v1/diagnose', AIML_BASE_URL)
+    const res = await fetch(aimlEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
