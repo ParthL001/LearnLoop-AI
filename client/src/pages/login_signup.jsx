@@ -68,13 +68,13 @@ export default function LoginSignup({ onLoginSuccess }) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f8fafc] p-4 sm:p-6">
+    <div className="flex min-h-screen items-center justify-center bg-[#0B0D10] p-4 sm:p-6">
       <div className="w-full max-w-md">
         {/* Brand header: Logo only, no Cognara text */}
         <div className="mb-6 text-center">
           <Logo className="mx-auto mb-3 h-12 w-auto" />
-          <h2 className="text-base font-bold tracking-tight text-[#0f172a]">Adaptive Learning Platform</h2>
-          <p className="mt-0.5 text-xs text-[#64748b]">AI-Assisted Diagnostic Tutoring & Misconception Detection</p>
+          <h2 className="text-base font-bold tracking-tight text-[#F8FAFC]">Adaptive Learning Platform</h2>
+          <p className="mt-0.5 text-xs text-[#7F8A9B]">AI-Assisted Diagnostic Tutoring & Misconception Detection</p>
         </div>
 
         {/* Auth Card using shadcn components */}
@@ -84,12 +84,12 @@ export default function LoginSignup({ onLoginSuccess }) {
               <CardTitle>
                 {mode === 'login' ? 'Sign In' : 'Create an Account'}
               </CardTitle>
-              <div className="flex rounded-[4px] border border-[#cbd5e1] p-0.5 bg-[#f1f5f9]">
+              <div className="flex rounded-[6px] border border-[#303846] p-0.5 bg-[#1B2028]">
                 <button
                   type="button"
                   onClick={() => { setMode('login'); setError('') }}
-                  className={`px-2.5 py-1 text-[11px] font-semibold rounded-[3px] transition-colors ${
-                    mode === 'login' ? 'bg-white text-[#0f172a] shadow-xs' : 'text-[#64748b] hover:text-[#0f172a]'
+                  className={`px-2.5 py-1 text-[11px] font-semibold rounded-[4px] transition-colors ${
+                    mode === 'login' ? 'bg-[#3B82F6] text-white shadow-xs' : 'text-[#7F8A9B] hover:text-[#F8FAFC]'
                   }`}
                 >
                   Sign In
@@ -97,8 +97,8 @@ export default function LoginSignup({ onLoginSuccess }) {
                 <button
                   type="button"
                   onClick={() => { setMode('signup'); setError('') }}
-                  className={`px-2.5 py-1 text-[11px] font-semibold rounded-[3px] transition-colors ${
-                    mode === 'signup' ? 'bg-white text-[#0f172a] shadow-xs' : 'text-[#64748b] hover:text-[#0f172a]'
+                  className={`px-2.5 py-1 text-[11px] font-semibold rounded-[4px] transition-colors ${
+                    mode === 'signup' ? 'bg-[#3B82F6] text-white shadow-xs' : 'text-[#7F8A9B] hover:text-[#F8FAFC]'
                   }`}
                 >
                   Sign Up
@@ -114,7 +114,7 @@ export default function LoginSignup({ onLoginSuccess }) {
 
           <CardContent>
             {error && (
-              <div className="mb-4 rounded-[4px] border border-[#fecaca] bg-[#fef2f2] p-2.5 text-xs text-[#991b1b]">
+              <div className="mb-4 rounded-[6px] border border-[#991B1B] bg-[#2A1618] p-2.5 text-xs text-[#EF4444]">
                 {error}
               </div>
             )}
@@ -205,7 +205,7 @@ export default function LoginSignup({ onLoginSuccess }) {
                       <button
                         type="button"
                         onClick={() => { setMode('signup'); setError('') }}
-                        className="font-semibold text-[#3730a3] hover:underline"
+                        className="font-semibold text-[#3B82F6] hover:underline"
                       >
                         Create one
                       </button>
@@ -216,7 +216,7 @@ export default function LoginSignup({ onLoginSuccess }) {
                       <button
                         type="button"
                         onClick={() => { setMode('login'); setError('') }}
-                        className="font-semibold text-[#2563eb] hover:underline"
+                        className="font-semibold text-[#3B82F6] hover:underline"
                       >
                         Sign in
                       </button>
@@ -229,7 +229,7 @@ export default function LoginSignup({ onLoginSuccess }) {
         </Card>
 
         {/* Simple disclaimer without brand name */}
-        <p className="mt-4 text-center text-[11px] text-[#64748b]">
+        <p className="mt-4 text-center text-[11px] text-[#7F8A9B]">
           Formative diagnostic items are calibrated to detect underlying reasoning patterns, not test capability.
         </p>
       </div>

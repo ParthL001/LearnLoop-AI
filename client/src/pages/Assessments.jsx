@@ -122,16 +122,16 @@ export default function Assessments() {
         </div>
 
         {isCompletedView ? (
-          <Card header={<h2 className="text-base font-bold text-[#0f172a]">Assessment Evaluation Results</h2>}>
+          <Card header={<h2 className="text-base font-bold text-[#F8FAFC]">Assessment Evaluation Results</h2>}>
             <div className="space-y-4">
-              <div className="p-4 rounded-[6px] border border-[#cbd5e1] bg-[#f8fafc] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="p-4 rounded-[6px] border border-[#303846] bg-[#1B2028] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#64748b]">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#7F8A9B]">
                     Deterministic Diagnostic Score
                   </span>
-                  <div className="text-2xl font-black text-[#0f172a] mt-0.5">
+                  <div className="text-2xl font-black text-[#F8FAFC] mt-0.5">
                     {submissionResult.scores.percentage}%
-                    <span className="text-xs font-medium text-[#64748b] ml-2">
+                    <span className="text-xs font-medium text-[#7F8A9B] ml-2">
                       ({submissionResult.scores.rawScore} of {submissionResult.scores.totalItems} correct)
                     </span>
                   </div>
@@ -142,11 +142,11 @@ export default function Assessments() {
               </div>
 
               {learnerReport?.comparison && (
-                <div className="p-3.5 rounded-[6px] border border-[#2563eb]/20 bg-[#eff6ff] text-xs space-y-1">
-                  <span className="font-bold text-[#1e3a8a]">Paired Growth Analysis:</span>
-                  <p className="text-[#1d4ed8]">
+                <div className="p-3.5 rounded-[6px] border border-[#1E3A8A] bg-[#152746] text-xs space-y-1">
+                  <span className="font-bold text-[#F8FAFC]">Paired Growth Analysis:</span>
+                  <p className="text-[#93C5FD]">
                     Pre-Test: {learnerReport.comparison.prePercentage}% · Post-Test: {learnerReport.comparison.postPercentage}% ·{' '}
-                    <strong>
+                    <strong className="text-[#F8FAFC]">
                       {learnerReport.comparison.percentagePointChange >= 0 ? '+' : ''}
                       {learnerReport.comparison.percentagePointChange} Percentage Points
                     </strong>
@@ -154,11 +154,11 @@ export default function Assessments() {
                 </div>
               )}
 
-              <p className="text-xs text-[#64748b] leading-relaxed pt-2">
+              <p className="text-xs text-[#7F8A9B] leading-relaxed pt-2">
                 {submissionResult.methodologicalNote}
               </p>
 
-              <div className="pt-4 border-t border-[#e2e8f0]">
+              <div className="pt-4 border-t border-[#303846]">
                 <Button
                   size="sm"
                   variant="primary"
@@ -177,15 +177,15 @@ export default function Assessments() {
           <Card
             header={
               <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-[#0f172a]">
+                <span className="font-semibold text-[#F8FAFC]">
                   Question {currentIdx + 1} of {qList.length}
                 </span>
-                <span className="text-[#64748b]">{answeredCount} of {qList.length} answered</span>
+                <span className="text-[#7F8A9B]">{answeredCount} of {qList.length} answered</span>
               </div>
             }
           >
             <div className="space-y-4">
-              <h3 className="text-sm font-bold text-[#0f172a] leading-relaxed">
+              <h3 className="text-sm font-bold text-[#F8FAFC] leading-relaxed">
                 {currentQ.prompt}
               </h3>
 
@@ -198,14 +198,14 @@ export default function Assessments() {
                       type="button"
                       disabled={submitting}
                       onClick={() => handleAnswerSelect(currentQ.id, idx)}
-                      className={`w-full text-left p-3 rounded-[5px] border text-xs flex items-center justify-between transition-colors ${
+                      className={`w-full text-left p-3 rounded-[6px] border text-xs flex items-center justify-between transition-colors ${
                         isSelected
-                          ? 'border-[#2563eb] bg-[#eff6ff] text-[#1e3a8a] font-semibold'
-                          : 'border-[#cbd5e1] bg-white text-[#0f172a] hover:bg-[#f8fafc]'
+                          ? 'border-[#3B82F6] bg-[#152746] text-[#F8FAFC] font-semibold'
+                          : 'border-[#303846] bg-[#1B2028] text-[#F8FAFC] hover:bg-[#202733]'
                       }`}
                     >
                       <span>{opt}</span>
-                      <span className="text-[10px] uppercase font-bold text-[#64748b]">
+                      <span className="text-[10px] uppercase font-bold text-[#7F8A9B]">
                         Option {String.fromCharCode(65 + idx)}
                       </span>
                     </button>
@@ -214,7 +214,7 @@ export default function Assessments() {
               </div>
 
               <div className="pt-2">
-                <label className="block text-xs font-semibold text-[#0f172a] mb-1">
+                <label className="block text-xs font-semibold text-[#F8FAFC] mb-1">
                   Reasoning (Optional reflection trace)
                 </label>
                 <textarea
@@ -223,18 +223,18 @@ export default function Assessments() {
                   disabled={submitting}
                   onChange={(e) => handleReasoningChange(currentQ.id, e.target.value)}
                   placeholder="Explain why you selected this answer..."
-                  className="w-full text-xs p-2.5 rounded-[5px] border border-[#cbd5e1] bg-white text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#2563eb] outline-none"
+                  className="w-full text-xs p-2.5 rounded-[6px] border border-[#303846] bg-[#1B2028] text-[#F8FAFC] placeholder:text-[#7F8A9B] focus:border-[#3B82F6] outline-none"
                 />
               </div>
 
               {testError && (
-                <div className="p-3 rounded-[5px] border border-[#fecaca] bg-[#fef2f2] text-xs text-[#991b1b] flex items-center gap-2">
+                <div className="p-3 rounded-[6px] border border-[#991B1B] bg-[#2A1618] text-xs text-[#EF4444] flex items-center gap-2">
                   <AlertTriangle size={14} className="shrink-0" />
                   <span>{testError}</span>
                 </div>
               )}
 
-              <div className="pt-4 border-t border-[#e2e8f0] flex items-center justify-between">
+              <div className="pt-4 border-t border-[#303846] flex items-center justify-between">
                 <Button
                   size="sm"
                   variant="secondary"
@@ -328,10 +328,10 @@ export default function Assessments() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-[#0f172a]">Pre & Post Assessments</h2>
+              <h2 className="text-lg font-bold text-[#F8FAFC]">Pre & Post Assessments</h2>
               <Badge variant="accent">Standardized Evaluation</Badge>
             </div>
-            <p className="mt-1 text-xs text-[#64748b] max-w-2xl leading-relaxed">
+            <p className="mt-1 text-xs text-[#A8B3C4] max-w-2xl leading-relaxed">
               The evaluation framework compares isomorphic diagnostic items before and after tutor sessions. This measures true conceptual growth rather than test-taking variation.
             </p>
           </div>
@@ -341,14 +341,14 @@ export default function Assessments() {
       {/* Paired Results Banner if both completed */}
       {learnerReport?.hasPairedResults && (
         <Card>
-          <div className="p-3 bg-[#eff6ff] border border-[#2563eb]/20 rounded-[6px] space-y-1">
+          <div className="p-3 bg-[#152746] border border-[#1E3A8A] rounded-[6px] space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#1e3a8a]">Verified Paired Growth Calibration</span>
+              <span className="text-xs font-bold text-[#F8FAFC]">Verified Paired Growth Calibration</span>
               <Badge variant="success">Paired Validated</Badge>
             </div>
-            <p className="text-xs text-[#1d4ed8]">
+            <p className="text-xs text-[#93C5FD]">
               Pre-test: {learnerReport.comparison.prePercentage}% → Post-test: {learnerReport.comparison.postPercentage}% (
-              <strong>
+              <strong className="text-[#F8FAFC]">
                 {learnerReport.comparison.percentagePointChange >= 0 ? '+' : ''}
                 {learnerReport.comparison.percentagePointChange} percentage points
               </strong>
@@ -370,24 +370,24 @@ export default function Assessments() {
                 <div className="flex items-center justify-between gap-2">
                   <Badge variant={isCompleted ? 'success' : 'neutral'}>{item.type}</Badge>
                   {item.score && (
-                    <span className="text-xs font-bold text-[#065f46]">Score: {item.score}</span>
+                    <span className="text-xs font-bold text-[#22C55E]">Score: {item.score}</span>
                   )}
                 </div>
 
-                <h3 className="text-sm font-bold text-[#0f172a]">{item.title}</h3>
-                <p className="text-xs text-[#334155] leading-relaxed">
+                <h3 className="text-sm font-bold text-[#F8FAFC]">{item.title}</h3>
+                <p className="text-xs text-[#A8B3C4] leading-relaxed">
                   {item.description}
                 </p>
 
-                <div className="pt-2 text-[11px] text-[#64748b] flex gap-3">
+                <div className="pt-2 text-[11px] text-[#7F8A9B] flex gap-3">
                   <span>{item.questionsCount} questions</span>
                   <span>·</span>
                   <span>{item.estimatedTime}</span>
                 </div>
               </div>
 
-              <div className="mt-5 pt-4 border-t border-[#e2e8f0] flex items-center justify-between">
-                <span className="text-[11px] font-medium text-[#64748b]">{item.status}</span>
+              <div className="mt-5 pt-4 border-t border-[#303846] flex items-center justify-between">
+                <span className="text-[11px] font-medium text-[#7F8A9B]">{item.status}</span>
                 {isSupported ? (
                   <Button
                     size="sm"
@@ -409,24 +409,24 @@ export default function Assessments() {
       </div>
 
       {/* Methodological Note Card with Cohort Telemetry */}
-      <Card header={<h3 className="text-xs font-bold text-[#0f172a] uppercase tracking-wider">Assessment Methodology & Cohort Telemetry</h3>}>
-        <div className="space-y-3 text-xs text-[#334155] leading-relaxed">
+      <Card header={<h3 className="text-xs font-bold text-[#F8FAFC] uppercase tracking-wider">Assessment Methodology & Cohort Telemetry</h3>}>
+        <div className="space-y-3 text-xs text-[#A8B3C4] leading-relaxed">
           <p>
             Pre/post assessment comparisons rely on isomorphic diagnostic probes. Single-attempt scores are not treated as fixed capability labels, but as signals to calibrate adaptive tutor nudges.
           </p>
 
           {cohortReport && (
-            <div className="p-3 bg-[#f8fafc] border border-[#e2e8f0] rounded-[5px] text-[11px] text-[#475569] space-y-1">
-              <span className="font-semibold text-[#0f172a]">Cohort Sample Statistics:</span>
+            <div className="p-3 bg-[#1B2028] border border-[#303846] rounded-[6px] text-[11px] text-[#A8B3C4] space-y-1">
+              <span className="font-semibold text-[#F8FAFC]">Cohort Sample Statistics:</span>
               <div>Total pre-assessments: {cohortReport.totalPreAssessments} · Paired valid evaluations: {cohortReport.pairedLearnersCount}</div>
               {cohortReport.pairedMetrics && (
                 <div>Mean paired growth: +{cohortReport.pairedMetrics.meanPercentagePointChange} percentage points</div>
               )}
-              <div className="text-[10px] text-[#64748b] italic pt-1">{cohortReport.attritionNote}</div>
+              <div className="text-[10px] text-[#7F8A9B] italic pt-1">{cohortReport.attritionNote}</div>
             </div>
           )}
 
-          <p className="text-[11px] text-[#64748b]">
+          <p className="text-[11px] text-[#7F8A9B]">
             Educational Notice: Score differences reflect observed performance on identical diagnostic items. In accordance with educational evaluation guidelines, score increases cannot be claimed as sole proof of product causation due to practice effects and testing familiarity.
           </p>
         </div>

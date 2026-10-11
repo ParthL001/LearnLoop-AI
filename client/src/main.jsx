@@ -16,27 +16,28 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('Cognara Application Error:', error, errorInfo)
+    console.error('LearnLoop AI Application Error:', error, errorInfo)
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: '32px', maxWidth: '600px', margin: '40px auto', fontFamily: 'sans-serif' }}>
-          <h2 style={{ color: '#991b1b', marginBottom: '8px' }}>Something went wrong</h2>
-          <p style={{ color: '#494944', fontSize: '14px', marginBottom: '16px' }}>
+        <div style={{ padding: '32px', maxWidth: '600px', margin: '60px auto', fontFamily: 'system-ui, sans-serif', background: '#14171C', border: '1px solid #303846', borderRadius: '8px', color: '#F8FAFC' }}>
+          <h2 style={{ color: '#EF4444', marginBottom: '8px', fontSize: '18px', fontWeight: 'bold' }}>Application Error</h2>
+          <p style={{ color: '#A8B3C4', fontSize: '13px', marginBottom: '16px', lineHeight: '1.5' }}>
             {this.state.error?.message || 'An unexpected rendering error occurred.'}
           </p>
           <button
             onClick={() => window.location.reload()}
             style={{
               padding: '8px 16px',
-              backgroundColor: '#3730a3',
+              backgroundColor: '#3B82F6',
               color: '#ffffff',
               border: 'none',
-              borderRadius: '4px',
+              borderRadius: '6px',
               cursor: 'pointer',
-              fontWeight: 600
+              fontWeight: 600,
+              fontSize: '12px'
             }}
           >
             Reload Application

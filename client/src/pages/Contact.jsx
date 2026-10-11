@@ -14,19 +14,19 @@ export default function Contact() {
     <div className="space-y-6">
       <Card>
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-bold text-[#0f172a]">Contact & Support</h2>
+          <h2 className="text-lg font-bold text-[#F8FAFC]">Contact & Support</h2>
           <Badge variant="neutral">Inquiries</Badge>
         </div>
-        <p className="mt-1 text-xs text-[#64748b] max-w-2xl leading-relaxed">
+        <p className="mt-1 text-xs text-[#A8B3C4] max-w-2xl leading-relaxed">
           Have questions regarding the adaptive tutor, curriculum alignment, or misconception diagnostics? Send a message to the engineering team.
         </p>
       </Card>
 
       <Card className="max-w-xl">
         {submitted ? (
-          <div className="p-4 rounded-[5px] border border-[#a7f3d0] bg-[#ecfdf5] text-xs text-[#065f46]">
+          <div className="p-4 rounded-[6px] border border-[#166534] bg-[#14291E] text-xs text-[#22C55E]">
             <p className="font-bold">Thank you for reaching out.</p>
-            <p className="mt-1 text-[#047857]">Your message has been received by the engineering team.</p>
+            <p className="mt-1 text-[#86EFAC]">Your message has been received by the engineering team.</p>
             <Button
               variant="secondary"
               className="mt-4"
@@ -65,7 +65,7 @@ export default function Contact() {
               required
             />
             <div>
-              <label className="block text-xs font-semibold text-[#0f172a] mb-1.5">
+              <label className="block text-xs font-semibold text-[#F8FAFC] mb-1.5">
                 Message
               </label>
               <textarea
@@ -74,7 +74,7 @@ export default function Contact() {
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder="Write your note here..."
-                className="w-full text-xs p-3 rounded-[5px] border border-[#cbd5e1] bg-white text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] outline-none"
+                className="w-full text-xs p-3 rounded-[6px] border border-[#303846] bg-[#1B2028] text-[#F8FAFC] placeholder:text-[#7F8A9B] focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] outline-none"
               />
             </div>
             <Button type="submit" variant="primary">

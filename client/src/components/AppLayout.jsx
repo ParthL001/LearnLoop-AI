@@ -40,13 +40,13 @@ export default function AppLayout({ user, onLogout }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-[#0f172a]">
+    <div className="min-h-screen bg-[#0B0D10] text-[#F8FAFC]">
       {/* Sidebar (Desktop and Mobile Drawer) */}
       <Sidebar isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
       {/* Main Column */}
       <div className="flex min-h-screen flex-col lg:pl-64">
-        {/* Sticky Header with Current Page Title, Home, Dashboard, About, Contact */}
+        {/* Sticky Header with Current Page Title, Command Search, and Quick Nav */}
         <Navbar
           onOpenMobileMenu={handleDashboardClick}
           currentTitle={currentTitle}
@@ -59,24 +59,24 @@ export default function AppLayout({ user, onLogout }) {
           <Outlet />
         </main>
 
-        {/* Simple Footer with Privacy Policy and Terms and Conditions */}
-        <footer className="border-t border-[#e2e8f0] bg-white px-6 py-4 text-xs text-[#64748b]">
+        {/* Cohesive Dark Footer */}
+        <footer className="border-t border-[#303846] bg-[#080A0D] px-6 py-4 text-xs text-[#7F8A9B]">
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p>© 2026 Adaptive Learning Platform · Diagnostic Tutoring System</p>
+            <p>© 2026 LearnLoop AI · Adaptive Learning & Misconception Engine</p>
             <div className="flex items-center gap-4">
-              <Link to="/about" className="hover:text-[#0f172a] hover:underline">
+              <Link to="/about" className="hover:text-[#F8FAFC] transition-colors">
                 About
               </Link>
               <span>·</span>
-              <Link to="/contact" className="hover:text-[#0f172a] hover:underline">
+              <Link to="/contact" className="hover:text-[#F8FAFC] transition-colors">
                 Contact
               </Link>
               <span>·</span>
-              <Link to="/privacy" className="hover:text-[#0f172a] hover:underline">
+              <Link to="/privacy" className="hover:text-[#F8FAFC] transition-colors">
                 Privacy Policy
               </Link>
               <span>·</span>
-              <Link to="/terms" className="hover:text-[#0f172a] hover:underline">
+              <Link to="/terms" className="hover:text-[#F8FAFC] transition-colors">
                 Terms and Conditions
               </Link>
             </div>

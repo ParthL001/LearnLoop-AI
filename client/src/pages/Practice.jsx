@@ -141,18 +141,18 @@ export default function Practice() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-[#0f172a]">Targeted Practice</h2>
+              <h2 className="text-base font-bold text-[#F8FAFC]">Targeted Practice</h2>
               <Badge variant="accent">
                 Question {currentIdx + 1} of {questions.length}
               </Badge>
             </div>
-            <p className="mt-1 text-xs text-[#64748b]">
+            <p className="mt-1 text-xs text-[#A8B3C4]">
               Answer the prompt and write your step-by-step thinking so the adaptive diagnostic engine can evaluate your mental model.
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-[#64748b]">
-              Topic Mastery: <strong className="text-[#2563eb]">{mastery?.[question.topicId || 'fractions'] || 68}%</strong>
+            <span className="text-xs text-[#A8B3C4]">
+              Topic Mastery: <strong className="text-[#3B82F6]">{mastery?.[question.topicId || 'fractions'] || 68}%</strong>
             </span>
             <Link to="/tutor">
               <Button size="sm" variant="secondary">
@@ -168,14 +168,14 @@ export default function Practice() {
       <Card
         header={
           <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-[#64748b] uppercase tracking-wider">
+            <span className="font-semibold text-[#7F8A9B] uppercase tracking-wider">
               Concept: {question.concept}
             </span>
-            <span className="text-[#0f172a] font-medium">Standard Diagnostic Probe</span>
+            <span className="text-[#A8B3C4] font-medium">Standard Diagnostic Probe</span>
           </div>
         }
       >
-        <h3 className="text-sm font-bold text-[#0f172a] leading-relaxed">
+        <h3 className="text-sm font-bold text-[#F8FAFC] leading-relaxed">
           {question.question}
         </h3>
 
@@ -186,13 +186,13 @@ export default function Practice() {
             const optionCorrect = submitted && isSelected && isCorrect
             const optionWrongSelected = submitted && isSelected && !isCorrect
 
-            let borderStyle = 'border-[#cbd5e1] bg-white text-[#0f172a] hover:bg-[#f8fafc]'
+            let borderStyle = 'border-[#303846] bg-[#1B2028] text-[#F8FAFC] hover:bg-[#202733] hover:border-[#3B82F6]'
             if (isSelected && !submitted) {
-              borderStyle = 'border-[#2563eb] bg-[#eff6ff] text-[#1e3a8a] font-semibold'
+              borderStyle = 'border-[#3B82F6] bg-[#152746] text-[#F8FAFC] font-semibold'
             } else if (optionCorrect) {
-              borderStyle = 'border-[#059669] bg-[#ecfdf5] text-[#065f46] font-semibold'
+              borderStyle = 'border-[#166534] bg-[#14291E] text-[#22C55E] font-semibold'
             } else if (optionWrongSelected) {
-              borderStyle = 'border-[#dc2626] bg-[#fef2f2] text-[#991b1b]'
+              borderStyle = 'border-[#991B1B] bg-[#2A1618] text-[#EF4444]'
             }
 
             return (
@@ -201,10 +201,10 @@ export default function Practice() {
                 type="button"
                 disabled={submitted || evaluating}
                 onClick={() => setSelectedOpt(idx)}
-                className={`w-full text-left p-3 rounded-[5px] border text-xs flex items-center justify-between gap-3 transition-colors ${borderStyle}`}
+                className={`w-full text-left p-3 rounded-[6px] border text-xs flex items-center justify-between gap-3 transition-colors ${borderStyle}`}
               >
                 <span>{option}</span>
-                <span className="text-[10px] uppercase font-bold text-[#64748b]">
+                <span className="text-[10px] uppercase font-bold text-[#7F8A9B]">
                   Option {String.fromCharCode(65 + idx)}
                 </span>
               </button>
@@ -214,7 +214,7 @@ export default function Practice() {
 
         {/* Reasoning Textarea */}
         <div className="mt-5">
-          <label className="block text-xs font-semibold text-[#0f172a] mb-1">
+          <label className="block text-xs font-semibold text-[#F8FAFC] mb-1">
             Student Reasoning (Used to isolate root causes versus random slips)
           </label>
           <textarea
@@ -223,13 +223,13 @@ export default function Practice() {
             disabled={submitted || evaluating}
             onChange={(e) => setReasoning(e.target.value)}
             placeholder="Explain how you reached your answer and what rule you applied..."
-            className="w-full text-xs p-3 rounded-[5px] border border-[#cbd5e1] bg-white text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] outline-none disabled:bg-[#f1f5f9]"
+            className="w-full text-xs p-3 rounded-[6px] border border-[#303846] bg-[#1B2028] text-[#F8FAFC] placeholder:text-[#7F8A9B] focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] outline-none disabled:bg-[#14171C] disabled:text-[#7F8A9B]"
           />
         </div>
 
         {/* Error Alert with Retry */}
         {evalError && (
-          <div className="mt-4 p-3 rounded-[5px] border border-[#fecaca] bg-[#fef2f2] text-xs text-[#991b1b] flex items-center justify-between gap-2">
+          <div className="mt-4 p-3 rounded-[6px] border border-[#991B1B] bg-[#2A1618] text-xs text-[#EF4444] flex items-center justify-between gap-2">
             <span>{evalError}</span>
             <Button size="sm" variant="secondary" onClick={handleSubmit} disabled={evaluating}>
               <RotateCcw size={12} />
@@ -240,22 +240,22 @@ export default function Practice() {
 
         {/* Feedback Section */}
         {submitted && evaluationResult && (
-          <div className="mt-5 p-4 rounded-[5px] border border-[#e2e8f0] bg-[#f8fafc] text-xs">
+          <div className="mt-5 p-4 rounded-[6px] border border-[#303846] bg-[#1B2028] text-xs">
             {isCorrect ? (
-              <div className="text-[#065f46] space-y-1">
+              <div className="text-[#22C55E] space-y-1">
                 <div className="flex items-center gap-1.5 font-bold">
                   <CheckCircle size={15} />
                   <span>Correct Reasoning Verified</span>
                 </div>
-                <p className="text-[#047857]">
+                <p className="text-[#86EFAC]">
                   {evaluationResult.feedback || 'Great job! Your answer and conceptual steps are mathematically sound.'}
                 </p>
-                <p className="text-[11px] text-[#065f46] pt-1 font-semibold">
+                <p className="text-[11px] text-[#22C55E] pt-1 font-semibold">
                   Mastery level calibrated and saved to your active profile.
                 </p>
               </div>
             ) : (
-              <div className="space-y-2 text-[#991b1b]">
+              <div className="space-y-2 text-[#EF4444]">
                 <div className="flex items-center gap-1.5 font-bold">
                   <AlertTriangle size={15} />
                   <span>
@@ -263,12 +263,12 @@ export default function Practice() {
                   </span>
                 </div>
                 {misconception ? (
-                  <div className="space-y-1 text-[#7f1d1d]">
-                    <p className="font-semibold text-xs text-[#991b1b]">{misconception.name}</p>
+                  <div className="space-y-1 text-[#FCA5A5]">
+                    <p className="font-semibold text-xs text-[#EF4444]">{misconception.name}</p>
                     <p>{misconception.description}</p>
                     {evaluationResult.remediationAdvice && (
-                      <div className="mt-2 pt-2 border-t border-[#fecaca] text-[#0f172a]">
-                        <span className="font-semibold">Targeted Recommendation: </span>
+                      <div className="mt-2 pt-2 border-t border-[#78350F] text-[#F8FAFC]">
+                        <span className="font-semibold text-[#FDE68A]">Targeted Recommendation: </span>
                         {evaluationResult.remediationAdvice}
                       </div>
                     )}
@@ -282,8 +282,8 @@ export default function Practice() {
         )}
 
         {/* Footer actions */}
-        <div className="mt-6 pt-4 border-t border-[#e2e8f0] flex items-center justify-between">
-          <span className="text-xs text-[#64748b]">
+        <div className="mt-6 pt-4 border-t border-[#303846] flex items-center justify-between">
+          <span className="text-xs text-[#7F8A9B]">
             {submitted
               ? 'Diagnosis updated dynamically'
               : evaluating

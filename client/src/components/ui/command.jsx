@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Search, X } from 'lucide-react'
 
 export function CommandDialog({ open, onOpenChange, children }) {
@@ -15,13 +15,13 @@ export function CommandDialog({ open, onOpenChange, children }) {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-black/40 backdrop-blur-xs">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-black/70 backdrop-blur-xs">
       <div
         role="presentation"
         className="fixed inset-0"
         onClick={() => onOpenChange(false)}
       />
-      <div className="relative z-50 w-full max-w-xl overflow-hidden rounded-[6px] border border-[#cbd5e1] bg-white text-[#0f172a] shadow-xl">
+      <div className="relative z-50 w-full max-w-xl overflow-hidden rounded-[8px] border border-[#303846] bg-[#14171C] text-[#F8FAFC] shadow-2xl">
         {children}
       </div>
     </div>
@@ -36,26 +36,26 @@ export function CommandInput({ value, onValueChange, placeholder = 'Search topic
   }, [])
 
   return (
-    <div className="flex h-11 items-center border-b border-[#e2e8f0] px-3.5 bg-white">
-      <Search size={16} className="shrink-0 text-[#64748b] mr-2.5" />
+    <div className="flex h-11 items-center border-b border-[#303846] px-3.5 bg-[#14171C]">
+      <Search size={16} className="shrink-0 text-[#7F8A9B] mr-2.5" />
       <input
         ref={inputRef}
         type="text"
         value={value}
         onChange={(e) => onValueChange(e.target.value)}
         placeholder={placeholder}
-        className="flex-1 bg-transparent text-xs text-[#0f172a] placeholder:text-[#94a3b8] outline-none"
+        className="flex-1 bg-transparent text-xs text-[#F8FAFC] placeholder:text-[#7F8A9B] outline-none"
       />
       {value && (
         <button
           type="button"
           onClick={() => onValueChange('')}
-          className="p-1 text-[#64748b] hover:text-[#0f172a] mr-1"
+          className="p-1 text-[#7F8A9B] hover:text-[#F8FAFC] mr-1"
         >
           <X size={14} />
         </button>
       )}
-      <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold text-[#64748b] bg-[#f1f5f9] border border-[#cbd5e1] rounded-[3px]">
+      <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold text-[#A8B3C4] bg-[#1B2028] border border-[#303846] rounded-[3px]">
         ESC
       </kbd>
     </div>
@@ -72,7 +72,7 @@ export function CommandList({ children, className = '' }) {
 
 export function CommandEmpty({ children = 'No matching topics found.' }) {
   return (
-    <div className="py-8 text-center text-xs text-[#64748b]">
+    <div className="py-8 text-center text-xs text-[#7F8A9B]">
       {children}
     </div>
   )
@@ -82,7 +82,7 @@ export function CommandGroup({ heading, children }) {
   return (
     <div className="px-1 py-1">
       {heading && (
-        <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#64748b]">
+        <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7F8A9B]">
           {heading}
         </div>
       )}
@@ -96,7 +96,7 @@ export function CommandItem({ onSelect, children, className = '' }) {
     <button
       type="button"
       onClick={onSelect}
-      className={`w-full flex items-center justify-between px-3 py-2 text-left text-xs rounded-[4px] text-[#0f172a] hover:bg-[#f1f5f9] transition-colors focus-visible:bg-[#eff6ff] focus-visible:text-[#1d4ed8] ${className}`}
+      className={`w-full flex items-center justify-between px-3 py-2 text-left text-xs rounded-[5px] text-[#F8FAFC] hover:bg-[#1B2028] transition-colors focus-visible:bg-[#152746] focus-visible:text-[#3B82F6] ${className}`}
     >
       {children}
     </button>
@@ -105,7 +105,7 @@ export function CommandItem({ onSelect, children, className = '' }) {
 
 export function CommandShortcut({ children }) {
   return (
-    <span className="ml-auto text-[10px] text-[#64748b] bg-[#f1f5f9] border border-[#cbd5e1] px-1.5 py-0.5 rounded-[3px]">
+    <span className="text-[10px] tracking-widest text-[#7F8A9B] uppercase font-medium">
       {children}
     </span>
   )

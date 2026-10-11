@@ -14,10 +14,10 @@ export default function LearningPath() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-[#0f172a]">Adaptive Learning Path</h2>
+              <h2 className="text-lg font-bold text-[#F8FAFC]">Adaptive Learning Path</h2>
               <Badge variant="accent">{activeTopic.title}</Badge>
             </div>
-            <p className="mt-1 text-xs text-[#64748b] max-w-2xl leading-relaxed">
+            <p className="mt-1 text-xs text-[#A8B3C4] max-w-2xl leading-relaxed">
               Curriculum milestones sequence learning steps according to concept dependencies and individual reasoning patterns. Milestones adapt dynamically when misconceptions are detected or resolved.
             </p>
           </div>
@@ -31,8 +31,8 @@ export default function LearningPath() {
       </Card>
 
       {/* Rationale Note */}
-      <div className="p-4 rounded-[6px] border border-[#bfdbfe] bg-[#eff6ff] text-xs text-[#1e3a8a]">
-        <span className="font-bold">Pedagogical Framework: </span>
+      <div className="p-4 rounded-[6px] border border-[#1E3A8A] bg-[#152746] text-xs text-[#93C5FD]">
+        <span className="font-bold text-[#F8FAFC]">Pedagogical Framework: </span>
         Foundational intuition on unit fraction partition size is verified before symbolic addition algorithms are introduced. Milestone 3 functions as a formative diagnostic probe before common denominator operations.
       </div>
 
@@ -55,27 +55,27 @@ export default function LearningPath() {
           return (
             <Card
               key={milestone.id}
-              className={isInProgress ? 'border-[#2563eb] ring-1 ring-[#2563eb]' : ''}
+              className={isInProgress ? 'border-[#3B82F6] ring-1 ring-[#3B82F6]' : ''}
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#64748b]">Step {index + 1}</span>
+                    <span className="text-xs font-bold text-[#7F8A9B]">Step {index + 1}</span>
                     <Badge variant={badgeVariant}>{milestone.status.replace('_', ' ')}</Badge>
-                    <span className="text-xs text-[#64748b] flex items-center gap-1">
+                    <span className="text-xs text-[#7F8A9B] flex items-center gap-1">
                       <Clock size={12} />
                       <span>{milestone.duration}</span>
                     </span>
                   </div>
-                  <h3 className="text-sm font-bold text-[#0f172a]">{milestone.title}</h3>
-                  <p className="text-xs text-[#334155] leading-relaxed max-w-2xl">
+                  <h3 className="text-sm font-bold text-[#F8FAFC]">{milestone.title}</h3>
+                  <p className="text-xs text-[#A8B3C4] leading-relaxed max-w-2xl">
                     {milestone.description}
                   </p>
                 </div>
 
                 <div className="shrink-0 flex items-center gap-3">
                   {milestone.score && (
-                    <span className="text-xs font-semibold text-[#065f46]">
+                    <span className="text-xs font-semibold text-[#22C55E]">
                       Score: {milestone.score}%
                     </span>
                   )}
@@ -87,7 +87,7 @@ export default function LearningPath() {
                       </Button>
                     </Link>
                   ) : (
-                    <span className="text-xs font-medium text-[#94a3b8] px-3 py-1 bg-[#f1f5f9] rounded-[4px] border border-[#e2e8f0]">
+                    <span className="text-xs font-medium text-[#7F8A9B] px-3 py-1 bg-[#1B2028] rounded-[4px] border border-[#303846]">
                       Locked
                     </span>
                   )}

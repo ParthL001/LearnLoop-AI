@@ -18,7 +18,7 @@ export function FieldLabel({ className = '', children, htmlFor, ...props }) {
   return (
     <label
       htmlFor={htmlFor}
-      className={`block text-xs font-semibold text-[#181816] ${className}`}
+      className={`block text-xs font-semibold text-[#F8FAFC] ${className}`}
       {...props}
     >
       {children}
@@ -28,7 +28,7 @@ export function FieldLabel({ className = '', children, htmlFor, ...props }) {
 
 export function FieldDescription({ className = '', children, ...props }) {
   return (
-    <p className={`text-[11px] text-[#797973] leading-normal ${className}`} {...props}>
+    <p className={`text-[11px] text-[#7F8A9B] leading-normal ${className}`} {...props}>
       {children}
     </p>
   )

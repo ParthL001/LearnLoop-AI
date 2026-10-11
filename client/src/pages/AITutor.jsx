@@ -97,10 +97,10 @@ export default function AITutor() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-[#0f172a]">AI Adaptive Tutor</h2>
+              <h2 className="text-base font-bold text-[#F8FAFC]">AI Adaptive Tutor</h2>
               <Badge variant="accent">{activeTopic.title}</Badge>
             </div>
-            <p className="mt-1 text-xs text-[#64748b]">
+            <p className="mt-1 text-xs text-[#A8B3C4]">
               The tutor asks probing questions to differentiate between accidental calculation slips and systematic conceptual misconceptions.
             </p>
           </div>
@@ -119,39 +119,39 @@ export default function AITutor() {
       {/* Main Tutor Workspace */}
       <div className="grid gap-6 lg:grid-cols-12">
         {/* Chat Window (7 cols) */}
-        <div className="lg:col-span-7 flex flex-col h-[580px] bg-white border border-[#e2e8f0] rounded-[6px] overflow-hidden shadow-xs">
+        <div className="lg:col-span-7 flex flex-col h-[580px] bg-[#14171C] border border-[#303846] rounded-[8px] overflow-hidden">
           {/* Header */}
-          <div className="px-4 py-2.5 border-b border-[#e2e8f0] bg-[#f8fafc] flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#0f172a]">
-              <MessageSquare size={14} className="text-[#2563eb]" />
+          <div className="px-4 py-3 border-b border-[#303846] bg-[#1B2028] flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-semibold text-[#F8FAFC]">
+              <MessageSquare size={14} className="text-[#3B82F6]" />
               <span>Interactive Dialogue</span>
             </div>
-            <span className="text-[11px] text-[#065f46] font-medium bg-[#ecfdf5] border border-[#a7f3d0] px-2 py-0.5 rounded-[3px]">
+            <span className="text-[11px] text-[#22C55E] font-medium bg-[#14291E] border border-[#166534] px-2 py-0.5 rounded-[4px]">
               Adaptive Engine Active
             </span>
           </div>
 
           {/* Messages feed */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#f8fafc]">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#0B0D10]">
             {messages.map((m) => {
               const isUser = m.sender === 'user'
 
               return (
                 <div key={m.id} className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
-                  <div className="text-[10px] font-semibold text-[#64748b] mb-1">
+                  <div className="text-[10px] font-semibold text-[#7F8A9B] mb-1">
                     {isUser ? 'You' : 'AI Tutor'} · {m.time}
                   </div>
                   <div
-                    className={`max-w-[85%] sm:max-w-[80%] p-3.5 text-xs rounded-[5px] leading-relaxed border ${
+                    className={`max-w-[85%] sm:max-w-[80%] p-3.5 text-xs rounded-[6px] leading-relaxed border ${
                       isUser
-                        ? 'bg-[#2563eb] text-white border-[#2563eb]'
-                        : 'bg-white text-[#0f172a] border-[#e2e8f0]'
+                        ? 'bg-[#3B82F6] text-white border-[#3B82F6]'
+                        : 'bg-[#1B2028] text-[#F8FAFC] border-[#303846]'
                     }`}
                   >
                     <p className="whitespace-pre-line">{m.text}</p>
 
                     {m.misconception && (
-                      <div className="mt-3 pt-2 border-t border-[#fde68a] bg-[#fffbeb] text-[#92400e] p-2.5 rounded-[4px]">
+                      <div className="mt-3 pt-2 border-t border-[#78350F] bg-[#2A2318] text-[#FDE68A] p-2.5 rounded-[4px]">
                         <span className="font-bold">Detected Misconception: </span>
                         {m.misconception.name}: {m.misconception.note}
                       </div>
@@ -162,7 +162,7 @@ export default function AITutor() {
             })}
 
             {loading && (
-              <div className="text-xs text-[#64748b] font-medium p-3 bg-white border border-[#e2e8f0] rounded-[4px] inline-block">
+              <div className="text-xs text-[#A8B3C4] font-medium p-3 bg-[#1B2028] border border-[#303846] rounded-[6px] inline-block animate-pulse">
                 Formulating adaptive response...
               </div>
             )}
@@ -170,7 +170,7 @@ export default function AITutor() {
           </div>
 
           {/* Quick Prompts */}
-          <div className="px-4 py-2 border-t border-[#e2e8f0] bg-white flex gap-2 overflow-x-auto text-xs">
+          <div className="px-4 py-2 border-t border-[#303846] bg-[#14171C] flex gap-2 overflow-x-auto text-xs">
             {[
               'Why is 2/3 bigger than 2/5?',
               'Why can I not add denominators directly?',
@@ -180,7 +180,7 @@ export default function AITutor() {
                 key={idx}
                 type="button"
                 onClick={() => handleSend(p)}
-                className="shrink-0 text-[11px] font-medium px-2.5 py-1 rounded-[3px] border border-[#cbd5e1] bg-[#f8fafc] text-[#334155] hover:bg-[#eff6ff] hover:text-[#1d4ed8] hover:border-[#bfdbfe] transition-colors"
+                className="shrink-0 text-[11px] font-medium px-2.5 py-1 rounded-[4px] border border-[#303846] bg-[#1B2028] text-[#A8B3C4] hover:bg-[#202733] hover:text-[#F8FAFC] hover:border-[#3B82F6] transition-colors"
               >
                 {p}
               </button>
@@ -188,7 +188,7 @@ export default function AITutor() {
           </div>
 
           {/* Input Row */}
-          <div className="p-3 border-t border-[#e2e8f0] bg-white">
+          <div className="p-3 border-t border-[#303846] bg-[#14171C]">
             <form
               onSubmit={(e) => {
                 e.preventDefault()
@@ -201,7 +201,7 @@ export default function AITutor() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Explain your step-by-step thinking or why you made a choice..."
-                className="flex-1 text-xs px-3 py-2 rounded-[5px] border border-[#cbd5e1] bg-white text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] outline-none"
+                className="flex-1 text-xs px-3 py-2 rounded-[6px] border border-[#303846] bg-[#1B2028] text-[#F8FAFC] placeholder:text-[#7F8A9B] focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] outline-none"
               />
               <Button type="submit" variant="primary" disabled={!input.trim() || loading}>
                 Send
@@ -215,7 +215,7 @@ export default function AITutor() {
           <Card
             header={
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748b]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#7F8A9B]">
                   Diagnostic Reasoning Breakdown
                 </span>
                 <Badge variant="accent">Live Context</Badge>
@@ -225,61 +225,61 @@ export default function AITutor() {
             <div className="space-y-3.5 text-xs">
               {/* 1. Current Question */}
               <div>
-                <span className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider">
+                <span className="font-bold text-[#7F8A9B] text-[11px] uppercase tracking-wider">
                   1. Current Question
                 </span>
-                <p className="mt-1 text-[#0f172a] font-medium leading-relaxed bg-[#f8fafc] p-2.5 rounded-[4px] border border-[#e2e8f0]">
+                <p className="mt-1 text-[#F8FAFC] font-medium leading-relaxed bg-[#1B2028] p-2.5 rounded-[4px] border border-[#303846]">
                   {diagnosticRecord.question}
                 </p>
               </div>
 
               {/* 2. Submitted Answer */}
               <div>
-                <span className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider">
+                <span className="font-bold text-[#7F8A9B] text-[11px] uppercase tracking-wider">
                   2. Student Submitted Answer
                 </span>
-                <p className="mt-1 text-[#92400e] bg-[#fffbeb] p-2 rounded-[4px] border border-[#fde68a]">
+                <p className="mt-1 text-[#FDE68A] bg-[#2A2318] p-2 rounded-[4px] border border-[#78350F]">
                   {diagnosticRecord.studentAnswer}
                 </p>
               </div>
 
               {/* 3. Stated Reasoning */}
               <div>
-                <span className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider">
+                <span className="font-bold text-[#7F8A9B] text-[11px] uppercase tracking-wider">
                   3. Stated Reasoning
                 </span>
-                <p className="mt-1 text-[#334155] italic bg-[#f8fafc] p-2 rounded-[4px] border border-[#e2e8f0]">
+                <p className="mt-1 text-[#A8B3C4] italic bg-[#1B2028] p-2 rounded-[4px] border border-[#303846]">
                   &quot;{diagnosticRecord.studentReasoning}&quot;
                 </p>
               </div>
 
               {/* 4. Supported Possible Misconception */}
               <div>
-                <span className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider">
+                <span className="font-bold text-[#7F8A9B] text-[11px] uppercase tracking-wider">
                   4. Supported Misconception Hypothesis
                 </span>
-                <div className="mt-1 p-2.5 rounded-[4px] border border-[#bfdbfe] bg-[#eff6ff] text-[#1e3a8a]">
+                <div className="mt-1 p-2.5 rounded-[4px] border border-[#1E3A8A] bg-[#152746] text-[#93C5FD]">
                   <p className="font-semibold">{diagnosticRecord.misconception}</p>
                 </div>
               </div>
 
               {/* 5. Grounded Explanation */}
               <div>
-                <span className="font-bold text-[#64748b] text-[11px] uppercase tracking-wider">
+                <span className="font-bold text-[#7F8A9B] text-[11px] uppercase tracking-wider">
                   5. Grounded Explanation
                 </span>
-                <p className="mt-1 text-[#334155] leading-relaxed">
+                <p className="mt-1 text-[#A8B3C4] leading-relaxed">
                   {diagnosticRecord.explanation}
                 </p>
               </div>
 
               {/* 6. Targeted Follow-up Question */}
-              <div className="pt-2 border-t border-[#e2e8f0]">
-                <span className="font-bold text-[#2563eb] text-[11px] uppercase tracking-wider flex items-center gap-1">
+              <div className="pt-2 border-t border-[#303846]">
+                <span className="font-bold text-[#3B82F6] text-[11px] uppercase tracking-wider flex items-center gap-1">
                   <CheckCircle2 size={13} />
                   <span>Targeted Follow-up Probe</span>
                 </span>
-                <p className="mt-1 text-[#0f172a] font-medium">
+                <p className="mt-1 text-[#F8FAFC] font-medium">
                   {diagnosticRecord.followUp}
                 </p>
               </div>
